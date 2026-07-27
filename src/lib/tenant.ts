@@ -90,6 +90,7 @@ function normalizeTemple(row: Record<string, unknown>): Temple {
     extra_sections: asArray(row.extra_sections) as Temple['extra_sections'],
     timeline: asArray(row.timeline) as Temple['timeline'],
     features: asArray(row.features) as Temple['features'],
+    videos: asArray(row.videos) as Temple['videos'],
     bank_name: (row.bank_name as string) ?? null,
     bank_account_number: (row.bank_account_number as string) ?? null,
     bank_account_holder: (row.bank_account_holder as string) ?? null,

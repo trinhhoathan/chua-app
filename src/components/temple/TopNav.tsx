@@ -18,6 +18,9 @@ export function TopNav({ temple }: Props) {
           <Link href="/#tru-tri" className="hover:text-white transition-colors">
             Trụ trì
           </Link>
+          <Link href="/#video" className="hover:text-white transition-colors">
+            Video
+          </Link>
           <Link href="/#lich-su" className="hover:text-white transition-colors">
             Lịch sử
           </Link>

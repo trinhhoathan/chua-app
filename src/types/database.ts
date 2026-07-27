@@ -20,6 +20,12 @@ export interface ExtraSection {
   image_url?: string;
 }
 
+export interface TempleVideo {
+  url: string;
+  title: string;
+  description?: string;
+}
+
 export interface Temple {
   id: string;
   domain: string;
@@ -42,6 +48,7 @@ export interface Temple {
   extra_sections: ExtraSection[];
   timeline: TimelineEntry[];
   features: FeatureEntry[];
+  videos: TempleVideo[];
   bank_name: string | null;
   bank_account_number: string | null;
   bank_account_holder: string | null;
