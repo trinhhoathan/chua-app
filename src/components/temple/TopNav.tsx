@@ -27,6 +27,9 @@ export function TopNav({ temple }: Props) {
           <Link href="/#minh-bach" className="hover:text-white transition-colors">
             Minh bạch
           </Link>
+          <Link href="/#danh-gia" className="hover:text-white transition-colors">
+            Đánh giá
+          </Link>
           <Link href="/so-cau" className="hover:text-white transition-colors">
             Đăng ký sớ
           </Link>

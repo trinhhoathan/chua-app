@@ -81,6 +81,14 @@ function normalizeTemple(row: Record<string, unknown>): Temple {
     qr_donate: (row.qr_donate as string) ?? null,
     address: (row.address as string) ?? null,
     maps_url: (row.maps_url as string) ?? null,
+    maps_embed_url: (row.maps_embed_url as string) ?? null,
+    google_rating:
+      row.google_rating == null ? null : Number(row.google_rating),
+    google_review_count:
+      row.google_review_count == null
+        ? null
+        : Number(row.google_review_count),
+    reviews: asArray(row.reviews) as Temple['reviews'],
     history_summary: (row.history_summary as string) ?? null,
     abbott_name: (row.abbott_name as string) ?? null,
     abbott_title: (row.abbott_title as string) ?? null,

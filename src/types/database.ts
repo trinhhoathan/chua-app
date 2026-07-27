@@ -26,6 +26,13 @@ export interface TempleVideo {
   description?: string;
 }
 
+export interface TempleReview {
+  author: string;
+  rating?: number;
+  text: string;
+  relative_time?: string;
+}
+
 export interface Temple {
   id: string;
   domain: string;
@@ -39,6 +46,10 @@ export interface Temple {
   qr_donate: string | null;
   address: string | null;
   maps_url: string | null;
+  maps_embed_url: string | null;
+  google_rating: number | null;
+  google_review_count: number | null;
+  reviews: TempleReview[];
   history_summary: string | null;
   abbott_name: string | null;
   abbott_title: string | null;

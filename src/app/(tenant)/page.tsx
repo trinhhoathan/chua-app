@@ -10,6 +10,7 @@ import { FengShuiNav } from '@/components/temple/FengShuiNav';
 import { WaterDonateSection } from '@/components/temple/WaterDonateSection';
 import { WaterTransparencySection } from '@/components/temple/WaterTransparencySection';
 import { TempleVideosSection } from '@/components/temple/TempleVideosSection';
+import { MapsReviewsSection } from '@/components/temple/MapsReviewsSection';
 
 export default async function HomePage() {
   const temple = await getCurrentTemple();
@@ -28,6 +29,7 @@ export default async function HomePage() {
       <FengShuiNav temple={temple} />
       <WaterTransparencySection temple={temple} data={transparency} />
       <VisitSection temple={temple} />
+      <MapsReviewsSection temple={temple} />
       <WaterDonateSection temple={temple} />
     </main>
   );
