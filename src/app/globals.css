@@ -1,26 +1,120 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #1a1714;
+  --mist: #e7ece8;
+  --fog: #d5ddd6;
+  --jade: #355844;
+  --jade-deep: #243d30;
+  --lacquer: #7a1f1f;
+  --lacquer-deep: #5c1616;
+  --gilt: #b08d42;
+  --paper: #f3f5f2;
+  --muted: #5c635e;
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ink: var(--ink);
+  --color-mist: var(--mist);
+  --color-fog: var(--fog);
+  --color-jade: var(--jade);
+  --color-jade-deep: var(--jade-deep);
+  --color-lacquer: var(--lacquer);
+  --color-lacquer-deep: var(--lacquer-deep);
+  --color-gilt: var(--gilt);
+  --color-paper: var(--paper);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--lacquer) 25%, white);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: scale(1.06) translateY(0);
+  }
+  to {
+    transform: scale(1) translateY(-1.5%);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both;
+}
+
+.animate-fade {
+  animation: soft-fade 1.2s ease both;
+}
+
+.animate-drift {
+  animation: drift 18s ease-out both;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.section-rule {
+  width: 3rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gilt), transparent);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-rise-delay,
+  .animate-rise-delay-2,
+  .animate-fade,
+  .animate-drift {
+    animation: none;
+  }
 }
