@@ -109,7 +109,7 @@ export default async function DoiSoatPage({ searchParams }: Props) {
       <div className="mt-8 grid sm:grid-cols-3 gap-3">
         <div className="border border-fog bg-paper p-5">
           <p className="text-[10px] uppercase tracking-widest text-muted">
-            Số thùng đã bán
+            Số thùng đã thỉnh
           </p>
           <p className="font-display text-3xl text-ink mt-2">{totalQty}</p>
         </div>

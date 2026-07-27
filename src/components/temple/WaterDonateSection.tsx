@@ -17,13 +17,12 @@ export function WaterDonateSection({ temple }: Props) {
       <div className="mx-auto max-w-4xl px-6 py-20 md:px-12 md:py-28 text-center">
         <div className="section-rule mx-auto mb-6" />
         <h2 className="font-display text-3xl md:text-4xl text-ink">
-          Cúng dâng nước tinh khiết
+          Cúng dường nước thanh tịnh
         </h2>
         <p className="mt-4 text-muted max-w-xl mx-auto leading-relaxed">
-          Mỗi thùng nước dâng lên chùa mang nhãn riêng của {temple.name}. Giá
-          niêm yết {formatVnd(temple.water_price_vnd)}/thùng — chùa nhận{' '}
-          {temple.water_profit_share_pct.toFixed(0)}% giá trị đơn để phục vụ
-          các Phật sự.
+          Mỗi thùng Nước Thanh Tịnh mang nhãn riêng của {temple.name}. Mức phát
+          tâm tùy hỷ {formatVnd(temple.water_price_vnd)}/thùng — một giọt nước
+          thanh tịnh, một duyên lành gieo vào chốn Già-lam.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-8">
@@ -70,11 +69,8 @@ export function WaterDonateSection({ temple }: Props) {
                 · Nội dung CK dạng <span className="font-mono">{code}-XXXXXX</span>{' '}
                 để nhận diện đúng chùa
               </li>
-              <li>· Ship nước tận sân chùa, dán nhãn Phật tử cúng dâng</li>
-              <li>
-                · {temple.water_profit_share_pct.toFixed(0)}% giá trị đơn quyết
-                toán cho chùa hàng tháng
-              </li>
+              <li>· Vận chuyển nước tận sân chùa, dán nhãn Quý Phật tử cúng dường</li>
+              <li>· Mỗi phát tâm được ghi nhận vào Sổ Vàng Công Đức của chùa</li>
             </ul>
           </div>
         </div>
@@ -85,7 +81,7 @@ export function WaterDonateSection({ temple }: Props) {
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white"
             style={{ backgroundColor: primary }}
           >
-            Đặt nước công đức →
+            Phát tâm thỉnh nước →
           </Link>
         </div>
       </div>

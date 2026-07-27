@@ -46,7 +46,7 @@ export default async function OrderDetailPage({ params }: Props) {
           className="text-[0.72rem] tracking-[0.3em] uppercase mb-2"
           style={{ color: primary }}
         >
-          Đơn cúng nước
+          Đơn thỉnh nước
         </p>
         <h1 className="font-display text-3xl text-ink">
           Mã đơn{' '}
@@ -63,13 +63,13 @@ export default async function OrderDetailPage({ params }: Props) {
             <span className="text-ink font-medium">{order.quantity} thùng</span>
           </p>
           <p>
-            <span className="text-muted">Tổng: </span>
+            <span className="text-muted">Mức phát tâm: </span>
             <span className="text-ink font-semibold">
               {formatVnd(order.total_amount)}đ
             </span>
           </p>
           <p>
-            <span className="text-muted">Phật tử: </span>
+            <span className="text-muted">Quý Phật tử: </span>
             <span className="text-ink">{order.customer_name}</span>
           </p>
         </div>

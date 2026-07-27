@@ -87,7 +87,7 @@ export default async function AdminHomePage() {
       href: '/quan-tri/don-hang',
     },
     {
-      label: 'Thùng đã bán tháng này',
+      label: 'Thùng đã thỉnh tháng này',
       value: String(paidQty),
       href: '/quan-tri/doi-soat',
     },
@@ -113,6 +113,22 @@ export default async function AdminHomePage() {
     },
   ];
 
+  let waterPrice = 0;
+  let hotline = '';
+  if (templeId) {
+    const { data: templeRow } = await supabase
+      .from('temples')
+      .select('water_price_vnd, hotline, contact_links')
+      .eq('id', templeId)
+      .maybeSingle();
+    waterPrice = Number(templeRow?.water_price_vnd ?? 0);
+    const links = templeRow?.contact_links as { phone?: string } | null;
+    hotline =
+      (templeRow?.hotline as string)?.trim() ||
+      links?.phone?.trim() ||
+      '';
+  }
+
   return (
     <div>
       <h1 className="font-display text-3xl text-ink">Tổng quan</h1>
@@ -133,6 +149,28 @@ export default async function AdminHomePage() {
             <p className="font-display text-2xl text-ink mt-2">{c.value}</p>
           </Link>
         ))}
+        <Link
+          href="/quan-tri/don-gia"
+          className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
+        >
+          <p className="text-[10px] uppercase tracking-widest text-muted">
+            Đơn giá nước / thùng
+          </p>
+          <p className="font-display text-2xl text-ink mt-2">
+            {waterPrice ? `${formatVnd(waterPrice)}đ` : '—'}
+          </p>
+        </Link>
+        <Link
+          href="/quan-tri/lien-he"
+          className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
+        >
+          <p className="text-[10px] uppercase tracking-widest text-muted">
+            Điện thoại liên hệ
+          </p>
+          <p className="font-display text-2xl text-ink mt-2 tabular-nums">
+            {hotline || 'Chưa có'}
+          </p>
+        </Link>
       </div>
     </div>
   );

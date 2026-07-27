@@ -146,7 +146,7 @@ export function PaymentCheckout({
         </div>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs text-muted">Số tiền</p>
+            <p className="text-xs text-muted">Mức phát tâm</p>
             <p className="text-xl font-semibold text-ink">
               {formatVnd(amount)}&nbsp;đ
             </p>
@@ -159,7 +159,7 @@ export function PaymentCheckout({
             onClick={() => copyText('amount', String(amount))}
             className="text-xs px-3 py-1.5 border border-fog hover:bg-mist"
           >
-            {copied === 'amount' ? 'Đã chép' : 'Chép số tiền'}
+            {copied === 'amount' ? 'Đã chép' : 'Chép mức phát tâm'}
           </button>
         </div>
         <div className="text-xs text-muted pt-1 space-y-0.5 border-t border-fog">

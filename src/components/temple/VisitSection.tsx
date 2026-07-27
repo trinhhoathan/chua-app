@@ -22,6 +22,7 @@ export function VisitSection({ temple }: Props) {
             fill
             className="object-cover"
             sizes="100vw"
+            unoptimized={/^https?:\/\//i.test(visitImage)}
           />
         ) : (
           <div className="absolute inset-0 bg-ink" />

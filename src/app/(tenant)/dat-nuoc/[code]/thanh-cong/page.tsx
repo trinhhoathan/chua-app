@@ -48,10 +48,12 @@ export default async function OrderPaidSuccessPage({ params }: Props) {
           Cảm niệm công đức
         </h1>
         <p className="mt-4 text-muted leading-relaxed">
-          Hệ thống đã nhận chuyển khoản cho đơn{' '}
-          <span className="font-mono text-ink">{order.order_code}</span>. Công
-          đức {order.quantity} thùng nước ({formatVnd(order.total_amount)}đ)
-          đã được ghi nhận về {temple.name}.
+          Hệ thống đã nhận chuyển khoản cho mã{' '}
+          <span className="font-mono text-ink">{order.order_code}</span>. Quý
+          Phật tử đã phát tâm cúng dường {order.quantity} thùng Nước Thanh Tịnh
+          (mức phát tâm tùy hỷ: {formatVnd(order.total_amount)}đ). Số nước này
+          sẽ được đặt dâng lễ Tam Bảo và gieo duyên phát cho khách hành hương tại{' '}
+          {temple.name}.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
@@ -60,7 +62,7 @@ export default async function OrderPaidSuccessPage({ params }: Props) {
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white"
             style={{ backgroundColor: primary }}
           >
-            Xem minh bạch quỹ
+            Xem Sổ Vàng Công Đức
           </Link>
           <Link
             href="/"

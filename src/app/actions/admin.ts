@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { assertTempleAccess } from '@/lib/auth';
 import { getCurrentTemple } from '@/lib/tenant';
@@ -254,5 +254,101 @@ export async function adjustInventory(input: {
   if (updErr) return { ok: false, error: updErr.message };
 
   revalidatePath('/quan-tri/kho');
+  return { ok: true };
+}
+
+export async function updateWaterPrice(input: {
+  templeId: string;
+  waterPriceVnd: number;
+}): Promise<{ ok: boolean; error?: string; price?: number }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+
+  const price = Math.round(Number(input.waterPriceVnd));
+  if (!Number.isFinite(price) || price < 1000 || price > 10_000_000) {
+    return {
+      ok: false,
+      error: 'Đơn giá phải từ 1.000đ đến 10.000.000đ / thùng.',
+    };
+  }
+  if (price % 1000 !== 0) {
+    return { ok: false, error: 'Đơn giá nên làm tròn đến hàng nghìn đồng.' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('temples')
+    .update({
+      water_price_vnd: price,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.templeId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidateTag('temples', 'max');
+  revalidatePath('/quan-tri/don-gia');
+  revalidatePath('/quan-tri');
+  revalidatePath('/');
+  revalidatePath('/dat-nuoc');
+  return { ok: true, price };
+}
+
+export async function updateContactLinks(input: {
+  templeId: string;
+  hotline?: string;
+  links: {
+    youtube?: string;
+    tiktok?: string;
+    facebook?: string;
+    messenger?: string;
+    zalo?: string;
+    zalo_community?: string;
+    phone?: string;
+  };
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+
+  const clean = (v?: string) => {
+    const t = (v ?? '').trim();
+    return t || null;
+  };
+
+  const contact_links = {
+    youtube: clean(input.links.youtube),
+    tiktok: clean(input.links.tiktok),
+    facebook: clean(input.links.facebook),
+    messenger: clean(input.links.messenger),
+    zalo: clean(input.links.zalo),
+    zalo_community: clean(input.links.zalo_community),
+    phone: clean(input.links.phone),
+  };
+
+  const hotline = clean(input.hotline) ?? contact_links.phone;
+  contact_links.phone = hotline;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('temples')
+    .update({
+      contact_links,
+      hotline,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.templeId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidateTag('temples', 'max');
+  revalidatePath('/quan-tri/lien-he');
+  revalidatePath('/quan-tri');
+  revalidatePath('/');
   return { ok: true };
 }

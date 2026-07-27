@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { unstable_cache } from 'next/cache';
 import { supabase } from './supabase';
 import type { Temple } from '@/types/database';
+import { normalizeContactLinks } from '@/lib/contact-links';
 
 const CACHE_SECONDS = 30;
 
@@ -94,6 +95,8 @@ function normalizeTemple(row: Record<string, unknown>): Temple {
     abbott_title: (row.abbott_title as string) ?? null,
     abbott_bio: (row.abbott_bio as string) ?? null,
     abbott_image_url: (row.abbott_image_url as string) ?? null,
+    hotline: (row.hotline as string) ?? null,
+    contact_links: normalizeContactLinks(row.contact_links, row.hotline as string | null),
     gallery: asArray(row.gallery) as Temple['gallery'],
     extra_sections: asArray(row.extra_sections) as Temple['extra_sections'],
     timeline: asArray(row.timeline) as Temple['timeline'],

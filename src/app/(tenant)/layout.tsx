@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { getCurrentTemple } from '@/lib/tenant';
-import { getCompanyBankAccount } from '@/lib/payment';
 import { TopNav } from '@/components/temple/TopNav';
 import { TempleFooter } from '@/components/temple/TempleFooter';
+import { ContactDock } from '@/components/temple/ContactDock';
 import { WaterStickyBar } from '@/components/water/WaterStickyBar';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,15 +62,19 @@ export default async function TenantLayout({
       }
     >
       <TopNav temple={temple} />
-      <div className="flex-1 pb-24">{children}</div>
-      <TempleFooter temple={temple} />
+      <div className="flex flex-1 flex-col pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
+        <div className="flex-1">{children}</div>
+        <TempleFooter temple={temple} />
+      </div>
+      <ContactDock
+        links={temple.contact_links}
+        mapsUrl={temple.maps_url}
+        primaryColor={primary}
+      />
       <WaterStickyBar
         primaryColor={primary}
         unitPrice={temple.water_price_vnd}
         templeName={temple.name}
-        paymentCode={temple.payment_code ?? 'XX'}
-        bank={getCompanyBankAccount()}
-        profitSharePct={temple.water_profit_share_pct}
       />
     </div>
   );

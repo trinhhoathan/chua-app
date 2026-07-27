@@ -38,7 +38,7 @@ export async function createWaterOrder(
   const note = (input.note ?? '').trim() || null;
 
   if (!quantity || quantity < 10 || quantity > 100000) {
-    return { ok: false, error: 'Số lượng tối thiểu là 10 thùng.' };
+    return { ok: false, error: 'Số lượng tối thiểu là 10 thùng (để thuận tiện vận chuyển về chùa).' };
   }
   if (name.length < 2) {
     return { ok: false, error: 'Vui lòng nhập họ tên Phật tử.' };

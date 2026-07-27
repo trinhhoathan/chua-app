@@ -33,7 +33,7 @@ export default async function DonHangPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-ink">Đơn nước công đức</h1>
+      <h1 className="font-display text-3xl text-ink">Phát tâm thỉnh nước</h1>
       <p className="mt-2 text-sm text-muted">
         100 đơn gần nhất của {ctx.temples[0]?.name}
       </p>

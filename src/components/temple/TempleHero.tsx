@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { Temple } from '@/types/database';
+import { TempleLogo } from '@/components/temple/TempleLogo';
 
 interface Props {
   temple: Temple;
@@ -20,6 +21,7 @@ export function TempleHero({ temple }: Props) {
             priority
             className="object-cover animate-drift"
             sizes="100vw"
+            unoptimized={/^https?:\/\//i.test(hero)}
           />
         ) : (
           <div
@@ -35,14 +37,11 @@ export function TempleHero({ temple }: Props) {
 
       <div className="relative z-10 w-full px-6 pb-28 pt-28 md:px-12 md:pb-32 lg:px-20">
         <div className="max-w-3xl animate-rise">
-          {temple.logo_url ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={temple.logo_url}
-              alt=""
-              className="h-14 w-14 mb-6 rounded-full object-cover ring-1 ring-white/30"
-            />
-          ) : null}
+          <TempleLogo
+            logoUrl={temple.logo_url}
+            name={temple.name}
+            className="h-14 w-14 mb-6 shrink-0 rounded-full ring-1 ring-white/30"
+          />
           {temple.temple_alt_name ? (
             <p className="text-[0.7rem] tracking-[0.35em] uppercase text-gilt mb-4 animate-fade">
               {temple.temple_alt_name}
@@ -58,17 +57,17 @@ export function TempleHero({ temple }: Props) {
           ) : null}
           <div className="mt-8 flex flex-wrap gap-3 animate-rise-delay-2">
             <a
-              href="#lich-su"
+              href="#gioi-thieu"
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-colors"
               style={{ backgroundColor: primary }}
             >
               Tìm hiểu lịch sử
             </a>
             <a
-              href="#cong-duc"
+              href="#dong-nuoc"
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white/90 border border-white/35 hover:bg-white/10 transition-colors"
             >
-              Công đức nước
+              Công đức nước tinh khiết
             </a>
           </div>
         </div>

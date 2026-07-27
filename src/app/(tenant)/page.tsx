@@ -5,12 +5,13 @@ import { TempleStory } from '@/components/temple/TempleStory';
 import { AbbottSection } from '@/components/temple/AbbottSection';
 import { TimelineSection } from '@/components/temple/TimelineSection';
 import { FeaturesSection } from '@/components/temple/FeaturesSection';
-import { VisitSection } from '@/components/temple/VisitSection';
+import { ExtraSections } from '@/components/temple/ExtraSections';
 import { FengShuiNav } from '@/components/temple/FengShuiNav';
-import { WaterDonateSection } from '@/components/temple/WaterDonateSection';
+import { WaterMeritsStory } from '@/components/temple/WaterMeritsStory';
 import { WaterTransparencySection } from '@/components/temple/WaterTransparencySection';
 import { TempleVideosSection } from '@/components/temple/TempleVideosSection';
 import { MapsReviewsSection } from '@/components/temple/MapsReviewsSection';
+import { GallerySection } from '@/components/temple/GallerySection';
 
 export default async function HomePage() {
   const temple = await getCurrentTemple();
@@ -22,15 +23,16 @@ export default async function HomePage() {
     <main className="overflow-x-hidden">
       <TempleHero temple={temple} />
       <TempleStory temple={temple} />
-      <AbbottSection temple={temple} />
-      <TempleVideosSection temple={temple} />
       <TimelineSection temple={temple} />
       <FeaturesSection temple={temple} />
-      <FengShuiNav temple={temple} />
-      <WaterTransparencySection temple={temple} data={transparency} />
-      <VisitSection temple={temple} />
+      <ExtraSections temple={temple} />
+      <AbbottSection temple={temple} />
+      <TempleVideosSection temple={temple} />
+      <GallerySection temple={temple} />
       <MapsReviewsSection temple={temple} />
-      <WaterDonateSection temple={temple} />
+      <FengShuiNav temple={temple} />
+      <WaterMeritsStory temple={temple} />
+      <WaterTransparencySection temple={temple} data={transparency} />
     </main>
   );
 }

@@ -4,6 +4,24 @@ interface Props {
   temple: Temple;
 }
 
+/** Force Google Maps embed to satellite imagery (`t=k`). */
+function toSatelliteEmbed(url: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.set('t', 'k');
+    if (!u.searchParams.has('output')) {
+      u.searchParams.set('output', 'embed');
+    }
+    return u.toString();
+  } catch {
+    if (/[?&]t=/.test(url)) {
+      return url.replace(/([?&])t=[^&]*/i, '$1t=k');
+    }
+    const join = url.includes('?') ? '&' : '?';
+    return `${url}${join}t=k`;
+  }
+}
+
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
   return (
@@ -36,6 +54,9 @@ export function MapsReviewsSection({ temple }: Props) {
         <div className="section-rule mb-6" />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
+            <p className="text-[0.72rem] tracking-[0.3em] uppercase text-lacquer mb-3">
+              Bản đồ & cảm nhận
+            </p>
             <h2 className="font-display text-3xl md:text-4xl text-ink leading-tight">
               Vị trí & đánh giá
             </h2>
@@ -68,8 +89,8 @@ export function MapsReviewsSection({ temple }: Props) {
         {temple.maps_embed_url ? (
           <div className="mt-10 overflow-hidden border border-fog bg-paper aspect-[16/10] md:aspect-[21/9]">
             <iframe
-              title={`Bản đồ ${temple.name}`}
-              src={temple.maps_embed_url}
+              title={`Bản đồ vệ tinh ${temple.name}`}
+              src={toSatelliteEmbed(temple.maps_embed_url)}
               className="h-full w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -118,9 +139,15 @@ export function MapsReviewsSection({ temple }: Props) {
                 {r.relative_time ? (
                   <p className="mt-1 text-xs text-muted">{r.relative_time}</p>
                 ) : null}
-                <p className="mt-3 text-sm text-muted leading-relaxed whitespace-pre-line">
-                  {r.text}
-                </p>
+                {r.text ? (
+                  <p className="mt-3 text-sm text-muted leading-relaxed whitespace-pre-line">
+                    {r.text}
+                  </p>
+                ) : (
+                  <p className="mt-3 text-sm text-muted/70 italic">
+                    Đánh giá bằng sao (không có nội dung chữ).
+                  </p>
+                )}
               </li>
             ))}
           </ul>

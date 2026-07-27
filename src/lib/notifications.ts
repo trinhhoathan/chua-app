@@ -111,9 +111,9 @@ function buildMessage(
 
   switch (templateKey) {
     case 'water_order_created':
-      return `Nam mô A Di Đà Phật. ${temple} đã ghi nhận đơn công đức nước của ${name}. Mã đơn: ${code}. Số thùng: ${qty}. Tổng: ${total}đ. Xin cảm niệm.`;
+      return `Nam mô A Di Đà Phật. ${temple} đã ghi nhận phát tâm thỉnh nước của ${name}. Mã: ${code}. Số thùng: ${qty}. Mức phát tâm: ${total}đ. Xin cảm niệm.`;
     case 'water_order_paid':
-      return `Nam mô A Di Đà Phật. ${temple} đã xác nhận công đức nước của ${name} (mã ${code}). Xin hồi hướng công đức.`;
+      return `Nam mô A Di Đà Phật. ${temple} đã xác nhận công đức nước tinh khiết của ${name} (mã ${code}). Xin hồi hướng công đức.`;
     case 'prayer_received':
       return `Nam mô A Di Đà Phật. ${temple} đã nhận sớ ${payload.requestType === 'cau_sieu' ? 'cầu siêu' : 'cầu an'} của ${name}. Chúng con sẽ chuẩn bị cho đại lễ.`;
     default:

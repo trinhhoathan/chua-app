@@ -3,18 +3,14 @@
 import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createWaterOrder } from '@/app/actions/orders';
-import type { CompanyBankAccount } from '@/lib/payment';
 
 interface Props {
   primaryColor: string;
   unitPrice: number;
   templeName: string;
-  paymentCode: string;
-  bank: CompanyBankAccount;
-  profitSharePct: number;
 }
 
-const QUICK_QTY = [10, 100, 1000, 5000];
+const QUICK_QTY = [10, 50, 100, 1000];
 const MIN_QTY = 10;
 const MAX_QTY = 100000;
 
@@ -26,7 +22,6 @@ export function WaterStickyBar({
   primaryColor,
   unitPrice,
   templeName,
-  profitSharePct,
 }: Props) {
   const router = useRouter();
   const [qty, setQty] = useState(MIN_QTY);
@@ -64,59 +59,72 @@ export function WaterStickyBar({
 
   return (
     <>
-      <div className="fixed bottom-0 inset-x-0 z-50 bg-ink text-white border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
-        <div className="mx-auto max-w-4xl px-3 md:px-6 py-2.5">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            <span className="text-[10px] tracking-[0.25em] uppercase text-white/50 shrink-0 mr-1">
-              Cúng nước
-            </span>
-            {QUICK_QTY.map((q) => (
-              <button
-                key={q}
-                onClick={() => setQty(q)}
-                className={`shrink-0 text-xs px-3 py-1.5 border transition-colors ${
-                  qty === q
-                    ? 'text-ink bg-white border-white'
-                    : 'text-white/80 border-white/25 hover:border-white/60'
-                }`}
-              >
-                {q} thùng
-              </button>
-            ))}
-            <input
-              type="number"
-              min={MIN_QTY}
-              max={MAX_QTY}
-              value={qty}
-              onChange={(e) =>
-                setQty(
-                  Math.max(
-                    MIN_QTY,
-                    Math.min(MAX_QTY, Number(e.target.value) || MIN_QTY),
-                  ),
-                )
-              }
-              className="shrink-0 w-16 text-xs px-2 py-1.5 bg-white/5 border border-white/20 text-white text-center"
-              aria-label="Số thùng"
-            />
-          </div>
-          <div className="mt-1.5 flex items-center justify-between gap-3">
-            <div className="text-sm">
-              <span className="text-white/60 text-xs">Tổng: </span>
-              <span className="font-semibold text-white">
-                {formatVnd(total)}&nbsp;đ
-              </span>
-              <span className="text-white/50 text-xs ml-1">
-                ({formatVnd(unitPrice)}đ/thùng)
-              </span>
+      <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-ink/95 backdrop-blur-md shadow-[0_-12px_40px_rgba(0,0,0,0.35)]">
+        <div className="mx-auto max-w-3xl px-3 md:px-5 py-3">
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:gap-3">
+            <div className="min-w-0 flex-1 rounded-md bg-white/[0.06] ring-1 ring-white/10 px-2.5 py-2">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <span className="shrink-0 text-[10px] tracking-[0.2em] uppercase text-white/45">
+                  Thỉnh nước
+                </span>
+                {QUICK_QTY.map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => setQty(q)}
+                    className={`shrink-0 text-xs px-2.5 py-1.5 rounded-sm border transition-colors ${
+                      qty === q
+                        ? 'text-ink bg-white border-white shadow-sm'
+                        : 'text-white/80 border-white/20 hover:border-white/50 hover:bg-white/5'
+                    }`}
+                  >
+                    {q}
+                  </button>
+                ))}
+                <input
+                  type="number"
+                  min={MIN_QTY}
+                  max={MAX_QTY}
+                  value={qty}
+                  onChange={(e) =>
+                    setQty(
+                      Math.max(
+                        MIN_QTY,
+                        Math.min(MAX_QTY, Number(e.target.value) || MIN_QTY),
+                      ),
+                    )
+                  }
+                  className="shrink-0 w-14 text-xs px-2 py-1.5 rounded-sm bg-white/5 border border-white/20 text-white text-center"
+                  aria-label="Số thùng"
+                />
+                <span className="shrink-0 text-[11px] text-white/45">thùng</span>
+              </div>
             </div>
-            <button
-              onClick={() => setOpen(true)}
-              className="text-sm font-medium text-white px-5 py-2 shrink-0"
-              style={{ backgroundColor: primaryColor }}
-            >
-              Công đức ngay
-            </button>
+
+            <div className="flex items-stretch gap-2 sm:gap-2.5 sm:shrink-0">
+              <div className="flex min-w-0 flex-1 flex-col justify-center rounded-md bg-white/[0.06] ring-1 ring-white/10 px-3 py-2 sm:w-[9.5rem] sm:flex-none">
+                <p className="text-[10px] uppercase tracking-wider text-white/45 leading-none">
+                  Mức phát tâm
+                </p>
+                <p className="mt-1 font-semibold text-white text-base leading-none tabular-nums">
+                  {formatVnd(total)}&nbsp;đ
+                </p>
+                <p className="mt-1 text-[10px] text-white/40 leading-none">
+                  {formatVnd(unitPrice)}đ/thùng
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="flex-[1.35] sm:flex-none sm:min-w-[11.5rem] rounded-md px-4 py-2.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,0,0.28)] transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
+                style={{ backgroundColor: primaryColor }}
+              >
+                <span className="block leading-tight">Phát tâm thỉnh nước</span>
+                <span className="mt-0.5 block text-[10px] font-medium text-white/80">
+                  {qty} thùng · tiếp tục
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -129,14 +137,14 @@ export function WaterStickyBar({
                 className="text-[0.7rem] tracking-[0.3em] uppercase mb-2"
                 style={{ color: primaryColor }}
               >
-                Cúng dâng nước
+                Cúng dường nước thanh tịnh
               </p>
               <h3 className="font-display text-2xl">
-                {qty} thùng — {formatVnd(total)}&nbsp;đ
+                {qty} thùng — mức phát tâm {formatVnd(total)}&nbsp;đ
               </h3>
               <p className="mt-1 text-xs text-muted">
-                {templeName} nhận {profitSharePct.toFixed(0)}% giá trị đơn để
-                phục vụ Phật sự.
+                Quý Phật tử phát tâm thỉnh nước tinh khiết dâng {templeName} —
+                ghi nhận vào Sổ Vàng Công Đức.
               </p>
               <div className="mt-5 space-y-3">
                 <label className="block text-xs text-muted">
@@ -187,7 +195,7 @@ export function WaterStickyBar({
                     onChange={(e) => setNote(e.target.value)}
                     rows={2}
                     className="mt-1 w-full px-3 py-2 bg-white border border-fog text-ink resize-none"
-                    placeholder="Cúng dâng cho ..."
+                    placeholder="Hồi hướng / nguyện cầu ..."
                   />
                 </label>
               </div>
@@ -208,7 +216,7 @@ export function WaterStickyBar({
                   className="flex-[2] py-3 text-sm text-white disabled:opacity-60"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  {pending ? 'Đang tạo đơn…' : 'Tiếp tục thanh toán'}
+                  {pending ? 'Đang ghi nhận…' : 'Hoàn tất phát tâm'}
                 </button>
               </div>
             </div>

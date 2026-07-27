@@ -18,42 +18,43 @@ export function WaterTransparencySection({ temple, data }: Props) {
       <div className="mx-auto max-w-5xl px-6 py-20 md:px-12 md:py-28">
         <div className="section-rule mb-6" />
         <h2 className="font-display text-3xl md:text-4xl text-ink leading-tight">
-          Minh bạch quỹ nước
+          Sổ Vàng Công Đức
         </h2>
         <p className="mt-4 text-muted max-w-2xl leading-relaxed">
-          Mọi đơn cúng nước đã thanh toán thành công tại {temple.name} được công
-          khai để Phật tử theo dõi công đức chung.
+          Mọi phát tâm thỉnh nước đã hoàn tất tại {temple.name} được công khai
+          để Quý Phật tử tùy hỷ theo dõi công đức chung — người đi lễ trước gieo
+          hạt lành, người đến sau hưởng giọt nước mát.
         </p>
 
         <div className="mt-10 grid sm:grid-cols-3 gap-6 md:gap-8">
           <Stat
-            label="Tổng thùng đã cúng"
+            label="Tổng thùng đã thỉnh"
             value={data.total_quantity.toLocaleString('vi-VN')}
             hint="thùng"
             accent={primary}
           />
           <Stat
-            label="Số đơn thành công"
+            label="Số lần phát tâm"
             value={data.order_count.toLocaleString('vi-VN')}
-            hint="đơn"
+            hint="phát tâm"
             accent={primary}
           />
           <Stat
-            label="Tổng giá trị"
+            label="Tổng công đức"
             value={formatVnd(data.total_amount)}
-            hint={`${temple.water_profit_share_pct.toFixed(0)}% về chùa`}
+            hint="đã ghi nhận"
             accent={primary}
           />
         </div>
 
         <div className="mt-12">
           <h3 className="text-sm font-medium tracking-wide uppercase text-ink/70 mb-4">
-            Lịch sử mua thành công gần đây
+            Phát tâm gần đây
           </h3>
           {data.recent.length === 0 ? (
             <p className="text-muted text-sm border border-fog bg-paper px-5 py-8 text-center">
-              Chưa có đơn thanh toán thành công. Hãy là người đầu tiên cúng
-              nước.
+              Chưa có phát tâm ghi nhận. Hãy là người đầu tiên gieo duyên nước
+              mát.
             </p>
           ) : (
             <ul className="divide-y divide-fog border border-fog bg-paper">

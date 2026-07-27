@@ -33,6 +33,16 @@ export interface TempleReview {
   relative_time?: string;
 }
 
+export interface TempleContactLinks {
+  youtube: string | null;
+  tiktok: string | null;
+  facebook: string | null;
+  messenger: string | null;
+  zalo: string | null;
+  zalo_community: string | null;
+  phone: string | null;
+}
+
 export interface Temple {
   id: string;
   domain: string;
@@ -55,6 +65,10 @@ export interface Temple {
   abbott_title: string | null;
   abbott_bio: string | null;
   abbott_image_url: string | null;
+  /** Số điện thoại trụ trì / hotline liên hệ. */
+  hotline: string | null;
+  /** Các kênh liên hệ hiển thị trên thanh công cụ phải. */
+  contact_links: TempleContactLinks;
   gallery: GalleryImage[];
   extra_sections: ExtraSection[];
   timeline: TimelineEntry[];
