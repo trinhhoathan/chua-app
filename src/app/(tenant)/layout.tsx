@@ -4,6 +4,7 @@ import { TopNav } from '@/components/temple/TopNav';
 import { TempleFooter } from '@/components/temple/TempleFooter';
 import { ContactDock } from '@/components/temple/ContactDock';
 import { WaterStickyBar } from '@/components/water/WaterStickyBar';
+import { WaterMeritFloatingNudge } from '@/components/water/WaterMeritFloatingNudge';
 
 export async function generateMetadata(): Promise<Metadata> {
   const temple = await getCurrentTemple();
@@ -70,6 +71,13 @@ export default async function TenantLayout({
         links={temple.contact_links}
         mapsUrl={temple.maps_url}
         primaryColor={primary}
+        templeName={temple.name}
+        templeId={temple.id}
+      />
+      <WaterMeritFloatingNudge
+        primaryColor={primary}
+        templeName={temple.name}
+        templeId={temple.id}
       />
       <WaterStickyBar
         primaryColor={primary}

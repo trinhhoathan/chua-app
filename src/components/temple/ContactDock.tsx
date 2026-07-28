@@ -3,11 +3,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { TempleContactLinks } from '@/types/database';
 import { phoneHref } from '@/lib/contact-links';
+import { XinXamQuanAmModal } from '@/components/temple/XinXamQuanAmModal';
 
 interface Props {
   links: TempleContactLinks;
   mapsUrl?: string | null;
   primaryColor?: string;
+  templeName?: string;
+  templeId?: string;
 }
 
 type DockItem = {
@@ -41,12 +44,43 @@ function IconWrap({
 
 const svgCls = 'size-[1.05rem] md:size-[1.15rem]';
 
+function XinXamIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className={svgCls} fill="currentColor" aria-hidden>
+      <path d="M9.2 3.2c-.7 0-1.3.5-1.45 1.15L5.2 17.6A1.8 1.8 0 0 0 7 19.8h5.2a1.8 1.8 0 0 0 1.75-2.15L11.4 4.35A1.5 1.5 0 0 0 9.2 3.2zm.15 1.7 2.35 12.1H7.35L9.35 4.9z" />
+      <path
+        d="m14.6 5.1 1.7 11.6a1.35 1.35 0 0 0 1.35 1.15h.15a1.35 1.35 0 0 0 1.32-1.55l-1.9-11.4A1.25 1.25 0 0 0 15.95 3.9h-.1a1.25 1.25 0 0 0-1.25 1.2z"
+        opacity=".9"
+      />
+      <rect
+        x="11.2"
+        y="1.6"
+        width="1.35"
+        height="5.2"
+        rx=".55"
+        transform="rotate(14 11.9 4.2)"
+      />
+      <rect
+        x="13.1"
+        y="1.2"
+        width="1.35"
+        height="5.5"
+        rx=".55"
+        transform="rotate(-10 13.8 4)"
+      />
+    </svg>
+  );
+}
+
 export function ContactDock({
   links,
   mapsUrl,
   primaryColor = '#7A1F1F',
+  templeName,
+  templeId,
 }: Props) {
   const [showTop, setShowTop] = useState(false);
+  const [xamOpen, setXamOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 420);
@@ -161,6 +195,51 @@ export function ContactDock({
     });
   }
 
+  if (links.instagram) {
+    items.push({
+      key: 'instagram',
+      label: 'Instagram',
+      href: links.instagram,
+      external: true,
+      bg: 'linear-gradient(160deg,#F58529 0%,#DD2A7B 45%,#8134AF 75%,#515BD4 100%)',
+      icon: (
+        <svg viewBox="0 0 24 24" className={svgCls} fill="currentColor" aria-hidden>
+          <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2zm-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6zm9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+        </svg>
+      ),
+    });
+  }
+
+  if (links.threads) {
+    items.push({
+      key: 'threads',
+      label: 'Threads',
+      href: links.threads,
+      external: true,
+      bg: 'linear-gradient(160deg,#3a3a3a 0%,#000000 100%)',
+      icon: (
+        <span className="text-[1.05rem] font-semibold leading-none tracking-tight">
+          @
+        </span>
+      ),
+    });
+  }
+
+  if (links.x) {
+    items.push({
+      key: 'x',
+      label: 'X',
+      href: links.x,
+      external: true,
+      bg: 'linear-gradient(160deg,#2a2a2a 0%,#000000 100%)',
+      icon: (
+        <svg viewBox="0 0 24 24" className={svgCls} fill="currentColor" aria-hidden>
+          <path d="M18.2 2H21l-6.6 7.5L22 22h-6.2l-4.9-6.4L5.5 22H2.7l7-8L2 2h6.3l4.4 5.8L18.2 2zm-1.1 18h1.7L7 3.9H5.2L17.1 20z" />
+        </svg>
+      ),
+    });
+  }
+
   if (links.zalo_community) {
     items.push({
       key: 'zalo_community',
@@ -176,57 +255,113 @@ export function ContactDock({
     });
   }
 
-  if (items.length === 0 && !showTop) return null;
-
   return (
-    <div className="pointer-events-none fixed right-2 z-[45] bottom-[7.25rem] md:right-3.5 md:bottom-auto md:top-1/2 md:-translate-y-1/2">
-      <div className="pointer-events-auto flex flex-col items-center gap-2 md:gap-2.5">
-        {items.map((item) => (
+    <>
+      <div className="pointer-events-none fixed right-2 z-[45] bottom-[7.25rem] md:right-3.5 md:bottom-auto md:top-1/2 md:-translate-y-1/2">
+        <div className="pointer-events-auto flex flex-col items-center gap-2 md:gap-2.5">
+          <button
+            type="button"
+            aria-label="Xin xăm Quan Âm online"
+            title="Xin xăm Quan Âm online"
+            onClick={() => setXamOpen(true)}
+            className="xam-dock-btn group"
+          >
+            <span className="xam-dock-label" aria-hidden>
+              Xin xăm Quan Âm
+            </span>
+            <span
+              className="xam-dock-glow relative flex size-10 items-center justify-center rounded-full text-white ring-1 ring-black/5 transition-transform group-hover:-translate-y-0.5 md:size-11"
+              style={{
+                background: `linear-gradient(160deg,#E8C56A 0%,#B8860B 45%,${primaryColor} 100%)`,
+              }}
+            >
+              <span className="xam-dock-icon inline-flex">
+                <XinXamIcon />
+              </span>
+            </span>
+          </button>
+
           <a
-            key={item.key}
-            href={item.href}
-            target={item.external ? '_blank' : undefined}
-            rel={item.external ? 'noopener noreferrer' : undefined}
-            aria-label={item.label}
+            href="/go-mo"
+            aria-label="Gõ mõ tụng kinh"
+            title="Gõ mõ tụng kinh"
             className="block"
           >
-            <IconWrap bg={item.bg} label={item.label}>
-              {item.icon}
+            <IconWrap
+              bg={`linear-gradient(160deg,#D4A574 0%,#8B5A2B 55%,${primaryColor} 100%)`}
+              label="Gõ mõ tụng kinh"
+            >
+              <svg viewBox="0 0 24 24" className={svgCls} fill="currentColor" aria-hidden>
+                <ellipse cx="11" cy="13" rx="7" ry="6" />
+                <ellipse cx="14.5" cy="13" rx="1.6" ry="3" fill="#1a1714" opacity=".45" />
+                <rect
+                  x="16.5"
+                  y="4"
+                  width="1.6"
+                  height="9"
+                  rx="0.6"
+                  transform="rotate(28 17.3 8.5)"
+                />
+                <circle cx="19.2" cy="4.2" r="2" />
+              </svg>
             </IconWrap>
           </a>
-        ))}
 
-        <button
-          type="button"
-          aria-label="Lên đầu trang"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className={`block transition-all duration-300 ${
-            showTop
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-2 pointer-events-none'
-          }`}
-        >
-          <IconWrap
-            bg="linear-gradient(160deg,#F6E7B2 0%,#D4A84B 100%)"
-            label="Lên đầu trang"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className={svgCls}
-              fill="none"
-              stroke="#5c4a1a"
-              strokeWidth="2.4"
-              aria-hidden
+          {items.map((item) => (
+            <a
+              key={item.key}
+              href={item.href}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+              aria-label={item.label}
+              className="block"
             >
-              <path
-                d="M12 19V5M5 12l7-7 7 7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </IconWrap>
-        </button>
+              <IconWrap bg={item.bg} label={item.label}>
+                {item.icon}
+              </IconWrap>
+            </a>
+          ))}
+
+          <button
+            type="button"
+            aria-label="Lên đầu trang"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className={`block transition-all duration-300 ${
+              showTop
+                ? 'opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-2 pointer-events-none'
+            }`}
+          >
+            <IconWrap
+              bg="linear-gradient(160deg,#F6E7B2 0%,#D4A84B 100%)"
+              label="Lên đầu trang"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className={svgCls}
+                fill="none"
+                stroke="#5c4a1a"
+                strokeWidth="2.4"
+                aria-hidden
+              >
+                <path
+                  d="M12 19V5M5 12l7-7 7 7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </IconWrap>
+          </button>
+        </div>
       </div>
-    </div>
+
+      <XinXamQuanAmModal
+        open={xamOpen}
+        onClose={() => setXamOpen(false)}
+        primaryColor={primaryColor}
+        templeName={templeName}
+        templeId={templeId}
+      />
+    </>
   );
 }

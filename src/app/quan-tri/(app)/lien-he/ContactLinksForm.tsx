@@ -2,7 +2,10 @@
 
 import { useState, useTransition } from 'react';
 import { updateContactLinks } from '@/app/actions/admin';
-import { CONTACT_LINK_FIELDS } from '@/lib/contact-links';
+import {
+  CONTACT_LINK_FIELDS,
+  type ContactLinkKey,
+} from '@/lib/contact-links';
 import type { TempleContactLinks } from '@/types/database';
 
 interface TempleRow {
@@ -17,18 +20,30 @@ function displayPhone(t: TempleRow | undefined): string {
   return t.hotline || t.contact_links.phone || '';
 }
 
+function linksFromTemple(t: TempleRow | undefined) {
+  return Object.fromEntries(
+    CONTACT_LINK_FIELDS.map((f) => [
+      f.key,
+      t?.contact_links?.[f.key] ?? '',
+    ]),
+  ) as Record<ContactLinkKey, string>;
+}
+
+function enabledFromTemple(t: TempleRow | undefined) {
+  return Object.fromEntries(
+    CONTACT_LINK_FIELDS.map((f) => [
+      f.key,
+      Boolean(t?.contact_links?.[f.key]?.trim()),
+    ]),
+  ) as Record<ContactLinkKey, boolean>;
+}
+
 export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
   const [templeId, setTempleId] = useState(temples[0]?.id ?? '');
   const current = temples.find((t) => t.id === templeId) ?? temples[0];
   const [phone, setPhone] = useState(displayPhone(current));
-  const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      CONTACT_LINK_FIELDS.map((f) => [
-        f.key,
-        current?.contact_links?.[f.key] ?? '',
-      ]),
-    ),
-  );
+  const [values, setValues] = useState(() => linksFromTemple(current));
+  const [enabled, setEnabled] = useState(() => enabledFromTemple(current));
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -37,13 +52,14 @@ export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
     const t = temples.find((x) => x.id === id);
     setTempleId(id);
     setPhone(displayPhone(t));
-    setValues(
-      Object.fromEntries(
-        CONTACT_LINK_FIELDS.map((f) => [f.key, t?.contact_links?.[f.key] ?? '']),
-      ),
-    );
+    setValues(linksFromTemple(t));
+    setEnabled(enabledFromTemple(t));
     setMsg(null);
     setErr(null);
+  }
+
+  function toggleChannel(key: ContactLinkKey, on: boolean) {
+    setEnabled((prev) => ({ ...prev, [key]: on }));
   }
 
   function submit(e: React.FormEvent) {
@@ -52,16 +68,22 @@ export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
     setMsg(null);
     setErr(null);
     start(async () => {
+      const pick = (key: ContactLinkKey) =>
+        enabled[key] ? values[key] : '';
+
       const res = await updateContactLinks({
         templeId,
         hotline: phone,
         links: {
-          youtube: values.youtube,
-          tiktok: values.tiktok,
-          facebook: values.facebook,
-          messenger: values.messenger,
-          zalo: values.zalo,
-          zalo_community: values.zalo_community,
+          youtube: pick('youtube'),
+          tiktok: pick('tiktok'),
+          facebook: pick('facebook'),
+          messenger: pick('messenger'),
+          zalo: pick('zalo'),
+          zalo_community: pick('zalo_community'),
+          instagram: pick('instagram'),
+          threads: pick('threads'),
+          x: pick('x'),
           phone,
         },
       });
@@ -70,7 +92,7 @@ export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
         return;
       }
       setMsg(
-        'Đã lưu. Số điện thoại cập nhật trên menu Hotline và icon gọi bên phải website.',
+        'Đã lưu. Chỉ các kênh đang bật mới hiện trên thanh công cụ bên phải website.',
       );
     });
   }
@@ -78,6 +100,8 @@ export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
   if (!current) {
     return <p className="text-sm text-muted">Chưa có chùa để cấu hình.</p>;
   }
+
+  const activeCount = CONTACT_LINK_FIELDS.filter((f) => enabled[f.key]).length;
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -110,10 +134,10 @@ export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
           </h2>
           <p className="text-sm text-muted leading-relaxed">
             Số này hiện trên nút Hotline ở menu trên và icon điện thoại ở thanh
-            công cụ bên phải. Trụ trì có thể đổi bất cứ lúc nào.
+            công cụ bên phải. Để trống nếu không muốn hiện.
           </p>
           <label className="block text-xs text-muted">
-            Số điện thoại *
+            Số điện thoại
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -141,26 +165,64 @@ export function ContactLinksForm({ temples }: { temples: TempleRow[] }) {
         </section>
 
         <section className="border border-fog bg-paper p-5 md:p-6 space-y-4">
-          <h2 className="font-display text-xl text-ink">Kênh mạng xã hội</h2>
-          <p className="text-sm text-muted leading-relaxed">
-            Để trống kênh nào không dùng — icon sẽ ẩn trên website. Nút «Lên đầu
-            trang» luôn có trên thanh công cụ phải.
-          </p>
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="font-display text-xl text-ink">
+                Nút liên hệ trên website
+              </h2>
+              <p className="mt-1 text-sm text-muted leading-relaxed">
+                Bật kênh nào cần dùng, tắt những kênh không muốn hiện. Có thể
+                chỉ giữ 1–2 nút nếu muốn giao diện gọn.
+              </p>
+            </div>
+            <p className="text-xs text-muted tabular-nums">
+              Đang bật: {activeCount}/{CONTACT_LINK_FIELDS.length}
+            </p>
+          </div>
 
           <div className="grid gap-3">
-            {CONTACT_LINK_FIELDS.map((f) => (
-              <label key={f.key} className="block text-xs text-muted">
-                {f.label}
-                <input
-                  value={values[f.key] ?? ''}
-                  onChange={(e) =>
-                    setValues((prev) => ({ ...prev, [f.key]: e.target.value }))
-                  }
-                  className="mt-1 w-full border border-fog px-3 py-2 bg-white text-ink text-sm"
-                  placeholder={f.placeholder}
-                />
-              </label>
-            ))}
+            {CONTACT_LINK_FIELDS.map((f) => {
+              const on = enabled[f.key];
+              return (
+                <div
+                  key={f.key}
+                  className={`border border-fog px-3 py-3 transition-colors ${
+                    on ? 'bg-white' : 'bg-fog/30'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={(e) => toggleChannel(f.key, e.target.checked)}
+                        className="size-4 accent-ink"
+                      />
+                      <span className="text-sm font-medium text-ink">
+                        {f.label}
+                      </span>
+                    </label>
+                    <span className="text-[0.7rem] uppercase tracking-wide text-muted">
+                      {on ? 'Hiện' : 'Ẩn'}
+                    </span>
+                  </div>
+                  {on ? (
+                    <input
+                      value={values[f.key] ?? ''}
+                      onChange={(e) =>
+                        setValues((prev) => ({
+                          ...prev,
+                          [f.key]: e.target.value,
+                        }))
+                      }
+                      className="mt-2.5 w-full border border-fog px-3 py-2 bg-white text-ink text-sm"
+                      placeholder={f.placeholder}
+                      required={on}
+                    />
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </section>
 

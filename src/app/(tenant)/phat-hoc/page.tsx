@@ -2,18 +2,18 @@ import Link from 'next/link';
 import { getCurrentTemple } from '@/lib/tenant';
 import {
   NAV_SECTION_LABELS,
-  PHONG_THUY_NAV_ORDER,
+  PHAT_HOC_NAV_ORDER,
   groupToolsByNavSection,
-  phongThuyMenuTools,
+  toolsByDomain,
   toolHref,
 } from '@/lib/fengshui/tools';
 
-export default async function PhongThuyHub() {
+export default async function PhatHocHub() {
   const temple = await getCurrentTemple();
   if (!temple) return null;
   const primary = temple.primary_color || '#7A1F1F';
-  const grouped = groupToolsByNavSection(PHONG_THUY_NAV_ORDER);
-  const count = phongThuyMenuTools().length;
+  const tools = toolsByDomain('phat_hoc');
+  const grouped = groupToolsByNavSection(PHAT_HOC_NAV_ORDER);
 
   return (
     <main className="pt-24 pb-16 px-6 md:px-12">
@@ -22,21 +22,21 @@ export default async function PhongThuyHub() {
           className="text-[0.72rem] tracking-[0.3em] uppercase mb-2"
           style={{ color: primary }}
         >
-          Công cụ phong thủy
+          Phật học · Tâm linh
         </p>
         <h1 className="font-display text-3xl md:text-4xl text-ink">
-          Mỗi ngày · Hệ trọng · Tử vi
+          Lịch lễ · Kinh · Tham gia chùa
         </h1>
         <p className="mt-3 text-muted max-w-2xl leading-relaxed">
-          Bộ công cụ hỗ trợ trụ trì tư vấn Phật tử của {temple.name}. Quẻ / thần
-          số nằm nhóm «Tham khảo thêm» — không ưu tiên trên menu.
+          Kho mục lục hỗ trợ trụ trì hướng dẫn Phật tử của {temple.name}. Nhóm
+          «Tham gia» nối thẳng sớ, quy y, hoạt động và cúng dường.
         </p>
         <p className="mt-3 text-sm">
           <Link
-            href="/phat-hoc"
+            href="/phong-thuy"
             className="underline underline-offset-4 text-ink hover:opacity-70"
           >
-            Sang mục Phật học →
+            ← Công cụ phong thủy · cổ học
           </Link>
         </p>
 
@@ -52,29 +52,25 @@ export default async function PhongThuyHub() {
           ))}
         </div>
 
-        <div className="mt-12 space-y-14">
-          {grouped.map(({ section, tools }) => (
+        <div className="mt-12 space-y-12">
+          {grouped.map(({ section, tools: catTools }) => (
             <section
               key={section}
               id={`section-${section}`}
               className="scroll-mt-20"
             >
               <h2
-                className="font-display text-2xl text-ink border-b border-fog pb-2 mb-6"
-                style={{ borderColor: `${primary}55` }}
+                className="text-[0.72rem] uppercase tracking-[0.22em] mb-3"
+                style={{ color: primary }}
               >
                 {NAV_SECTION_LABELS[section]}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {tools.map((tool) => (
+                {catTools.map((tool) => (
                   <Link
                     key={tool.slug}
                     href={toolHref(tool)}
-                    className={`group relative border p-4 transition-colors bg-white ${
-                      section === 'tham_khao'
-                        ? 'border-fog/80 hover:border-ink/20 opacity-95'
-                        : 'border-fog hover:border-ink/30'
-                    }`}
+                    className="group relative border border-fog p-4 hover:border-ink/30 transition-colors bg-white"
                   >
                     {tool.status === 'coming_soon' ? (
                       <span className="absolute top-3 right-3 text-[0.6rem] uppercase tracking-wide px-1.5 py-0.5 bg-mist text-muted">
@@ -93,7 +89,7 @@ export default async function PhongThuyHub() {
         </div>
 
         <p className="mt-14 text-xs text-muted leading-relaxed max-w-2xl">
-          {count} chức năng phong thủy / cổ học · Phật học xem tại mục riêng.
+          {tools.length} mục Phật học trong khung hệ thống.
         </p>
       </div>
     </main>

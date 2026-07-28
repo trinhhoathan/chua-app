@@ -2,6 +2,9 @@ import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import type { Devotee } from '@/types/database';
 import { DevoteeForm } from './DevoteeForm';
+import { DevoteesTable } from './DevoteesTable';
+
+export const dynamic = 'force-dynamic';
 
 export default async function PhatTuPage() {
   const ctx = await requireAdmin();
@@ -13,56 +16,48 @@ export default async function PhatTuPage() {
     .from('devotees')
     .select('*')
     .eq('temple_id', templeId)
-    .order('full_name');
+    .order('created_at', { ascending: false });
 
   const rows = (data ?? []) as Devotee[];
+  const totals = {
+    all: rows.length,
+    web: rows.filter((r) => r.source === 'web').length,
+    admin: rows.filter((r) => r.source === 'admin').length,
+    consent: rows.filter((r) => r.consent_contact).length,
+  };
 
   return (
     <div>
       <h1 className="font-display text-3xl text-ink">Danh sách Phật tử</h1>
-      <p className="mt-2 text-sm text-muted">
-        Quản lý Pháp danh, ngày quy y của {ctx.temples[0]?.name}
+      <p className="mt-2 text-sm text-muted max-w-2xl">
+        Sổ Phật tử của {ctx.temples[0]?.name}. Người tự đăng ký qua website
+        sẽ được đánh dấu «Website».
       </p>
 
-      <div className="mt-8 grid lg:grid-cols-[1fr_1.2fr] gap-8">
-        <DevoteeForm templeId={templeId} />
-        <div className="overflow-x-auto border border-fog bg-paper">
-          <table className="w-full text-sm">
-            <thead className="text-left text-muted bg-mist">
-              <tr>
-                <th className="p-3">Họ tên</th>
-                <th className="p-3">Pháp danh</th>
-                <th className="p-3">Năm sinh</th>
-                <th className="p-3">SĐT</th>
-                <th className="p-3">Quy y</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="p-6 text-center text-muted">
-                    Chưa có Phật tử.
-                  </td>
-                </tr>
-              ) : (
-                rows.map((d) => (
-                  <tr key={d.id} className="border-t border-fog">
-                    <td className="p-3">{d.full_name}</td>
-                    <td className="p-3">{d.dharma_name ?? '—'}</td>
-                    <td className="p-3">{d.birth_year ?? '—'}</td>
-                    <td className="p-3">{d.phone ?? '—'}</td>
-                    <td className="p-3 text-xs">
-                      {d.quy_y_date
-                        ? new Date(d.quy_y_date).toLocaleDateString('vi-VN')
-                        : '—'}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Tổng số" value={totals.all} />
+        <StatCard label="Tự đăng ký" value={totals.web} />
+        <StatCard label="Nhập tay" value={totals.admin} />
+        <StatCard label="Đồng ý nhận tin" value={totals.consent} />
       </div>
+
+      <div className="mt-8 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-8">
+        <DevoteeForm templeId={templeId} />
+        <DevoteesTable templeId={templeId} devotees={rows} />
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border border-fog bg-paper px-4 py-3">
+      <p className="text-[0.7rem] uppercase tracking-wide text-muted">
+        {label}
+      </p>
+      <p className="mt-1 font-display text-2xl text-ink tabular-nums">
+        {value.toLocaleString('vi-VN')}
+      </p>
     </div>
   );
 }

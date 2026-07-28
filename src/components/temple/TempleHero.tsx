@@ -1,10 +1,14 @@
 import Image from 'next/image';
 import type { Temple } from '@/types/database';
 import { TempleLogo } from '@/components/temple/TempleLogo';
+import { HeroXinXamButton } from '@/components/temple/HeroXinXamButton';
 
 interface Props {
   temple: Temple;
 }
+
+const ghostBtn =
+  'inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white/90 border border-white/35 hover:bg-white/10 transition-colors';
 
 export function TempleHero({ temple }: Props) {
   const primary = temple.primary_color || '#7A1F1F';
@@ -63,11 +67,17 @@ export function TempleHero({ temple }: Props) {
             >
               Tìm hiểu lịch sử
             </a>
-            <a
-              href="#dong-nuoc"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white/90 border border-white/35 hover:bg-white/10 transition-colors"
-            >
+            <a href="#dong-nuoc" className={ghostBtn}>
               Công đức nước tinh khiết
+            </a>
+            <HeroXinXamButton
+              primaryColor={primary}
+              templeName={temple.name}
+              templeId={temple.id}
+              className={ghostBtn}
+            />
+            <a href="/go-mo" className={ghostBtn}>
+              Gõ mõ tụng kinh
             </a>
           </div>
         </div>

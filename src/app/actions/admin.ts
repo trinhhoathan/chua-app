@@ -2,11 +2,12 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { assertTempleAccess } from '@/lib/auth';
 import { getCurrentTemple } from '@/lib/tenant';
 import { supabase } from '@/lib/supabase';
 import { sendDevoteeNotification } from '@/lib/notifications';
-import type { PrayerRequestType } from '@/types/database';
+import type { PrayerRequestType, TempleEventType } from '@/types/database';
 
 export async function createPrayerRequest(input: {
   requestType: PrayerRequestType;
@@ -150,6 +151,184 @@ export async function deleteDevotee(input: {
     .eq('temple_id', input.templeId);
   if (error) return { ok: false, error: error.message };
   revalidatePath('/quan-tri/phat-tu');
+  return { ok: true };
+}
+
+const PHONE_REGEX = /^[0-9+()\-\s]{8,15}$/;
+
+function normalizePhoneKey(raw: string): string {
+  return raw.replace(/[^\d+]/g, '');
+}
+
+export async function registerDevoteePublic(input: {
+  fullName: string;
+  phone: string;
+  consent: boolean;
+  preferredChannel?: 'zalo' | 'sms' | 'phone';
+  note?: string;
+  hp?: string;
+}): Promise<{ ok: boolean; error?: string; existing?: boolean }> {
+  if (input.hp && input.hp.trim() !== '') return { ok: true };
+
+  const temple = await getCurrentTemple();
+  if (!temple) return { ok: false, error: 'Không tìm thấy chùa.' };
+
+  const fullName = input.fullName.trim();
+  const phoneRaw = input.phone.trim();
+  if (fullName.length < 2) {
+    return { ok: false, error: 'Vui lòng nhập đầy đủ họ và tên.' };
+  }
+  if (!PHONE_REGEX.test(phoneRaw)) {
+    return { ok: false, error: 'Số điện thoại chưa hợp lệ.' };
+  }
+  if (!input.consent) {
+    return {
+      ok: false,
+      error: 'Cần đồng ý nhận thông tin lễ hoạt động từ nhà chùa.',
+    };
+  }
+
+  const phone = normalizePhoneKey(phoneRaw);
+  const admin = getSupabaseAdmin();
+
+  const { data: existing } = await admin
+    .from('devotees')
+    .select('id, full_name, consent_contact')
+    .eq('temple_id', temple.id)
+    .eq('phone', phone)
+    .maybeSingle();
+
+  if (existing?.id) {
+    const { error } = await admin
+      .from('devotees')
+      .update({
+        full_name: fullName,
+        consent_contact: true,
+        preferred_channel: input.preferredChannel ?? 'zalo',
+        note: input.note?.trim() || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', existing.id);
+    if (error) return { ok: false, error: error.message };
+  } else {
+    const { error } = await admin.from('devotees').insert({
+      temple_id: temple.id,
+      full_name: fullName,
+      phone,
+      consent_contact: true,
+      preferred_channel: input.preferredChannel ?? 'zalo',
+      source: 'web',
+      note: input.note?.trim() || null,
+    });
+    if (error) return { ok: false, error: error.message };
+  }
+
+  try {
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      await sendDevoteeNotification({
+        templeId: temple.id,
+        recipient: phone,
+        templateKey: 'devotee_registered',
+        payload: {
+          customerName: fullName,
+          templeName: temple.name,
+        },
+      });
+    }
+  } catch {
+    // ignore
+  }
+
+  revalidatePath('/quan-tri/phat-tu');
+  return { ok: true, existing: Boolean(existing) };
+}
+
+export async function upsertTempleEvent(input: {
+  templeId: string;
+  id?: string;
+  title: string;
+  summary?: string;
+  imageUrl?: string;
+  eventType: TempleEventType;
+  startsAt: string;
+  endsAt?: string;
+  location?: string;
+  isPublished?: boolean;
+  sortOrder?: number;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+  const title = input.title.trim();
+  if (title.length < 2) return { ok: false, error: 'Thiếu tiêu đề sự kiện.' };
+  if (!input.startsAt) return { ok: false, error: 'Thiếu ngày giờ bắt đầu.' };
+
+  const starts = new Date(input.startsAt);
+  if (Number.isNaN(starts.getTime())) {
+    return { ok: false, error: 'Ngày giờ bắt đầu không hợp lệ.' };
+  }
+  const ends = input.endsAt
+    ? new Date(input.endsAt)
+    : new Date(starts.getTime() + 2 * 60 * 60 * 1000);
+  if (Number.isNaN(ends.getTime())) {
+    return { ok: false, error: 'Ngày giờ kết thúc không hợp lệ.' };
+  }
+  if (ends.getTime() < starts.getTime()) {
+    return { ok: false, error: 'Ngày kết thúc phải sau ngày bắt đầu.' };
+  }
+
+  const supabase = await createClient();
+  const row = {
+    temple_id: input.templeId,
+    title,
+    summary: input.summary?.trim() || null,
+    image_url: input.imageUrl?.trim() || null,
+    event_type: input.eventType,
+    starts_at: starts.toISOString(),
+    ends_at: ends.toISOString(),
+    location: input.location?.trim() || null,
+    is_published: input.isPublished ?? true,
+    sort_order: input.sortOrder ?? 0,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (input.id) {
+    const { error } = await supabase
+      .from('temple_events')
+      .update(row)
+      .eq('id', input.id)
+      .eq('temple_id', input.templeId);
+    if (error) return { ok: false, error: error.message };
+  } else {
+    const { error } = await supabase.from('temple_events').insert(row);
+    if (error) return { ok: false, error: error.message };
+  }
+
+  revalidatePath('/quan-tri/hoat-dong');
+  revalidatePath('/');
+  return { ok: true };
+}
+
+export async function deleteTempleEvent(input: {
+  id: string;
+  templeId: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('temple_events')
+    .delete()
+    .eq('id', input.id)
+    .eq('temple_id', input.templeId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/quan-tri/hoat-dong');
+  revalidatePath('/');
   return { ok: true };
 }
 
@@ -307,6 +486,9 @@ export async function updateContactLinks(input: {
     messenger?: string;
     zalo?: string;
     zalo_community?: string;
+    instagram?: string;
+    threads?: string;
+    x?: string;
     phone?: string;
   };
 }): Promise<{ ok: boolean; error?: string }> {
@@ -328,6 +510,9 @@ export async function updateContactLinks(input: {
     messenger: clean(input.links.messenger),
     zalo: clean(input.links.zalo),
     zalo_community: clean(input.links.zalo_community),
+    instagram: clean(input.links.instagram),
+    threads: clean(input.links.threads),
+    x: clean(input.links.x),
     phone: clean(input.links.phone),
   };
 

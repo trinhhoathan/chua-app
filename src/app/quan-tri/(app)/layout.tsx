@@ -5,6 +5,8 @@ import { logoutAction } from '@/app/actions/auth';
 
 const NAV = [
   { href: '/quan-tri', label: 'Tổng quan' },
+  { href: '/quan-tri/hoat-dong', label: 'Hoạt động' },
+  { href: '/quan-tri/gui-tin', label: 'Gửi tin' },
   { href: '/quan-tri/don-hang', label: 'Thỉnh nước' },
   { href: '/quan-tri/don-gia', label: 'Đơn giá' },
   { href: '/quan-tri/lien-he', label: 'Liên hệ' },

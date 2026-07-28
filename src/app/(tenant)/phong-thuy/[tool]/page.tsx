@@ -1,7 +1,11 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getCurrentTemple } from '@/lib/tenant';
-import { FENGSHUI_TOOLS, getToolMeta } from '@/lib/fengshui/tools';
+import {
+  getToolMeta,
+  toolsWithOwnPage,
+} from '@/lib/fengshui/tools';
 import { ToolShell } from '@/components/fengshui/ToolShell';
+import { ComingSoonPanel } from '@/components/fengshui/ComingSoonPanel';
 import { DongTho } from '@/components/fengshui/tools/DongTho';
 import { DateVerdictTool } from '@/components/fengshui/tools/DateVerdictTool';
 import { HuongNha } from '@/components/fengshui/tools/HuongNha';
@@ -9,19 +13,26 @@ import { CuoiHoi } from '@/components/fengshui/tools/CuoiHoi';
 import { MaChay } from '@/components/fengshui/tools/MaChay';
 import { TrungTang } from '@/components/fengshui/tools/TrungTang';
 import { SinhCon } from '@/components/fengshui/tools/SinhCon';
+import { LapLaSoTuVi } from '@/components/fengshui/tools/LapLaSoTuVi';
+import { DoiAmDuong } from '@/components/fengshui/tools/DoiAmDuong';
+import { GioHoangDao } from '@/components/fengshui/tools/GioHoangDao';
+import { NgayViaPhat } from '@/components/fengshui/tools/NgayViaPhat';
+import { XinXamQuanAm } from '@/components/fengshui/tools/XinXamQuanAm';
 
 interface Props {
   params: Promise<{ tool: string }>;
 }
 
 export function generateStaticParams() {
-  return FENGSHUI_TOOLS.map((t) => ({ tool: t.slug }));
+  return toolsWithOwnPage().map((t) => ({ tool: t.slug }));
 }
 
 export default async function ToolPage({ params }: Props) {
   const { tool } = await params;
   const meta = getToolMeta(tool);
   if (!meta) notFound();
+  if (meta.href) redirect(meta.href);
+
   const temple = await getCurrentTemple();
   if (!temple) return null;
 
@@ -29,13 +40,36 @@ export default async function ToolPage({ params }: Props) {
 
   return (
     <ToolShell tool={meta} primaryColor={primary}>
-      {renderTool(tool, primary)}
+      {meta.status === 'coming_soon' ? (
+        <ComingSoonPanel tool={meta} primaryColor={primary} />
+      ) : (
+        renderTool(tool, primary, temple.name, temple.id)
+      )}
     </ToolShell>
   );
 }
 
-function renderTool(slug: string, primary: string) {
+function renderTool(
+  slug: string,
+  primary: string,
+  templeName: string,
+  templeId: string,
+) {
   switch (slug) {
+    case 'doi-am-duong':
+      return <DoiAmDuong primaryColor={primary} />;
+    case 'gio-hoang-dao':
+      return <GioHoangDao primaryColor={primary} />;
+    case 'ngay-via-phat':
+      return <NgayViaPhat primaryColor={primary} />;
+    case 'gieo-que-xin-xam':
+      return (
+        <XinXamQuanAm
+          primaryColor={primary}
+          templeName={templeName}
+          templeId={templeId}
+        />
+      );
     case 'dong-tho':
       return <DongTho primaryColor={primary} />;
     case 'khoi-cong':
@@ -80,6 +114,8 @@ function renderTool(slug: string, primary: string) {
       return <TrungTang primaryColor={primary} />;
     case 'sinh-con':
       return <SinhCon primaryColor={primary} />;
+    case 'lap-la-so-tu-vi':
+      return <LapLaSoTuVi primaryColor={primary} />;
     default:
       return null;
   }

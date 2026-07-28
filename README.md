@@ -34,9 +34,13 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role — bắt buộc webhook/thông báo>
 ADMIN_KEY=<legacy key, tuỳ chọn>
 PAYMENT_WEBHOOK_SECRET=<secret cho POST /api/payments/webhook>
 SEPAY_WEBHOOK_API_KEY=<API Key cấu hình trên SePay Dashboard>
-ZALO_OA_ACCESS_TOKEN=   # tuỳ chọn
-SMS_API_URL=            # tuỳ chọn
+ZALO_OA_ACCESS_TOKEN=   # tuỳ chọn — OA CS (cần user_id follower)
+ZALO_ZNS_ACCESS_TOKEN=  # khuyến nghị — Zalo ZNS gửi theo SĐT
+ZALO_ZNS_TEMPLATE_ID=   # template ZNS đã duyệt trên Zalo
+SMS_API_URL=            # tuỳ chọn — endpoint SMS Brandname
 SMS_API_KEY=            # tuỳ chọn
+EMAIL_API_URL=          # tuỳ chọn
+EMAIL_API_KEY=          # tuỳ chọn
 
 # 1 tài khoản ngân hàng công ty (chung mọi chùa)
 COMPANY_BANK_NAME=VietinBank

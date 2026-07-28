@@ -238,6 +238,42 @@ export function dayCanChi(jd: number): { can: Can; chi: Chi } {
   return { can: CAN[canIdx], chi: CHI[chiIdx] };
 }
 
+/**
+ * Giờ địa chi (canh giờ VN): 23h–1h Tý, 1–3 Sửu, …
+ */
+export function hourCanChi(
+  hour: number,
+  dayCan: Can,
+): { can: Can; chi: Chi } {
+  const h = ((hour % 24) + 24) % 24;
+  const chiIdx = Math.floor(((h + 1) % 24) / 2);
+  const dayCanIdx = CAN.indexOf(dayCan);
+  // Giờ Tý can = (dayCanIdx % 5) * 2
+  const firstHourCan = (dayCanIdx % 5) * 2;
+  const canIdx = (firstHourCan + chiIdx) % 10;
+  return { can: CAN[canIdx], chi: CHI[chiIdx] };
+}
+
+export function hourBranchLabel(hour: number): string {
+  const h = ((hour % 24) + 24) % 24;
+  const chiIdx = Math.floor(((h + 1) % 24) / 2);
+  const ranges = [
+    '23–1h',
+    '1–3h',
+    '3–5h',
+    '5–7h',
+    '7–9h',
+    '9–11h',
+    '11–13h',
+    '13–15h',
+    '15–17h',
+    '17–19h',
+    '19–21h',
+    '21–23h',
+  ];
+  return `${CHI[chiIdx]} (${ranges[chiIdx]})`;
+}
+
 export function monthCanChiFromYear(
   lunarYear: number,
   lunarMonth: number,
@@ -266,4 +302,92 @@ export function tuoiMu(
   referenceYear: number = new Date().getFullYear(),
 ): number {
   return referenceYear - birthYear + 1;
+}
+
+/**
+ * Âm → dương (Ho Ngọc Đức). Trả null nếu ngày ÂL không hợp lệ.
+ */
+export function lunarToSolar(
+  lunarDay: number,
+  lunarMonth: number,
+  lunarYear: number,
+  lunarLeap = false,
+): { day: number; month: number; year: number } | null {
+  let a11: number;
+  let b11: number;
+  if (lunarMonth < 11) {
+    a11 = getLunarMonth11(lunarYear - 1, TIMEZONE);
+    b11 = getLunarMonth11(lunarYear, TIMEZONE);
+  } else {
+    a11 = getLunarMonth11(lunarYear, TIMEZONE);
+    b11 = getLunarMonth11(lunarYear + 1, TIMEZONE);
+  }
+  const k = INT(0.5 + (a11 - 2415021.076998695) / 29.530588853);
+  let off = lunarMonth - 11;
+  if (off < 0) off += 12;
+  if (b11 - a11 > 365) {
+    const leapOff = getLeapMonthOffset(a11, TIMEZONE);
+    let leapMonth = leapOff - 2;
+    if (leapMonth < 0) leapMonth += 12;
+    if (lunarLeap && lunarMonth !== leapMonth) {
+      return null;
+    }
+    if (lunarLeap || off >= leapOff) {
+      off += 1;
+    }
+  }
+  const monthStart = getNewMoonDay(k + off, TIMEZONE);
+  const [day, month, year] = jdToDate(monthStart + lunarDay - 1);
+  if (day < 1 || month < 1) return null;
+  return { day, month, year };
+}
+
+const HOUR_RANGES = [
+  '23–1h',
+  '1–3h',
+  '3–5h',
+  '5–7h',
+  '7–9h',
+  '9–11h',
+  '11–13h',
+  '13–15h',
+  '15–17h',
+  '17–19h',
+  '19–21h',
+  '21–23h',
+] as const;
+
+/** Giờ Hoàng đạo theo chi ngày (bảng dân gian phổ biến VN). */
+const HOANG_DAO_BY_DAY_CHI: Record<Chi, readonly Chi[]> = {
+  Tý: ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Thân', 'Dậu'],
+  Ngọ: ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Thân', 'Dậu'],
+  Sửu: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Thân', 'Tuất'],
+  Mùi: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Thân', 'Tuất'],
+  Dần: ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'],
+  Thân: ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'],
+  Mão: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Mùi', 'Dậu'],
+  Dậu: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Mùi', 'Dậu'],
+  Thìn: ['Sửu', 'Dần', 'Thìn', 'Ngọ', 'Thân', 'Dậu'],
+  Tuất: ['Sửu', 'Dần', 'Thìn', 'Ngọ', 'Thân', 'Dậu'],
+  Tỵ: ['Dần', 'Thìn', 'Tỵ', 'Thân', 'Dậu', 'Hợi'],
+  Hợi: ['Dần', 'Thìn', 'Tỵ', 'Thân', 'Dậu', 'Hợi'],
+};
+
+export interface HourSlot {
+  chi: Chi;
+  range: string;
+  hoangDao: boolean;
+}
+
+export function hoursForDayChi(dayChi: Chi): HourSlot[] {
+  const good = new Set(HOANG_DAO_BY_DAY_CHI[dayChi]);
+  return CHI.map((chi, i) => ({
+    chi,
+    range: HOUR_RANGES[i],
+    hoangDao: good.has(chi),
+  }));
+}
+
+export function hoangDaoHours(dayChi: Chi): HourSlot[] {
+  return hoursForDayChi(dayChi).filter((h) => h.hoangDao);
 }

@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useTransition, useMemo } from 'react';
+import { useState, useTransition, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createWaterOrder } from '@/app/actions/orders';
+import {
+  OPEN_WATER_DONATE_EVENT,
+  WATER_BAR_PULSE_EVENT,
+} from '@/lib/water-merit-prompt';
 
 interface Props {
   primaryColor: string;
@@ -31,8 +35,32 @@ export function WaterStickyBar({
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [pulse, setPulse] = useState(false);
 
   const total = useMemo(() => qty * unitPrice, [qty, unitPrice]);
+
+  useEffect(() => {
+    function onOpen(e: Event) {
+      const detail = (e as CustomEvent<{ note?: string; qty?: number }>).detail;
+      if (detail?.qty && detail.qty >= MIN_QTY) {
+        setQty(Math.min(MAX_QTY, detail.qty));
+      }
+      if (detail?.note) setNote(detail.note);
+      setOpen(true);
+      setPulse(true);
+      window.setTimeout(() => setPulse(false), 2200);
+    }
+    function onPulse() {
+      setPulse(true);
+      window.setTimeout(() => setPulse(false), 2200);
+    }
+    window.addEventListener(OPEN_WATER_DONATE_EVENT, onOpen);
+    window.addEventListener(WATER_BAR_PULSE_EVENT, onPulse);
+    return () => {
+      window.removeEventListener(OPEN_WATER_DONATE_EVENT, onOpen);
+      window.removeEventListener(WATER_BAR_PULSE_EVENT, onPulse);
+    };
+  }, []);
 
   function submit() {
     setError(null);
@@ -59,7 +87,11 @@ export function WaterStickyBar({
 
   return (
     <>
-      <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-ink/95 backdrop-blur-md shadow-[0_-12px_40px_rgba(0,0,0,0.35)]">
+      <div
+        className={`fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-ink/95 backdrop-blur-md shadow-[0_-12px_40px_rgba(0,0,0,0.35)] transition-shadow ${
+          pulse ? 'water-bar-pulse' : ''
+        }`}
+      >
         <div className="mx-auto max-w-3xl px-3 md:px-5 py-3">
           <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:gap-3">
             <div className="min-w-0 flex-1 rounded-md bg-white/[0.06] ring-1 ring-white/10 px-2.5 py-2">
