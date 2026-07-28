@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import Link from 'next/link';
 import type { TempleContactLinks } from '@/types/database';
 import { phoneHref } from '@/lib/contact-links';
 import { XinXamQuanAmModal } from '@/components/temple/XinXamQuanAmModal';
@@ -72,23 +73,29 @@ function XinXamIcon() {
   );
 }
 
-export function ContactDock({
-  links,
-  mapsUrl,
-  primaryColor = '#7A1F1F',
-  templeName,
-  templeId,
-}: Props) {
-  const [showTop, setShowTop] = useState(false);
-  const [xamOpen, setXamOpen] = useState(false);
+function GoMoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className={svgCls} fill="currentColor" aria-hidden>
+      <ellipse cx="11" cy="13" rx="7" ry="6" />
+      <ellipse cx="14.5" cy="13" rx="1.6" ry="3" fill="#1a1714" opacity=".45" />
+      <rect
+        x="16.5"
+        y="4"
+        width="1.6"
+        height="9"
+        rx="0.6"
+        transform="rotate(28 17.3 8.5)"
+      />
+      <circle cx="19.2" cy="4.2" r="2" />
+    </svg>
+  );
+}
 
-  useEffect(() => {
-    const onScroll = () => setShowTop(window.scrollY > 420);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
+function buildContactItems(
+  links: TempleContactLinks,
+  mapsUrl: string | null | undefined,
+  primaryColor: string,
+): DockItem[] {
   const items: DockItem[] = [];
 
   if (links.zalo) {
@@ -255,10 +262,187 @@ export function ContactDock({
     });
   }
 
+  return items;
+}
+
+export function ContactDock({
+  links,
+  mapsUrl,
+  primaryColor = '#7A1F1F',
+  templeName,
+  templeId,
+}: Props) {
+  const [showTop, setShowTop] = useState(false);
+  const [xamOpen, setXamOpen] = useState(false);
+  const [fanOpen, setFanOpen] = useState(false);
+  const items = buildContactItems(links, mapsUrl, primaryColor);
+  const autoCloseRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 420);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  function clearAutoClose() {
+    if (autoCloseRef.current) {
+      window.clearTimeout(autoCloseRef.current);
+      autoCloseRef.current = null;
+    }
+  }
+
+  function scheduleAutoClose() {
+    clearAutoClose();
+    autoCloseRef.current = window.setTimeout(() => {
+      setFanOpen(false);
+    }, 4200);
+  }
+
+  function openFan() {
+    setFanOpen(true);
+    scheduleAutoClose();
+  }
+
+  function closeFan() {
+    clearAutoClose();
+    setFanOpen(false);
+  }
+
+  function toggleFan() {
+    if (fanOpen) closeFan();
+    else openFan();
+  }
+
+  useEffect(() => {
+    if (!fanOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') closeFan();
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- closeFan ổn định qua refs
+  }, [fanOpen]);
+
+  useEffect(() => {
+    return () => clearAutoClose();
+  }, []);
+
+  function openXinXam() {
+    closeFan();
+    setXamOpen(true);
+  }
+
+  const xamBg = `linear-gradient(160deg,#E8C56A 0%,#B8860B 45%,${primaryColor} 100%)`;
+  const goMoBg = `linear-gradient(160deg,#D4A574 0%,#8B5A2B 55%,${primaryColor} 100%)`;
+
+  /** Icon gần FAB bung trước (index từ dưới lên). */
+  const fanActions = [
+    ...(showTop
+      ? [
+          {
+            key: 'top',
+            node: (
+              <button
+                type="button"
+                aria-label="Lên đầu trang"
+                onClick={() => {
+                  closeFan();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="block"
+              >
+                <IconWrap
+                  bg="linear-gradient(160deg,#F6E7B2 0%,#D4A84B 100%)"
+                  label="Lên đầu trang"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={svgCls}
+                    fill="none"
+                    stroke="#5c4a1a"
+                    strokeWidth="2.4"
+                    aria-hidden
+                  >
+                    <path
+                      d="M12 19V5M5 12l7-7 7 7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </IconWrap>
+              </button>
+            ),
+          },
+        ]
+      : []),
+    ...items
+      .slice()
+      .reverse()
+      .map((item) => ({
+        key: item.key,
+        node: (
+          <a
+            href={item.href}
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener noreferrer' : undefined}
+            aria-label={item.label}
+            onClick={closeFan}
+            className="block"
+          >
+            <IconWrap bg={item.bg} label={item.label}>
+              {item.icon}
+            </IconWrap>
+          </a>
+        ),
+      })),
+    {
+      key: 'go-mo',
+      node: (
+        <Link
+          href="/go-mo"
+          aria-label="Gõ mõ tụng kinh"
+          title="Gõ mõ tụng kinh"
+          onClick={closeFan}
+          className="block"
+        >
+          <IconWrap bg={goMoBg} label="Gõ mõ tụng kinh">
+            <GoMoIcon />
+          </IconWrap>
+        </Link>
+      ),
+    },
+    {
+      key: 'xin-xam',
+      node: (
+        <button
+          type="button"
+          aria-label="Xin xăm Quan Âm online"
+          title="Xin xăm Quan Âm online"
+          onClick={openXinXam}
+          className="xam-dock-btn group block"
+        >
+          <span
+            className="xam-dock-glow relative flex size-10 items-center justify-center rounded-full text-white shadow-[2px_3px_0_rgba(0,0,0,0.14)] ring-1 ring-black/5"
+            style={{ background: xamBg }}
+          >
+            <span className="xam-dock-icon inline-flex">
+              <XinXamIcon />
+            </span>
+          </span>
+        </button>
+      ),
+    },
+  ];
+
+  // Visual top → bottom: xin xăm … contacts … (scroll) then FAB
+  const fanVisual = fanActions.slice().reverse();
+
   return (
     <>
-      <div className="pointer-events-none fixed right-2 z-[45] bottom-[7.25rem] md:right-3.5 md:bottom-auto md:top-1/2 md:-translate-y-1/2">
-        <div className="pointer-events-auto flex flex-col items-center gap-2 md:gap-2.5">
+      {/* Desktop / tablet: cột icon dọc */}
+      <div className="pointer-events-none fixed right-2 z-[45] bottom-[7.25rem] hidden md:block md:right-3.5 md:bottom-auto md:top-1/2 md:-translate-y-1/2">
+        <div className="pointer-events-auto flex flex-col items-center gap-2.5">
           <button
             type="button"
             aria-label="Xin xăm Quan Âm online"
@@ -270,10 +454,8 @@ export function ContactDock({
               Xin xăm Quan Âm
             </span>
             <span
-              className="xam-dock-glow relative flex size-10 items-center justify-center rounded-full text-white ring-1 ring-black/5 transition-transform group-hover:-translate-y-0.5 md:size-11"
-              style={{
-                background: `linear-gradient(160deg,#E8C56A 0%,#B8860B 45%,${primaryColor} 100%)`,
-              }}
+              className="xam-dock-glow relative flex size-11 items-center justify-center rounded-full text-white ring-1 ring-black/5 transition-transform group-hover:-translate-y-0.5"
+              style={{ background: xamBg }}
             >
               <span className="xam-dock-icon inline-flex">
                 <XinXamIcon />
@@ -281,31 +463,11 @@ export function ContactDock({
             </span>
           </button>
 
-          <a
-            href="/go-mo"
-            aria-label="Gõ mõ tụng kinh"
-            title="Gõ mõ tụng kinh"
-            className="block"
-          >
-            <IconWrap
-              bg={`linear-gradient(160deg,#D4A574 0%,#8B5A2B 55%,${primaryColor} 100%)`}
-              label="Gõ mõ tụng kinh"
-            >
-              <svg viewBox="0 0 24 24" className={svgCls} fill="currentColor" aria-hidden>
-                <ellipse cx="11" cy="13" rx="7" ry="6" />
-                <ellipse cx="14.5" cy="13" rx="1.6" ry="3" fill="#1a1714" opacity=".45" />
-                <rect
-                  x="16.5"
-                  y="4"
-                  width="1.6"
-                  height="9"
-                  rx="0.6"
-                  transform="rotate(28 17.3 8.5)"
-                />
-                <circle cx="19.2" cy="4.2" r="2" />
-              </svg>
+          <Link href="/go-mo" aria-label="Gõ mõ tụng kinh" title="Gõ mõ tụng kinh" className="block">
+            <IconWrap bg={goMoBg} label="Gõ mõ tụng kinh">
+              <GoMoIcon />
             </IconWrap>
-          </a>
+          </Link>
 
           {items.map((item) => (
             <a
@@ -353,6 +515,71 @@ export function ContactDock({
             </IconWrap>
           </button>
         </div>
+      </div>
+
+      {/* Mobile: FAB + fan icon bung hết chiều cao khả dụng */}
+      {fanOpen ? (
+        <button
+          type="button"
+          aria-label="Đóng liên hệ"
+          className="md:hidden fixed inset-0 z-[44] bg-ink/20"
+          onClick={closeFan}
+        />
+      ) : null}
+
+      <div
+        className={`md:hidden fixed right-3 z-[45] flex flex-col items-center justify-end gap-2 pointer-events-none dock-fan-stack bottom-[calc(1rem+3.25rem+env(safe-area-inset-bottom,0px))] ${
+          fanOpen ? 'is-open' : ''
+        }`}
+        aria-hidden={!fanOpen}
+      >
+        {fanVisual.map((action, i) => (
+          <div
+            key={action.key}
+            className="dock-fan-item"
+            style={
+              {
+                '--fan-i': fanVisual.length - 1 - i,
+                '--fan-n': fanVisual.length,
+              } as CSSProperties
+            }
+          >
+            {action.node}
+          </div>
+        ))}
+      </div>
+
+      <div className="md:hidden pointer-events-none fixed right-3 z-[46] bottom-[max(1rem,env(safe-area-inset-bottom,0px))]">
+        <button
+          type="button"
+          aria-label={fanOpen ? 'Đóng liên hệ' : 'Mở liên hệ'}
+          aria-expanded={fanOpen}
+          onClick={toggleFan}
+          className="pointer-events-auto relative z-[1] flex size-12 items-center justify-center rounded-full text-white shadow-[0_10px_28px_-8px_rgba(0,0,0,0.5)] ring-1 ring-white/25 transition-transform active:scale-95"
+          style={{ backgroundColor: primaryColor }}
+        >
+          {fanOpen ? (
+            <svg
+              viewBox="0 0 24 24"
+              className="size-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden
+            >
+              <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden>
+              <path d="M12 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm-6.5 18c0-3.1 2.9-5.5 6.5-5.5s6.5 2.4 6.5 5.5V21H5.5v-1z" />
+              <circle cx="18.5" cy="8.5" r="1.6" opacity=".85" />
+              <path
+                d="M20.8 16.2c0-1.5-1.2-2.7-2.8-2.9.7.7 1.1 1.6 1.1 2.6V17h1.7v-1z"
+                opacity=".85"
+              />
+            </svg>
+          )}
+        </button>
       </div>
 
       <XinXamQuanAmModal

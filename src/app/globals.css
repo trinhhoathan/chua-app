@@ -443,6 +443,42 @@ body {
     xam-label-shimmer 5.5s linear infinite;
 }
 
+@media (max-width: 767px) {
+  .xam-dock-label {
+    display: none;
+  }
+}
+
+.dock-fan-item {
+  opacity: 0;
+  transform: translateY(18px) scale(0.55);
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc((var(--fan-n, 8) - var(--fan-i, 0)) * 32ms);
+  will-change: transform, opacity;
+}
+
+.dock-fan-stack.is-open .dock-fan-item {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  transition-delay: calc(var(--fan-i, 0) * 42ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-fan-item {
+    transition: opacity 0.15s ease;
+    transform: none;
+  }
+
+  .dock-fan-stack.is-open .dock-fan-item {
+    transform: none;
+  }
+}
+
+
 .xam-dock-label::after {
   content: '';
   position: absolute;

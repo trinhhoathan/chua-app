@@ -81,6 +81,11 @@ export function PaymentCheckout({
       const data = (await res.json()) as { paid?: boolean; status?: string };
       if (data.status) setStatus(data.status);
       if (data.paid) {
+        try {
+          localStorage.setItem('tuvi-last-paid-order', orderCode);
+        } catch {
+          /* ignore */
+        }
         router.replace(`/dat-nuoc/${encodeURIComponent(orderCode)}/thanh-cong`);
       }
     } catch {

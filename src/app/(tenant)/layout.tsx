@@ -63,7 +63,7 @@ export default async function TenantLayout({
       }
     >
       <TopNav temple={temple} />
-      <div className="flex flex-1 flex-col pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
+      <div className="flex flex-1 flex-col pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
         <div className="flex-1">{children}</div>
         <TempleFooter temple={temple} />
       </div>

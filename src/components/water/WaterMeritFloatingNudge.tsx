@@ -48,7 +48,7 @@ export function WaterMeritFloatingNudge({
       : 'Tiếp nối công đức — thỉnh nước';
 
   return (
-    <div className="pointer-events-none fixed left-2 z-[46] bottom-[7.25rem] md:left-3.5 md:bottom-28">
+    <div className="pointer-events-none fixed left-2 z-[46] bottom-[max(5.5rem,calc(4rem+env(safe-area-inset-bottom,0px)))] md:left-3.5 md:bottom-28">
       <div className="pointer-events-auto max-w-[14.5rem] animate-rise shadow-[0_12px_32px_-12px_rgba(0,0,0,0.45)]">
         <div
           className="relative rounded-md text-white px-3 py-2.5 ring-1 ring-white/20"

@@ -3,11 +3,11 @@
 import { useMemo, useState, useTransition } from 'react';
 import type { BroadcastCampaign, BroadcastChannel, TempleEvent } from '@/types/database';
 import {
-  BROADCAST_MAX_RECIPIENTS,
   cancelBroadcastCampaign,
   createBroadcastCampaign,
   processBroadcastBatch,
 } from '@/app/actions/broadcast';
+import { BROADCAST_MAX_RECIPIENTS } from '@/lib/broadcast-constants';
 
 interface Providers {
   zalo: boolean;

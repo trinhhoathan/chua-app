@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getOrderByCode } from '@/app/actions/orders';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
+import { SavePaidOrderCode } from '@/components/water/SavePaidOrderCode';
 
 interface Props {
   params: Promise<{ code: string }>;
@@ -30,6 +31,10 @@ export default async function OrderPaidSuccessPage({ params }: Props) {
 
   return (
     <main className="pt-24 pb-28 px-6 md:px-12">
+      <SavePaidOrderCode
+        orderCode={order.order_code}
+        templeId={temple.id}
+      />
       <div className="mx-auto max-w-xl text-center">
         <div
           className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full text-white text-2xl"
@@ -55,12 +60,22 @@ export default async function OrderPaidSuccessPage({ params }: Props) {
           sẽ được đặt dâng lễ Tam Bảo và gieo duyên phát cho khách hành hương tại{' '}
           {temple.name}.
         </p>
+        <p className="mt-3 text-sm text-muted">
+          Mã đơn đã được lưu — quý vị có thể quay lại mục Lập lá số tử vi để mở
+          khóa luận giải chi tiết 12 cung.
+        </p>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/#minh-bach"
+            href="/phong-thuy/lap-la-so-tu-vi"
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white"
             style={{ backgroundColor: primary }}
+          >
+            Mở khóa luận giải 12 cung
+          </Link>
+          <Link
+            href="/#minh-bach"
+            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium border border-fog text-ink hover:bg-mist"
           >
             Xem Sổ Vàng Công Đức
           </Link>

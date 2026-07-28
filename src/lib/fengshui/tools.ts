@@ -102,13 +102,13 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
   {
     slug: 'lich-van-nien',
     title: 'Lịch vạn niên',
-    subtitle: 'Tra cứu âm dương mọi ngày',
+    subtitle: 'Âm dương · nên · kiêng',
     category: 'Lịch pháp',
     domain: 'co_hoc',
     navSection: 'hang_ngay',
-    status: 'coming_soon',
+    status: 'ready',
     description:
-      'Lịch vạn niên âm dương, Can Chi ngày — nền tảng chọn ngày lễ và việc hệ trọng.',
+      'Lịch vạn niên âm dương, Can Chi, Hoàng đạo / Hắc đạo và nhật lịch nên — kiêng chi tiết theo từng ngày.',
   },
   {
     slug: 'doi-am-duong',
@@ -293,13 +293,12 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
   {
     slug: 'lap-la-so-tu-vi',
     title: 'Lập lá số tử vi',
-    subtitle: 'Form · Can Chi · khung 12 cung',
+    subtitle: 'iztro · 12 cung · tiếng Việt',
     category: 'Tử vi',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
     status: 'ready',
-    description:
-      'Lập khung lá số từ ngày giờ sinh. Giai đoạn này có Tứ trụ Can Chi; an sao đầy đủ sẽ bổ sung sau.',
+    description: '',
   },
   {
     slug: 'luan-giai-tu-vi',
@@ -505,8 +504,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Lịch lễ',
     domain: 'phat_hoc',
     navSection: 'lich_le',
-    status: 'coming_soon',
-    description: 'Giới thiệu khóa tu, an cư; có thể gắn sự kiện chùa.',
+    status: 'ready',
+    description:
+      'Ý nghĩa khóa tu, an cư kiết hạ và lịch khóa tu nhà chùa đã công bố.',
   },
 
   // —— Kinh · khấn ——
@@ -517,9 +517,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Kinh sách',
     domain: 'phat_hoc',
     navSection: 'kinh_khan',
-    status: 'coming_soon',
+    status: 'ready',
     description:
-      'Kho kinh tụng phổ biến tại chùa Việt — nội dung do nhà chùa quản lý.',
+      'Kho kinh · chú · nghi thức tụng phổ biến tại chùa Việt — đọc trực tiếp, có thể mở gõ mõ tụng kèm.',
   },
   {
     slug: 'tra-cuu-kinh',
@@ -528,8 +528,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Kinh sách',
     domain: 'phat_hoc',
     navSection: 'kinh_khan',
-    status: 'coming_soon',
-    description: 'Mục lục tra cứu kinh sách tự quản theo chùa.',
+    status: 'ready',
+    description:
+      'Tìm kinh theo tên hoặc việc cần làm (cầu an, cầu siêu, sám hối…) — mục lục tham khảo phổ biến tại chùa Việt.',
   },
   {
     slug: 'van-khan-nghi-le',

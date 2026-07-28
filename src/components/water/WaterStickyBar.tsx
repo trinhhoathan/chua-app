@@ -87,13 +87,14 @@ export function WaterStickyBar({
 
   return (
     <>
+      {/* Desktop / tablet sticky bar — ẩn trên mobile */}
       <div
-        className={`fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-ink/95 backdrop-blur-md shadow-[0_-12px_40px_rgba(0,0,0,0.35)] transition-shadow ${
+        className={`hidden md:block fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-ink/95 backdrop-blur-md shadow-[0_-12px_40px_rgba(0,0,0,0.35)] transition-shadow ${
           pulse ? 'water-bar-pulse' : ''
         }`}
       >
-        <div className="mx-auto max-w-3xl px-3 md:px-5 py-3">
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:gap-3">
+        <div className="mx-auto max-w-3xl px-5 py-3">
+          <div className="flex flex-row items-stretch gap-3">
             <div className="min-w-0 flex-1 rounded-md bg-white/[0.06] ring-1 ring-white/10 px-2.5 py-2">
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                 <span className="shrink-0 text-[10px] tracking-[0.2em] uppercase text-white/45">
@@ -133,8 +134,8 @@ export function WaterStickyBar({
               </div>
             </div>
 
-            <div className="flex items-stretch gap-2 sm:gap-2.5 sm:shrink-0">
-              <div className="flex min-w-0 flex-1 flex-col justify-center rounded-md bg-white/[0.06] ring-1 ring-white/10 px-3 py-2 sm:w-[9.5rem] sm:flex-none">
+            <div className="flex items-stretch gap-2.5 shrink-0">
+              <div className="flex w-[9.5rem] flex-col justify-center rounded-md bg-white/[0.06] ring-1 ring-white/10 px-3 py-2">
                 <p className="text-[10px] uppercase tracking-wider text-white/45 leading-none">
                   Mức phát tâm
                 </p>
@@ -148,7 +149,7 @@ export function WaterStickyBar({
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="flex-[1.35] sm:flex-none sm:min-w-[11.5rem] rounded-md px-4 py-2.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,0,0.28)] transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
+                className="min-w-[11.5rem] rounded-md px-4 py-2.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,0,0.28)] transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
                 style={{ backgroundColor: primaryColor }}
               >
                 <span className="block leading-tight">Phát tâm thỉnh nước</span>
@@ -181,6 +182,22 @@ export function WaterStickyBar({
               <div className="mt-5 space-y-3">
                 <label className="block text-xs text-muted">
                   Số thùng
+                  <div className="mt-1.5 flex flex-wrap gap-1.5 md:hidden">
+                    {QUICK_QTY.map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => setQty(q)}
+                        className={`text-xs px-2.5 py-1.5 border ${
+                          qty === q
+                            ? 'border-ink text-ink bg-mist'
+                            : 'border-fog text-muted'
+                        }`}
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
                   <input
                     type="number"
                     min={MIN_QTY}

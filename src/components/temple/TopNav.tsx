@@ -15,6 +15,7 @@ import {
   type FengShuiToolMeta,
   type NavSection,
 } from '@/lib/fengshui/tools';
+import { openWaterDonateForm } from '@/lib/water-merit-prompt';
 
 interface Props {
   temple: Temple;
@@ -184,6 +185,7 @@ export function TopNav({ temple }: Props) {
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<MobileSection>(null);
+  const [scrolled, setScrolled] = useState(false);
   const desktopMenusRef = useRef<HTMLDivElement>(null);
   const moreId = useId();
   const phongThuyId = useId();
@@ -199,6 +201,15 @@ export function TopNav({ temple }: Props) {
     () => groupToolsByNavSection(PHAT_HOC_NAV_ORDER),
     [],
   );
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 12);
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -223,7 +234,10 @@ export function TopNav({ temple }: Props) {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setMobileOpen(false);
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+        setMobileSection(null);
+      }
     }
     document.addEventListener('keydown', onKey);
     return () => {
@@ -235,25 +249,76 @@ export function TopNav({ temple }: Props) {
   function closeAll() {
     setOpenMenu(null);
     setMobileOpen(false);
+    setMobileSection(null);
   }
 
   function toggleMenu(menu: OpenMenu) {
     setOpenMenu((cur) => (cur === menu ? null : menu));
   }
 
+  function toggleMobile() {
+    setMobileOpen((v) => {
+      if (v) setMobileSection(null);
+      return !v;
+    });
+  }
+
+  const navSolid = scrolled || mobileOpen;
+
   return (
     <>
-      <nav className="fixed top-0 inset-x-0 z-40 bg-ink/30 backdrop-blur-md border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-4 md:px-8 h-14 flex items-center justify-between gap-4">
-          <Link
-            href="/"
-            onClick={closeAll}
-            className="flex items-center gap-2 text-white shrink-0 min-w-0 max-w-[42%] sm:max-w-[280px]"
-          >
-            <span className="font-display text-[0.95rem] md:text-base tracking-tight truncate">
-              {temple.name}
-            </span>
-          </Link>
+      <nav
+        className={`fixed top-0 inset-x-0 z-[56] border-b transition-[background-color,border-color,backdrop-filter] ${
+          navSolid
+            ? 'bg-ink/95 backdrop-blur-md border-white/10'
+            : 'bg-ink/30 backdrop-blur-md border-white/10'
+        }`}
+      >
+        <div className="mx-auto max-w-6xl px-4 md:px-8 h-14 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1 lg:flex-initial">
+            <button
+              type="button"
+              aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-site-menu"
+              onClick={toggleMobile}
+              className="lg:hidden shrink-0 -ml-1.5 inline-flex size-10 items-center justify-center text-white/95 hover:bg-white/10 transition-colors"
+            >
+              {mobileOpen ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  className="size-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  aria-hidden
+                >
+                  <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  className="size-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  aria-hidden
+                >
+                  <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+
+            <Link
+              href="/"
+              onClick={closeAll}
+              className="flex items-center gap-2 text-white min-w-0 max-w-full sm:max-w-[280px]"
+            >
+              <span className="font-display text-[0.95rem] md:text-base tracking-tight truncate">
+                {temple.name}
+              </span>
+            </Link>
+          </div>
 
           <div className="hidden lg:flex flex-1 items-center justify-end gap-1 min-w-0">
             <div
@@ -422,25 +487,25 @@ export function TopNav({ temple }: Props) {
           </div>
 
           <div className="flex lg:hidden items-center gap-2 shrink-0">
-            {hotline ? (
-              <HotlineLink phone={hotline} primary={primary} compact />
-            ) : null}
             <button
               type="button"
-              aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}
-              aria-expanded={mobileOpen}
-              onClick={() => setMobileOpen((v) => !v)}
-              className="inline-flex size-9 items-center justify-center text-white ring-1 ring-white/25 hover:bg-white/10"
+              onClick={() => {
+                closeAll();
+                openWaterDonateForm();
+              }}
+              className="shrink-0 inline-flex items-center gap-1.5 h-8 rounded-full pl-2.5 pr-3 text-[0.78rem] font-medium leading-none text-white ring-1 ring-white/35"
+              style={{ backgroundColor: primary }}
+              aria-label="Thỉnh nước dâng chùa"
             >
-              {mobileOpen ? (
-                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                  <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                  <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-                </svg>
-              )}
+              <svg
+                viewBox="0 0 16 16"
+                className="size-3.5 opacity-95"
+                fill="currentColor"
+                aria-hidden
+              >
+                <path d="M8 1.5C8 1.5 3.5 7 3.5 10a4.5 4.5 0 1 0 9 0C12.5 7 8 1.5 8 1.5z" />
+              </svg>
+              Thỉnh nước
             </button>
           </div>
         </div>
@@ -456,20 +521,44 @@ export function TopNav({ temple }: Props) {
       ) : null}
 
       {mobileOpen ? (
-        <div className="fixed inset-0 z-30 lg:hidden">
+        <div className="fixed inset-0 z-[55] lg:hidden">
           <button
             type="button"
             aria-label="Đóng menu"
-            className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]"
-            onClick={() => setMobileOpen(false)}
+            className="absolute inset-0 bg-ink/60 backdrop-blur-[2px]"
+            onClick={closeAll}
           />
-          <div className="absolute top-14 inset-x-0 max-h-[calc(100vh-3.5rem)] overflow-y-auto border-b border-white/10 bg-ink/96 backdrop-blur-md shadow-xl">
-            <div className="mx-auto max-w-6xl px-4 py-4">
+          <div
+            id="mobile-site-menu"
+            role="dialog"
+            aria-modal
+            aria-label="Menu điều hướng"
+            className="absolute top-14 inset-x-0 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-white/10 bg-ink/98 backdrop-blur-md shadow-[0_24px_60px_-16px_rgba(0,0,0,0.75)]"
+          >
+            <div className="mx-auto max-w-6xl px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+              {/* Lối tắt hay dùng — nổi trên danh sách dài */}
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <Link
+                  href="/go-mo"
+                  onClick={closeAll}
+                  className="rounded-sm px-3 py-2.5 text-center text-[0.8rem] text-white ring-1 ring-white/15 hover:bg-white/8"
+                >
+                  Gõ mõ tụng kinh
+                </Link>
+                <Link
+                  href="/phong-thuy/gieo-que-xin-xam"
+                  onClick={closeAll}
+                  className="rounded-sm px-3 py-2.5 text-center text-[0.8rem] text-white ring-1 ring-white/15 hover:bg-white/8"
+                >
+                  Xin xăm Quan Âm
+                </Link>
+              </div>
+
               {ALL_SIMPLE.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeAll}
                   className="block px-3 py-3 text-base text-white/85 hover:text-white hover:bg-white/8 border-b border-white/8"
                 >
                   {l.label}
@@ -498,7 +587,7 @@ export function TopNav({ temple }: Props) {
                   <div className="pb-4 space-y-5">
                     <Link
                       href="/phong-thuy"
-                      onClick={() => setMobileOpen(false)}
+                      onClick={closeAll}
                       className="block px-3 py-1.5 text-sm text-white/50 hover:text-white"
                     >
                       Mở trang đầy đủ →
@@ -515,7 +604,7 @@ export function TopNav({ temple }: Props) {
                           <Link
                             key={tool.slug}
                             href={toolHref(tool)}
-                            onClick={() => setMobileOpen(false)}
+                            onClick={closeAll}
                             className="flex items-center justify-between py-2 text-sm text-white/80 hover:text-white border-b border-white/[0.06]"
                           >
                             <span>{tool.title}</span>
@@ -554,7 +643,7 @@ export function TopNav({ temple }: Props) {
                   <div className="pb-4 space-y-4">
                     <Link
                       href="/phat-hoc"
-                      onClick={() => setMobileOpen(false)}
+                      onClick={closeAll}
                       className="block px-3 py-1.5 text-sm text-white/50 hover:text-white"
                     >
                       Mở trang đầy đủ →
@@ -571,7 +660,7 @@ export function TopNav({ temple }: Props) {
                           <Link
                             key={tool.slug}
                             href={toolHref(tool)}
-                            onClick={() => setMobileOpen(false)}
+                            onClick={closeAll}
                             className="flex items-center justify-between py-2 text-sm text-white/80 hover:text-white border-b border-white/[0.06]"
                           >
                             <span>{tool.title}</span>
@@ -590,7 +679,7 @@ export function TopNav({ temple }: Props) {
 
               <Link
                 href="/#dong-nuoc"
-                onClick={() => setMobileOpen(false)}
+                onClick={closeAll}
                 className="mt-3 flex items-center justify-center px-4 py-3 text-sm text-white tracking-wide"
                 style={{ backgroundColor: primary }}
               >
