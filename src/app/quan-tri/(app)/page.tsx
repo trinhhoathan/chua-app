@@ -93,7 +93,7 @@ export default async function AdminHomePage() {
     },
     {
       label: 'Phần chùa nhận tháng này',
-      value: `${formatVnd(templeShare)}đ`,
+      value: formatVnd(templeShare),
       href: '/quan-tri/doi-soat',
     },
     {
@@ -149,17 +149,31 @@ export default async function AdminHomePage() {
             <p className="font-display text-2xl text-ink mt-2">{c.value}</p>
           </Link>
         ))}
-        <Link
-          href="/quan-tri/don-gia"
-          className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
-        >
-          <p className="text-[10px] uppercase tracking-widest text-muted">
-            Đơn giá nước / thùng
-          </p>
-          <p className="font-display text-2xl text-ink mt-2">
-            {waterPrice ? `${formatVnd(waterPrice)}đ` : '—'}
-          </p>
-        </Link>
+        {ctx.isSuperAdmin ? (
+          <Link
+            href="/quan-tri/don-gia"
+            className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
+          >
+            <p className="text-[10px] uppercase tracking-widest text-muted">
+              Đơn giá nước / thùng
+            </p>
+            <p className="font-display text-2xl text-ink mt-2">
+              {waterPrice ? formatVnd(waterPrice) : '—'}
+            </p>
+          </Link>
+        ) : (
+          <div className="border border-fog bg-paper p-5">
+            <p className="text-[10px] uppercase tracking-widest text-muted">
+              Đơn giá nước / thùng
+            </p>
+            <p className="font-display text-2xl text-ink mt-2">
+              {waterPrice ? formatVnd(waterPrice) : '—'}
+            </p>
+            <p className="mt-2 text-[11px] text-muted">
+              Do quản trị viên nền tảng đặt — trụ trì chỉ xem.
+            </p>
+          </div>
+        )}
         <Link
           href="/quan-tri/lien-he"
           className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"

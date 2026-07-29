@@ -16,8 +16,8 @@ export default async function LoginPage({ searchParams }: Props) {
         </p>
         <h1 className="font-display text-3xl text-ink">Đăng nhập</h1>
         <p className="mt-2 text-sm text-muted">
-          Dành cho trụ trì / ban quản lý. Mỗi tài khoản chỉ thấy dữ liệu chùa
-          được gán.
+          Dùng số điện thoại và mật khẩu 6 số. Trụ trì chỉ thấy dữ liệu chùa được
+          gán; quản trị viên nền tảng thấy tất cả.
         </p>
 
         {sp.error ? (
@@ -29,22 +29,31 @@ export default async function LoginPage({ searchParams }: Props) {
         <form action={loginAction} className="mt-6 space-y-4">
           <input type="hidden" name="next" value={next} />
           <label className="block text-xs text-muted">
-            Email
+            Số điện thoại
             <input
-              type="email"
-              name="email"
+              type="tel"
+              name="phone"
               required
-              className="mt-1 w-full px-3 py-2 border border-fog bg-white text-ink"
-              placeholder="trutri@chuacovien.vn"
+              inputMode="numeric"
+              autoComplete="username"
+              pattern="0[0-9]{9}"
+              maxLength={14}
+              className="mt-1 w-full px-3 py-2 border border-fog bg-white text-ink tracking-wide"
+              placeholder="0981666568"
             />
           </label>
           <label className="block text-xs text-muted">
-            Mật khẩu
+            Mật khẩu (6 số)
             <input
               type="password"
               name="password"
               required
-              className="mt-1 w-full px-3 py-2 border border-fog bg-white text-ink"
+              inputMode="numeric"
+              autoComplete="current-password"
+              pattern="[0-9]{6}"
+              maxLength={6}
+              className="mt-1 w-full px-3 py-2 border border-fog bg-white text-ink tracking-[0.35em]"
+              placeholder="••••••"
             />
           </label>
           <button
@@ -54,12 +63,6 @@ export default async function LoginPage({ searchParams }: Props) {
             Đăng nhập
           </button>
         </form>
-
-        <p className="mt-6 text-[11px] text-muted leading-relaxed">
-          Tài khoản mẫu: tạo user trên Supabase Auth rồi gắn vào bảng{' '}
-          <code className="bg-fog px-1">temple_admins</code>. Xem README
-          mục Phase 2.
-        </p>
       </div>
     </main>
   );

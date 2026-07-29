@@ -28,9 +28,9 @@ export function DevoteeJoinSection({ temple }: Props) {
             Ghi danh trở thành phật tử của {temple.name}
           </h2>
           <p className="mt-5 text-muted leading-relaxed text-[1.05rem]">
-            Quý vị để lại họ tên và số điện thoại, nhà chùa sẽ gửi thông tin
-            các buổi lễ, khóa tu, hoạt động thiện nguyện và lời chúc bình an
-            vào những ngày đại lễ.
+            Quý vị điền thông tin ghi danh, nhà chùa sẽ gửi tin các buổi lễ,
+            khóa tu, hoạt động thiện nguyện và lời chúc bình an vào những ngày
+            đại lễ.
           </p>
 
           {hero ? (

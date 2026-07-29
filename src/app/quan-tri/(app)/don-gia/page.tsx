@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { formatVnd } from '@/lib/tenant';
@@ -5,6 +6,10 @@ import { WaterPriceForm } from './WaterPriceForm';
 
 export default async function DonGiaPage() {
   const ctx = await requireAdmin();
+  if (!ctx.isSuperAdmin) {
+    redirect('/quan-tri');
+  }
+
   const templeIds = ctx.temples.map((t) => t.id);
   if (templeIds.length === 0) return null;
 
@@ -26,9 +31,9 @@ export default async function DonGiaPage() {
     <div>
       <h1 className="font-display text-3xl text-ink">Đơn giá nước</h1>
       <p className="mt-2 text-sm text-muted max-w-2xl leading-relaxed">
-        Quản lý mức phát tâm mỗi thùng nước thanh tịnh trên website. Hiện tại:{' '}
+        Chỉ siêu quản trị viên được đặt mức phát tâm mỗi thùng. Hiện tại:{' '}
         <span className="text-ink font-medium">
-          {temples.map((t) => `${t.name} ${formatVnd(t.water_price_vnd)}đ`).join(' · ')}
+          {temples.map((t) => `${t.name} ${formatVnd(t.water_price_vnd)}`).join(' · ')}
         </span>
       </p>
 

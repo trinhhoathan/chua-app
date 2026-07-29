@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+  <defs>
+    <radialGradient id="yangMetal" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#f0d078"/>
+      <stop offset="40%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#7a5a12"/>
+    </radialGradient>
+    <radialGradient id="yangInner" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#e8c45a"/>
+      <stop offset="100%" stop-color="#a67c1a"/>
+    </radialGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#yangMetal)" stroke="#5c4208" stroke-width="2"/>
+  <circle cx="60" cy="60" r="48" fill="none" stroke="#8b6914" stroke-width="1.5" opacity="0.7"/>
+  <circle cx="60" cy="60" r="40" fill="url(#yangInner)" stroke="#6b4e0e" stroke-width="1"/>
+  <!-- square hole -->
+  <rect x="48" y="48" width="24" height="24" rx="1" fill="#1a1208" stroke="#5c4208" stroke-width="1.5"/>
+  <!-- } -->
+  <text x="60" y="28" text-anchor="middle" font-size="14" font-family="serif" fill="#4a3408" font-weight="700">}</text>
+  <text x="60" y="98" text-anchor="middle" font-size="11" font-family="serif" fill="#4a3408" opacity="0.85">~</text>
+  <!-- rim shine -->
+  <path d="M28 38 A40 40 0 0 1 78 26" stroke="#ffe9a8" stroke-width="2.5" stroke-linecap="round" opacity="0.35" fill="none"/>
+</svg>

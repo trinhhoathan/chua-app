@@ -6,7 +6,9 @@ import type { TempleEvent, TempleEventType } from '@/types/database';
 import {
   upsertTempleEvent,
   deleteTempleEvent,
+  uploadEventImage,
 } from '@/app/actions/admin';
+import { compressImageForUpload } from '@/lib/compress-image';
 
 interface Props {
   templeId: string;
@@ -63,6 +65,35 @@ export function EventsAdminBoard({
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const [uploading, setUploading] = useState(false);
+
+  async function onPickImage(file: File | null) {
+    if (!file) return;
+    setErr(null);
+    setMsg(null);
+    setUploading(true);
+    try {
+      const compressed = await compressImageForUpload(file);
+      if (compressed.size > 2 * 1024 * 1024) {
+        setErr('Ảnh vẫn quá lớn sau khi nén (tối đa 2MB). Hãy chọn ảnh nhỏ hơn.');
+        return;
+      }
+      const fd = new FormData();
+      fd.set('templeId', templeId);
+      fd.set('file', compressed);
+      const res = await uploadEventImage(fd);
+      if (!res.ok || !res.url) {
+        setErr(res.error ?? 'Không tải được ảnh.');
+        return;
+      }
+      setForm((prev) => ({ ...prev, imageUrl: res.url! }));
+      setMsg('Đã tải ảnh lên.');
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Không xử lý được ảnh.');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   function edit(ev: TempleEvent) {
     setForm({
@@ -237,15 +268,65 @@ export function EventsAdminBoard({
           />
         </label>
 
-        <label className="block text-xs text-muted">
-          Ảnh (URL)
-          <input
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-            placeholder="https://…/le-hoi.jpg"
-            className="mt-1 w-full border border-fog px-3 py-2 bg-white text-ink text-sm"
-          />
-        </label>
+        <div className="space-y-2">
+          <p className="text-xs text-muted">Ảnh sự kiện</p>
+          <label className="flex flex-col items-start gap-2 border border-dashed border-fog bg-mist/40 px-4 py-3 cursor-pointer hover:bg-mist">
+            <span className="text-sm text-ink">
+              {uploading
+                ? 'Đang tải & nén ảnh…'
+                : 'Chọn ảnh từ điện thoại / máy tính'}
+            </span>
+            <span className="text-[11px] text-muted">
+              JPG, PNG, WebP · tự nén nhỏ · tối đa ~2MB
+            </span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/*"
+              disabled={uploading || pending}
+              className="sr-only"
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                e.target.value = '';
+                void onPickImage(f);
+              }}
+            />
+          </label>
+
+          {form.imageUrl ? (
+            <div className="flex items-start gap-3">
+              <div className="relative size-20 shrink-0 overflow-hidden bg-fog border border-fog">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={form.imageUrl}
+                  alt="Xem trước ảnh sự kiện"
+                  className="size-full object-cover"
+                />
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="text-[11px] text-muted break-all line-clamp-2">
+                  {form.imageUrl}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, imageUrl: '' })}
+                  className="text-xs text-lacquer underline"
+                >
+                  Gỡ ảnh
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          <label className="block text-[11px] text-muted">
+            Hoặc dán URL ảnh (tuỳ chọn)
+            <input
+              value={form.imageUrl}
+              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+              placeholder="https://…/le-hoi.jpg"
+              className="mt-1 w-full border border-fog px-3 py-2 bg-white text-ink text-sm"
+            />
+          </label>
+        </div>
 
         <label className="flex items-center gap-2 text-sm text-ink">
           <input
@@ -264,7 +345,7 @@ export function EventsAdminBoard({
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || uploading}
           className="px-5 py-2.5 bg-ink text-white text-sm disabled:opacity-60"
         >
           {pending

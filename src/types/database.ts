@@ -136,6 +136,10 @@ export interface Devotee {
   full_name: string;
   dharma_name: string | null;
   birth_year: number | null;
+  /** YYYY-MM-DD */
+  birth_date: string | null;
+  /** HH:mm:ss */
+  birth_time: string | null;
   phone: string | null;
   address: string | null;
   note: string | null;

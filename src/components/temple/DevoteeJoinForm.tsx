@@ -1,7 +1,16 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { registerDevoteePublic } from '@/app/actions/admin';
+import {
+  VnDateDropdowns,
+  VnTimeDropdowns,
+  composeVnDate,
+  composeVnTime,
+  yearOptions,
+  type DateParts,
+  type TimeParts,
+} from '@/components/forms/VnDateTimeFields';
 
 interface Props {
   templeName: string;
@@ -9,7 +18,8 @@ interface Props {
   variant?: 'section' | 'page';
 }
 
-type Channel = 'zalo' | 'sms' | 'phone';
+const EMPTY_DATE: DateParts = { day: '', month: '', year: '' };
+const EMPTY_TIME: TimeParts = { hour: '', minute: '' };
 
 export function DevoteeJoinForm({
   templeName,
@@ -17,8 +27,13 @@ export function DevoteeJoinForm({
   variant = 'section',
 }: Props) {
   const [fullName, setFullName] = useState('');
+  const [dharmaName, setDharmaName] = useState('');
   const [phone, setPhone] = useState('');
-  const [channel, setChannel] = useState<Channel>('zalo');
+  const [address, setAddress] = useState('');
+  const [note, setNote] = useState('');
+  const [birth, setBirth] = useState<DateParts>(EMPTY_DATE);
+  const [birthTime, setBirthTime] = useState<TimeParts>(EMPTY_TIME);
+  const [quyY, setQuyY] = useState<DateParts>(EMPTY_DATE);
   const [consent, setConsent] = useState(true);
   const [hp, setHp] = useState('');
   const [msg, setMsg] = useState<{
@@ -27,15 +42,72 @@ export function DevoteeJoinForm({
   } | null>(null);
   const [pending, start] = useTransition();
 
+  const thisYear = new Date().getFullYear();
+  const birthYears = useMemo(
+    () => yearOptions(thisYear - 120, thisYear),
+    [thisYear],
+  );
+  const quyYYears = useMemo(
+    () => yearOptions(thisYear - 80, thisYear),
+    [thisYear],
+  );
+
+  const labelCls = 'text-xs uppercase tracking-[0.2em] text-muted';
+  const inputCls =
+    'mt-1.5 w-full border border-fog bg-white px-4 py-3 text-ink text-base';
+
+  function resetForm() {
+    setFullName('');
+    setDharmaName('');
+    setPhone('');
+    setAddress('');
+    setNote('');
+    setBirth(EMPTY_DATE);
+    setBirthTime(EMPTY_TIME);
+    setQuyY(EMPTY_DATE);
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
+
+    const birthDate = composeVnDate(birth);
+    const birthTimeStr = composeVnTime(birthTime);
+    const quyYDate = composeVnDate(quyY);
+
+    if (birthDate === '__incomplete__') {
+      setMsg({
+        kind: 'err',
+        text: 'Chọn đủ Ngày / Tháng / Năm sinh, hoặc để trống cả ba.',
+      });
+      return;
+    }
+    if (birthTimeStr === '__incomplete__') {
+      setMsg({
+        kind: 'err',
+        text: 'Chọn đủ Giờ và Phút sinh, hoặc để trống cả hai.',
+      });
+      return;
+    }
+    if (quyYDate === '__incomplete__') {
+      setMsg({
+        kind: 'err',
+        text: 'Chọn đủ Ngày / Tháng / Năm quy y, hoặc để trống cả ba.',
+      });
+      return;
+    }
+
     start(async () => {
       const res = await registerDevoteePublic({
         fullName,
         phone,
         consent,
-        preferredChannel: channel,
+        dharmaName,
+        birthDate,
+        birthTime: birthTimeStr,
+        address,
+        note,
+        quyYDate: quyYDate || undefined,
         hp,
       });
       if (!res.ok) {
@@ -48,8 +120,7 @@ export function DevoteeJoinForm({
           ? 'Đã cập nhật thông tin của quý vị. Xin cảm tạ.'
           : 'Xin chào mừng quý vị đã kết duyên cùng nhà chùa.',
       });
-      setFullName('');
-      setPhone('');
+      resetForm();
     });
   }
 
@@ -71,20 +142,52 @@ export function DevoteeJoinForm({
         aria-hidden="true"
       />
 
-      <label className="block text-xs uppercase tracking-[0.2em] text-muted">
-        Họ và tên
+      <label className={`block ${labelCls}`}>
+        Họ và tên *
         <input
           required
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           placeholder="Nguyễn Văn A"
           autoComplete="name"
-          className="mt-1.5 w-full border border-fog bg-white px-4 py-3 text-ink text-base"
+          className={inputCls}
         />
       </label>
 
-      <label className="block text-xs uppercase tracking-[0.2em] text-muted">
-        Số điện thoại
+      <label className={`block ${labelCls}`}>
+        Pháp danh
+        <input
+          value={dharmaName}
+          onChange={(e) => setDharmaName(e.target.value)}
+          placeholder="Thiện Tâm"
+          className={inputCls}
+        />
+      </label>
+
+      <VnDateDropdowns
+        label="Ngày / Tháng / Năm sinh"
+        labelClassName={labelCls}
+        value={birth}
+        years={birthYears}
+        onChange={setBirth}
+      />
+
+      <VnTimeDropdowns
+        labelClassName={labelCls}
+        value={birthTime}
+        onChange={setBirthTime}
+      />
+
+      <VnDateDropdowns
+        label="Ngày quy y"
+        labelClassName={labelCls}
+        value={quyY}
+        years={quyYYears}
+        onChange={setQuyY}
+      />
+
+      <label className={`block ${labelCls}`}>
+        Số điện thoại *
         <input
           required
           value={phone}
@@ -96,39 +199,26 @@ export function DevoteeJoinForm({
         />
       </label>
 
-      <fieldset>
-        <legend className="text-xs uppercase tracking-[0.2em] text-muted">
-          Kênh nhà chùa liên hệ khi có lễ
-        </legend>
-        <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
-          {([
-            { value: 'zalo', label: 'Zalo' },
-            { value: 'sms', label: 'Tin nhắn' },
-            { value: 'phone', label: 'Gọi điện' },
-          ] as { value: Channel; label: string }[]).map((c) => {
-            const active = channel === c.value;
-            return (
-              <button
-                key={c.value}
-                type="button"
-                onClick={() => setChannel(c.value)}
-                className="px-3 py-2 border text-center transition-colors"
-                style={
-                  active
-                    ? {
-                        background: primaryColor,
-                        borderColor: primaryColor,
-                        color: '#fff',
-                      }
-                    : undefined
-                }
-              >
-                {c.label}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+      <label className={`block ${labelCls}`}>
+        Địa chỉ
+        <input
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder="Số nhà, thôn/xóm, xã/phường…"
+          className={inputCls}
+        />
+      </label>
+
+      <label className={`block ${labelCls}`}>
+        Ghi chú
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={2}
+          placeholder="Ghi chú thêm (nếu có)"
+          className={`${inputCls} resize-none`}
+        />
+      </label>
 
       <label className="flex items-start gap-2.5 text-sm text-ink leading-snug">
         <input
@@ -139,7 +229,7 @@ export function DevoteeJoinForm({
         />
         <span>
           Đồng ý cho <strong className="font-medium">{templeName}</strong> gửi
-          thông tin lễ, khóa tu, thiện nguyện qua kênh đã chọn.
+          thông tin lễ, khóa tu, thiện nguyện tới số điện thoại đã đăng ký.
         </span>
       </label>
 

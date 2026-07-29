@@ -43,7 +43,7 @@ export default async function OrderPaymentPage({ params }: Props) {
           Hoàn tất công đức
         </p>
         <h1 className="font-display text-3xl md:text-4xl text-ink">
-          Mức phát tâm {formatVnd(order.total_amount)}đ
+          Mức phát tâm {formatVnd(order.total_amount)}
         </h1>
         <p className="mt-2 text-sm text-muted">
           Mã <span className="font-mono text-ink">{order.order_code}</span> —

@@ -8,6 +8,7 @@ import { getCurrentTemple } from '@/lib/tenant';
 import { supabase } from '@/lib/supabase';
 import { sendDevoteeNotification } from '@/lib/notifications';
 import type { PrayerRequestType, TempleEventType } from '@/types/database';
+import { normalizeVnTime, parseVnDate } from '@/lib/vn-date';
 
 export async function createPrayerRequest(input: {
   requestType: PrayerRequestType;
@@ -94,10 +95,15 @@ export async function upsertDevotee(input: {
   id?: string;
   fullName: string;
   dharmaName?: string;
+  /** dd/mm/yyyy */
+  birthDate?: string;
+  /** HH:mm */
+  birthTime?: string;
   birthYear?: number;
   phone?: string;
   address?: string;
   note?: string;
+  /** dd/mm/yyyy */
   quyYDate?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   try {
@@ -105,16 +111,61 @@ export async function upsertDevotee(input: {
   } catch {
     return { ok: false, error: 'Không có quyền.' };
   }
+
+  let birth_date: string | null = null;
+  let birth_year: number | null = null;
+  if (input.birthDate?.trim()) {
+    const parsed = parseVnDate(input.birthDate);
+    if (!parsed) {
+      return {
+        ok: false,
+        error: 'Ngày sinh không hợp lệ. Dùng định dạng dd/mm/yyyy.',
+      };
+    }
+    birth_date = parsed.isoDate;
+    birth_year = parsed.year;
+  } else if (input.birthYear) {
+    birth_year = input.birthYear;
+  }
+
+  let birth_time: string | null = null;
+  if (input.birthTime?.trim()) {
+    birth_time = normalizeVnTime(input.birthTime);
+    if (!birth_time) {
+      return { ok: false, error: 'Giờ sinh không hợp lệ.' };
+    }
+  }
+
+  let quy_y_date: string | null = null;
+  if (input.quyYDate?.trim()) {
+    // Cho phép cả dd/mm/yyyy và YYYY-MM-DD (cũ)
+    const raw = input.quyYDate.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      quy_y_date = raw;
+    } else {
+      const parsed = parseVnDate(raw);
+      if (!parsed) {
+        return {
+          ok: false,
+          error: 'Ngày quy y không hợp lệ. Dùng định dạng dd/mm/yyyy.',
+        };
+      }
+      quy_y_date = parsed.isoDate;
+    }
+  }
+
   const supabase = await createClient();
   const row = {
     temple_id: input.templeId,
     full_name: input.fullName.trim(),
     dharma_name: input.dharmaName?.trim() || null,
-    birth_year: input.birthYear || null,
+    birth_year,
+    birth_date,
+    birth_time,
     phone: input.phone?.trim() || null,
     address: input.address?.trim() || null,
     note: input.note?.trim() || null,
-    quy_y_date: input.quyYDate || null,
+    quy_y_date,
     updated_at: new Date().toISOString(),
   };
   if (!row.full_name) return { ok: false, error: 'Thiếu họ tên.' };
@@ -164,8 +215,15 @@ export async function registerDevoteePublic(input: {
   fullName: string;
   phone: string;
   consent: boolean;
-  preferredChannel?: 'zalo' | 'sms' | 'phone';
+  dharmaName?: string;
+  /** dd/mm/yyyy */
+  birthDate?: string;
+  /** HH:mm */
+  birthTime?: string;
+  address?: string;
   note?: string;
+  /** dd/mm/yyyy */
+  quyYDate?: string;
   hp?: string;
 }): Promise<{ ok: boolean; error?: string; existing?: boolean }> {
   if (input.hp && input.hp.trim() !== '') return { ok: true };
@@ -188,40 +246,60 @@ export async function registerDevoteePublic(input: {
     };
   }
 
-  const phone = normalizePhoneKey(phoneRaw);
-  const admin = getSupabaseAdmin();
-
-  const { data: existing } = await admin
-    .from('devotees')
-    .select('id, full_name, consent_contact')
-    .eq('temple_id', temple.id)
-    .eq('phone', phone)
-    .maybeSingle();
-
-  if (existing?.id) {
-    const { error } = await admin
-      .from('devotees')
-      .update({
-        full_name: fullName,
-        consent_contact: true,
-        preferred_channel: input.preferredChannel ?? 'zalo',
-        note: input.note?.trim() || null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', existing.id);
-    if (error) return { ok: false, error: error.message };
-  } else {
-    const { error } = await admin.from('devotees').insert({
-      temple_id: temple.id,
-      full_name: fullName,
-      phone,
-      consent_contact: true,
-      preferred_channel: input.preferredChannel ?? 'zalo',
-      source: 'web',
-      note: input.note?.trim() || null,
-    });
-    if (error) return { ok: false, error: error.message };
+  let birth_date: string | null = null;
+  let birth_year: number | null = null;
+  if (input.birthDate?.trim()) {
+    const parsed = parseVnDate(input.birthDate);
+    if (!parsed) {
+      return {
+        ok: false,
+        error: 'Ngày sinh không hợp lệ. Chọn đủ ngày / tháng / năm.',
+      };
+    }
+    birth_date = parsed.isoDate;
+    birth_year = parsed.year;
   }
+
+  let birth_time: string | null = null;
+  if (input.birthTime?.trim()) {
+    birth_time = normalizeVnTime(input.birthTime);
+    if (!birth_time) {
+      return { ok: false, error: 'Giờ sinh không hợp lệ.' };
+    }
+  }
+
+  let quy_y_date: string | null = null;
+  if (input.quyYDate?.trim()) {
+    const parsed = parseVnDate(input.quyYDate);
+    if (!parsed) {
+      return {
+        ok: false,
+        error: 'Ngày quy y không hợp lệ. Chọn đủ ngày / tháng / năm.',
+      };
+    }
+    quy_y_date = parsed.isoDate;
+  }
+
+  const phone = normalizePhoneKey(phoneRaw);
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('register_devotee_web', {
+    p_temple_id: temple.id,
+    p_full_name: fullName,
+    p_phone: phone,
+    p_dharma_name: input.dharmaName?.trim() || null,
+    p_birth_date: birth_date,
+    p_birth_time: birth_time,
+    p_birth_year: birth_year,
+    p_address: input.address?.trim() || null,
+    p_note: input.note?.trim() || null,
+    p_quy_y_date: quy_y_date,
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  const existing = Boolean(
+    data && typeof data === 'object' && (data as { existing?: boolean }).existing,
+  );
 
   try {
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -240,7 +318,7 @@ export async function registerDevoteePublic(input: {
   }
 
   revalidatePath('/quan-tri/phat-tu');
-  return { ok: true, existing: Boolean(existing) };
+  return { ok: true, existing };
 }
 
 export async function upsertTempleEvent(input: {
@@ -330,6 +408,52 @@ export async function deleteTempleEvent(input: {
   revalidatePath('/quan-tri/hoat-dong');
   revalidatePath('/');
   return { ok: true };
+}
+
+const EVENT_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+const EVENT_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+/** Upload ảnh nhỏ sự kiện lên Storage (bucket temple-media). */
+export async function uploadEventImage(
+  formData: FormData,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  const templeId = String(formData.get('templeId') ?? '').trim();
+  const file = formData.get('file');
+
+  if (!templeId) return { ok: false, error: 'Thiếu chùa.' };
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: 'Chưa chọn ảnh.' };
+  }
+
+  try {
+    await assertTempleAccess(templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền tải ảnh.' };
+  }
+
+  if (!EVENT_IMAGE_MIME.has(file.type)) {
+    return { ok: false, error: 'Chỉ nhận ảnh JPG, PNG hoặc WebP.' };
+  }
+  if (file.size > EVENT_IMAGE_MAX_BYTES) {
+    return { ok: false, error: 'Ảnh tối đa 2MB. Hãy chọn ảnh nhỏ hơn.' };
+  }
+
+  const ext =
+    file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `events/${templeId}/${crypto.randomUUID()}.${ext}`;
+
+  const supabase = await createClient();
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const { error } = await supabase.storage.from('temple-media').upload(path, buffer, {
+    contentType: file.type,
+    upsert: false,
+    cacheControl: '31536000',
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  const { data } = supabase.storage.from('temple-media').getPublicUrl(path);
+  return { ok: true, url: data.publicUrl };
 }
 
 export async function upsertInventoryItem(input: {
@@ -441,7 +565,13 @@ export async function updateWaterPrice(input: {
   waterPriceVnd: number;
 }): Promise<{ ok: boolean; error?: string; price?: number }> {
   try {
-    await assertTempleAccess(input.templeId);
+    const ctx = await assertTempleAccess(input.templeId);
+    if (!ctx.isSuperAdmin) {
+      return {
+        ok: false,
+        error: 'Chỉ siêu quản trị viên được chỉnh đơn giá nước.',
+      };
+    }
   } catch {
     return { ok: false, error: 'Không có quyền.' };
   }

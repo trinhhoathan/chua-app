@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { loginEmailToPhone } from '@/lib/admin-phone-auth';
 import type { Temple } from '@/types/database';
 
 export interface TempleAdminRow {
@@ -8,6 +9,7 @@ export interface TempleAdminRow {
   temple_id: string;
   role: 'admin' | 'staff';
   display_name: string | null;
+  phone: string | null;
   is_super_admin: boolean;
   is_active: boolean;
 }
@@ -15,6 +17,8 @@ export interface TempleAdminRow {
 export interface AdminContext {
   userId: string;
   email: string | null;
+  phone: string | null;
+  displayName: string | null;
   isSuperAdmin: boolean;
   memberships: TempleAdminRow[];
   temples: Pick<Temple, 'id' | 'name' | 'domain' | 'primary_color'>[];
@@ -65,9 +69,20 @@ export async function requireAdmin(): Promise<AdminContext> {
 
   const { data: temples } = await templesQuery;
 
+  const phoneFromMeta =
+    typeof user.user_metadata?.phone === 'string'
+      ? user.user_metadata.phone
+      : null;
+
   return {
     userId: user.id,
     email: user.email ?? null,
+    phone:
+      rows.find((r) => r.phone)?.phone ??
+      phoneFromMeta ??
+      loginEmailToPhone(user.email) ??
+      null,
+    displayName: rows.find((r) => r.display_name)?.display_name ?? null,
     isSuperAdmin,
     memberships: rows,
     temples: (temples ?? []) as AdminContext['temples'],

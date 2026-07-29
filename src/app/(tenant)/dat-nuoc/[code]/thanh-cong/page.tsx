@@ -56,7 +56,7 @@ export default async function OrderPaidSuccessPage({ params }: Props) {
           Hệ thống đã nhận chuyển khoản cho mã{' '}
           <span className="font-mono text-ink">{order.order_code}</span>. Quý
           Phật tử đã phát tâm cúng dường {order.quantity} thùng Nước Thanh Tịnh
-          (mức phát tâm tùy hỷ: {formatVnd(order.total_amount)}đ). Số nước này
+          (mức phát tâm tùy hỷ: {formatVnd(order.total_amount)}). Số nước này
           sẽ được đặt dâng lễ Tam Bảo và gieo duyên phát cho khách hành hương tại{' '}
           {temple.name}.
         </p>

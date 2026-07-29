@@ -139,7 +139,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Lịch pháp',
     domain: 'phong_thuy',
     navSection: 'hang_ngay',
-    status: 'coming_soon',
+    status: 'ready',
     description: 'Gợi ý hướng xuất hành theo ngày — hỗ trợ Phật tử đi lễ, công việc.',
   },
   {
@@ -149,7 +149,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Lịch pháp',
     domain: 'co_hoc',
     navSection: 'hang_ngay',
-    status: 'coming_soon',
+    status: 'ready',
     description:
       'Gợi ý ngày tốt theo việc: cưới hỏi, động thổ, khai trương, ký hợp đồng…',
   },
@@ -173,7 +173,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Xây dựng',
     domain: 'phong_thuy',
     navSection: 'viec_he_trong',
-    status: 'coming_soon',
+    status: 'ready',
     description:
       'Gợi ý người mượn tuổi phù hợp khi chủ nhà phạm Kim Lâu / Hoang Ốc.',
   },
@@ -244,7 +244,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Ma chay',
     domain: 'phong_thuy',
     navSection: 'viec_he_trong',
-    status: 'coming_soon',
+    status: 'ready',
     description: 'Hỗ trợ chọn ngày cải táng / bốc mộ — tham vấn trụ trì.',
   },
   {
@@ -284,7 +284,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Gia đình',
     domain: 'phong_thuy',
     navSection: 'viec_he_trong',
-    status: 'coming_soon',
+    status: 'ready',
     description:
       'Xem sao chiếu mệnh / Thái Tuế năm nay — gắn với lễ dâng sao giải hạn tại chùa.',
   },
@@ -386,42 +386,46 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
   {
     slug: '64-que-kinh-dich',
     title: '64 quẻ Kinh Dịch',
-    subtitle: 'Tra cứu quẻ',
+    subtitle: 'Tra cứu · reo quẻ',
     category: 'Kinh Dịch',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Tra cứu ý nghĩa 64 quẻ Kinh Dịch — tham khảo dân gian.',
+    status: 'ready',
+    description:
+      'Tra cứu 64 quẻ, reo quẻ 6 hào và luận giải AI — hỗ trợ Phật tử tham khảo cổ học.',
   },
   {
     slug: 'luc-hao',
     title: 'Lục hào · Bốc dịch',
-    subtitle: 'Quẻ sáu hào',
+    subtitle: 'Nạp Giáp · Thế Ứng · Lục thân',
     category: 'Kinh Dịch',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung Lục hào — dùng thận trọng trong môi trường chùa.',
+    status: 'ready',
+    description:
+      'Lục hào Nạp Giáp — gieo 6 hào, xếp cung Thế Ứng, Can Chi, Lục thân và Dụng thần.',
   },
   {
     slug: 'khong-minh-than-toan',
     title: 'Khổng Minh thần toán',
-    subtitle: 'Quẻ Khổng Minh',
+    subtitle: '384 quẻ · ba từ động tâm',
     category: 'Kinh Dịch',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung quẻ Khổng Minh thần toán.',
+    status: 'ready',
+    description:
+      'Khổng Minh thần toán — lập 1 trong 384 quẻ từ ba từ, số quẻ hoặc thượng·hạ·hào.',
   },
   {
     slug: 'mai-hoa-dich-so',
     title: 'Mai hoa dịch số',
-    subtitle: 'Mai hoa · số quẻ',
+    subtitle: 'Lập quẻ theo giờ · số động tâm',
     category: 'Kinh Dịch',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung Mai hoa dịch số.',
+    status: 'ready',
+    description:
+      'Mai Hoa Dịch Số — lập quẻ chủ, hào động, quẻ biến và hỗ quái từ năm tháng ngày giờ hoặc hai số.',
   },
   {
     slug: 'gieo-que-xin-xam',
@@ -441,8 +445,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Thần số',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung thần số học theo ngày sinh và tên.',
+    status: 'ready',
+    description:
+      'Thần số Pythagoras — số đường đời, ngày sinh, năm cá nhân và họ tên (master 11·22·33).',
   },
   {
     slug: 'danh-gia-tinh-danh',
@@ -451,8 +456,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Thần số',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Đánh giá tính danh theo nét và âm.',
+    status: 'ready',
+    description:
+      'Số hóa nét Quốc ngữ — Họ/Mệnh/Tên/Phụ/Tổng vận, cục số và chấm điểm tính danh.',
   },
   {
     slug: 'nhan-tuong',
@@ -477,12 +483,13 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
   {
     slug: 'boi-sim',
     title: 'Bói SIM · số điện thoại',
-    subtitle: 'Chấm điểm dãy số',
+    subtitle: 'Bát Cực Linh Số',
     category: 'Thần số',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung xem SIM / SĐT — mục phụ, không ưu tiên trên menu chính.',
+    status: 'ready',
+    description:
+      'Du Niên 8 sao (Bát Cực Linh Số) + 81 Số Lý, Âm Dương, hợp mệnh Nạp Âm.',
   },
 
   // —— Phật học: lịch lễ ——
@@ -539,8 +546,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Nghi lễ Phật',
     domain: 'phat_hoc',
     navSection: 'kinh_khan',
-    status: 'coming_soon',
-    description: 'Mẫu văn khấn và nghi lễ thường dùng tại chùa.',
+    status: 'ready',
+    description:
+      'Mẫu văn khấn và hướng dẫn nghi lễ thường dùng — rằm, cầu an, cầu siêu, cúng dường, vào chùa.',
   },
 
   // —— Tu học ——

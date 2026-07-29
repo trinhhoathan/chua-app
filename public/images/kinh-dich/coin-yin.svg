@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+  <defs>
+    <radialGradient id="yinMetal" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#b8a878"/>
+      <stop offset="40%" stop-color="#6b5c3a"/>
+      <stop offset="100%" stop-color="#2e2614"/>
+    </radialGradient>
+    <radialGradient id="yinInner" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#8a7a52"/>
+      <stop offset="100%" stop-color="#3d3420"/>
+    </radialGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#yinMetal)" stroke="#1a1408" stroke-width="2"/>
+  <circle cx="60" cy="60" r="48" fill="none" stroke="#4a3e28" stroke-width="1.5" opacity="0.8"/>
+  <circle cx="60" cy="60" r="40" fill="url(#yinInner)" stroke="#2a2210" stroke-width="1"/>
+  <rect x="48" y="48" width="24" height="24" rx="1" fill="#0c0a06" stroke="#2a2210" stroke-width="1.5"/>
+  <text x="60" y="28" text-anchor="middle" font-size="14" font-family="serif" fill="#1a1408" font-weight="700">p</text>
+  <text x="60" y="98" text-anchor="middle" font-size="11" font-family="serif" fill="#1a1408" opacity="0.9">d</text>
+  <path d="M28 38 A40 40 0 0 1 78 26" stroke="#d4c498" stroke-width="2" stroke-linecap="round" opacity="0.2" fill="none"/>
+</svg>

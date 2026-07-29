@@ -3,10 +3,12 @@
 import { useMemo, useState, useTransition } from 'react';
 import type { Devotee, DevoteeSource } from '@/types/database';
 import { deleteDevotee } from '@/app/actions/admin';
+import { formatVnDate, formatVnTime } from '@/lib/vn-date';
 
 interface Props {
   templeId: string;
   devotees: Devotee[];
+  onEdit: (d: Devotee) => void;
 }
 
 const SOURCE_LABEL: Record<DevoteeSource, string> = {
@@ -31,7 +33,7 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
-export function DevoteesTable({ templeId, devotees }: Props) {
+export function DevoteesTable({ templeId, devotees, onEdit }: Props) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [pending, start] = useTransition();
@@ -133,6 +135,19 @@ export function DevoteesTable({ templeId, devotees }: Props) {
                         Pháp danh: {d.dharma_name}
                       </p>
                     ) : null}
+                    {d.birth_date || d.birth_year || d.birth_time ? (
+                      <p className="text-xs text-muted">
+                        Sinh:{' '}
+                        {d.birth_date
+                          ? formatVnDate(d.birth_date)
+                          : d.birth_year
+                            ? String(d.birth_year)
+                            : '—'}
+                        {d.birth_time
+                          ? ` · ${formatVnTime(d.birth_time)}`
+                          : ''}
+                      </p>
+                    ) : null}
                     {d.address ? (
                       <p className="text-xs text-muted">{d.address}</p>
                     ) : null}
@@ -161,14 +176,24 @@ export function DevoteesTable({ templeId, devotees }: Props) {
                   </td>
                   <td className="p-3 text-xs">{formatDate(d.created_at)}</td>
                   <td className="p-3 text-right">
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() => remove(d)}
-                      className="text-xs px-2 py-1 border border-lacquer text-lacquer hover:bg-lacquer/5 disabled:opacity-50"
-                    >
-                      Xóa
-                    </button>
+                    <div className="flex flex-col items-end gap-2">
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => onEdit(d)}
+                        className="text-xs px-2 py-1 border border-fog hover:bg-mist disabled:opacity-50"
+                      >
+                        Sửa
+                      </button>
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => remove(d)}
+                        className="text-xs px-2 py-1 border border-lacquer text-lacquer hover:bg-lacquer/5 disabled:opacity-50"
+                      >
+                        Xóa
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

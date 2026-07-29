@@ -3,17 +3,18 @@ import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { logoutAction } from '@/app/actions/auth';
 
-const NAV = [
+const NAV: Array<{ href: string; label: string; superOnly?: boolean }> = [
   { href: '/quan-tri', label: 'Tổng quan' },
   { href: '/quan-tri/hoat-dong', label: 'Hoạt động' },
   { href: '/quan-tri/gui-tin', label: 'Gửi tin' },
   { href: '/quan-tri/don-hang', label: 'Thỉnh nước' },
-  { href: '/quan-tri/don-gia', label: 'Đơn giá' },
+  { href: '/quan-tri/don-gia', label: 'Đơn giá', superOnly: true },
   { href: '/quan-tri/lien-he', label: 'Liên hệ' },
   { href: '/quan-tri/doi-soat', label: 'Đối soát' },
   { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu' },
   { href: '/quan-tri/phat-tu', label: 'Phật tử' },
   { href: '/quan-tri/kho', label: 'Kho vận' },
+  { href: '/quan-tri/thanh-vien', label: 'Thành viên', superOnly: true },
 ];
 
 export default async function AdminLayout({
@@ -75,7 +76,11 @@ export default async function AdminLayout({
             </p>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <span className="text-white/60 hidden sm:inline">{ctx.email}</span>
+            <span className="text-white/60 hidden sm:inline">
+              {ctx.displayName
+                ? `${ctx.displayName}${ctx.phone ? ` · ${ctx.phone}` : ''}`
+                : (ctx.phone ?? ctx.email)}
+            </span>
             <form action={logoutAction}>
               <button className="px-3 py-1.5 border border-white/25 hover:bg-white/10 text-xs">
                 Đăng xuất
@@ -85,15 +90,17 @@ export default async function AdminLayout({
         </div>
         <nav className="border-t border-white/10">
           <div className="mx-auto max-w-6xl px-4 md:px-6 flex gap-1 overflow-x-auto no-scrollbar">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="shrink-0 px-3 py-2.5 text-sm text-white/70 hover:text-white border-b-2 border-transparent hover:border-gilt"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {NAV.filter((item) => !item.superOnly || ctx.isSuperAdmin).map(
+              (item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="shrink-0 px-3 py-2.5 text-sm text-white/70 hover:text-white border-b-2 border-transparent hover:border-gilt"
+                >
+                  {item.label}
+                </Link>
+              ),
+            )}
           </div>
         </nav>
       </header>

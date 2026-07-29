@@ -1,8 +1,7 @@
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import type { Devotee } from '@/types/database';
-import { DevoteeForm } from './DevoteeForm';
-import { DevoteesTable } from './DevoteesTable';
+import { PhatTuBoard } from './PhatTuBoard';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,10 +40,7 @@ export default async function PhatTuPage() {
         <StatCard label="Đồng ý nhận tin" value={totals.consent} />
       </div>
 
-      <div className="mt-8 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-8">
-        <DevoteeForm templeId={templeId} />
-        <DevoteesTable templeId={templeId} devotees={rows} />
-      </div>
+      <PhatTuBoard templeId={templeId} devotees={rows} />
     </div>
   );
 }

@@ -192,31 +192,32 @@ Cần đăng nhập trụ trì (Phase 2) hoặc `ADMIN_KEY` legacy.
 
 ## Phase 2 — Admin Auth & Dashboard
 
-### Tạo tài khoản trụ trì
+### Tạo tài khoản trụ trì (đăng nhập bằng SĐT)
 
-1. Supabase Dashboard → **Authentication → Users → Add user** (email + password).
-2. Copy `user_id` (UUID).
-3. Gắn với chùa:
+Đăng nhập tại `/quan-tri/dang-nhap` bằng **số điện thoại** + **mật khẩu 6 số** (không dùng chữ cái).
 
-```sql
-INSERT INTO public.temple_admins (user_id, temple_id, role, display_name, is_super_admin)
-SELECT
-  '<USER_UUID>',
-  id,
-  'admin',
-  'Thầy Thích Minh Thành',
-  FALSE
-FROM public.temples
-WHERE domain = 'covien.localhost';
+Seed nhanh (tạo Super Admin + trụ trì Bắc Hồng):
+
+```bash
+node --env-file=.env.local scripts/seed-admin-users.mjs
 ```
 
-4. Đăng nhập tại `/quan-tri/dang-nhap`.
+Hoặc Super Admin vào `/quan-tri/thanh-vien` để tạo/sửa quyền user thành viên (trụ trì).
+
+| Vai trò | Mô tả |
+|---------|--------|
+| Super Admin | Quản trị tất cả chùa, cấp quyền thành viên |
+| Admin chùa (trụ trì) | Chỉ thấy / sửa dữ liệu chùa được gán |
+| Staff | Nhân sự chùa (cùng phạm vi temple_id) |
+
+Tài khoản Auth dùng email nội bộ `0xxxxxxxxx@phone.chua.app` (map từ SĐT; không gửi mail).
 
 ### Menu quản trị (`/quan-tri`)
 
 | Route | Chức năng |
 |-------|-----------|
 | `/quan-tri` | Tổng quan (đơn chờ, thùng bán, phần chùa, sớ, Phật tử, kho thấp) |
+| `/quan-tri/thanh-vien` | Super Admin: tạo/sửa tài khoản trụ trì, phân quyền |
 | `/quan-tri/don-hang` | Danh sách đơn nước + đánh dấu đã trả |
 | `/quan-tri/doi-soat` | Sổ quyết toán theo tháng |
 | `/quan-tri/so-cau` | Duyệt sớ + in |

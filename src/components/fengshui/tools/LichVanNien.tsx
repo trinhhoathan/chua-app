@@ -487,14 +487,17 @@ export function LichVanNien({ primaryColor }: Props) {
           {WEEK_HEADERS.map((h) => (
             <div
               key={h}
-              className="py-2 text-center text-[11px] text-muted tracking-wide"
+              className={`py-2 text-center text-[11px] tracking-wide ${
+                h === 'CN' ? 'text-red-600 font-medium' : 'text-muted'
+              }`}
             >
               {h}
             </div>
           ))}
         </div>
         <div className="grid grid-cols-7">
-          {grid.map((cell) => {
+          {grid.map((cell, index) => {
+            const isSunday = index % 7 === 6;
             const isSelected =
               cell.solarYear === selected.y &&
               cell.solarMonth === selected.m &&
@@ -529,9 +532,19 @@ export function LichVanNien({ primaryColor }: Props) {
                 <div className="flex items-start justify-between gap-1">
                   <span
                     className={`text-sm tabular-nums leading-none ${
-                      cell.inMonth ? 'text-ink' : 'text-muted/50'
+                      isSunday
+                        ? cell.inMonth
+                          ? 'text-red-600'
+                          : 'text-red-600/40'
+                        : cell.inMonth
+                          ? 'text-ink'
+                          : 'text-muted/50'
                     } ${isToday ? 'font-semibold' : ''}`}
-                    style={isToday ? { color: primaryColor } : undefined}
+                    style={
+                      isToday && !isSunday
+                        ? { color: primaryColor }
+                        : undefined
+                    }
                   >
                     {cell.solarDay}
                   </span>

@@ -65,7 +65,7 @@ export default async function OrderDetailPage({ params }: Props) {
           <p>
             <span className="text-muted">Mức phát tâm: </span>
             <span className="text-ink font-semibold">
-              {formatVnd(order.total_amount)}đ
+              {formatVnd(order.total_amount)}
             </span>
           </p>
           <p>
