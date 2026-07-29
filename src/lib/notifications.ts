@@ -65,7 +65,7 @@ export async function sendDevoteeNotification(
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return {
-      ok: status === 'sent' || status === 'queued',
+      ok: status === 'sent',
       channel,
       status,
       error: errorMessage ?? undefined,
