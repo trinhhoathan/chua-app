@@ -5,17 +5,17 @@ import { MediaAdminBoard, type MediaTemple } from './MediaAdminBoard';
 
 function asGallery(raw: unknown): GalleryImage[] {
   if (!Array.isArray(raw)) return [];
-  return raw
-    .map((item) => {
-      if (!item || typeof item !== 'object') return null;
-      const url = String((item as { url?: unknown }).url ?? '').trim();
-      if (!url) return null;
-      const altRaw = (item as { alt?: unknown }).alt;
-      const alt =
-        typeof altRaw === 'string' && altRaw.trim() ? altRaw.trim() : undefined;
-      return { url, alt };
-    })
-    .filter((x): x is GalleryImage => Boolean(x));
+  const out: GalleryImage[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const url = String((item as { url?: unknown }).url ?? '').trim();
+    if (!url) continue;
+    const altRaw = (item as { alt?: unknown }).alt;
+    const alt =
+      typeof altRaw === 'string' && altRaw.trim() ? altRaw.trim() : undefined;
+    out.push(alt ? { url, alt } : { url });
+  }
+  return out;
 }
 
 export default async function HinhAnhPage() {
