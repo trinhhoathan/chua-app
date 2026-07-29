@@ -10,6 +10,7 @@ const NAV: Array<{ href: string; label: string; superOnly?: boolean }> = [
   { href: '/quan-tri/don-hang', label: 'Thỉnh nước' },
   { href: '/quan-tri/don-gia', label: 'Đơn giá', superOnly: true },
   { href: '/quan-tri/lien-he', label: 'Liên hệ' },
+  { href: '/quan-tri/hinh-anh', label: 'Hình ảnh' },
   { href: '/quan-tri/doi-soat', label: 'Đối soát' },
   { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu' },
   { href: '/quan-tri/phat-tu', label: 'Phật tử' },

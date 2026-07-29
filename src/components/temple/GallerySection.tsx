@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import type { Temple } from '@/types/database';
+import { GalleryLightbox, useGalleryLightbox } from './GalleryLightbox';
 
 interface Props {
   temple: Temple;
@@ -11,6 +14,8 @@ function isRemote(url: string) {
 
 export function GallerySection({ temple }: Props) {
   const images = (temple.gallery ?? []).filter((g) => g?.url);
+  const { openIndex, openAt, close, setOpenIndex } = useGalleryLightbox();
+
   if (images.length === 0) return null;
 
   return (
@@ -24,22 +29,29 @@ export function GallerySection({ temple }: Props) {
           Thư viện ảnh
         </h2>
         <p className="mt-3 text-muted max-w-xl leading-relaxed">
-          Không gian chùa và cảm nhận từ cộng đồng trên Google Maps.
+          Bấm vào ảnh để xem đầy đủ. Vuốt hoặc dùng mũi tên để xem ảnh khác.
         </p>
 
         <ul className="mt-12 columns-1 sm:columns-2 lg:columns-3 gap-4 [column-fill:_balance]">
           {images.map((img, idx) => (
             <li key={`${img.url}-${idx}`} className="mb-4 break-inside-avoid">
-              <figure className="relative overflow-hidden bg-mist aspect-[4/3]">
-                <Image
-                  src={img.url}
-                  alt={img.alt || `${temple.name} — ảnh ${idx + 1}`}
-                  fill
-                  className="object-cover transition-transform duration-700 hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized={isRemote(img.url)}
-                />
-              </figure>
+              <button
+                type="button"
+                onClick={() => openAt(idx)}
+                className="group block w-full text-left"
+                aria-label={`Xem ảnh ${idx + 1}`}
+              >
+                <figure className="relative overflow-hidden bg-mist aspect-[4/3]">
+                  <Image
+                    src={img.url}
+                    alt={img.alt || `${temple.name} — ảnh ${idx + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized={isRemote(img.url)}
+                  />
+                </figure>
+              </button>
             </li>
           ))}
         </ul>
@@ -57,6 +69,14 @@ export function GallerySection({ temple }: Props) {
           </p>
         ) : null}
       </div>
+
+      <GalleryLightbox
+        images={images}
+        templeName={temple.name}
+        openIndex={openIndex}
+        onClose={close}
+        onChangeIndex={setOpenIndex}
+      />
     </section>
   );
 }

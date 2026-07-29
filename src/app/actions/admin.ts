@@ -410,17 +410,26 @@ export async function deleteTempleEvent(input: {
   return { ok: true };
 }
 
-const EVENT_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
-const EVENT_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const TEMPLE_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+const TEMPLE_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+type TempleMediaKind = 'events' | 'abbott' | 'gallery';
+const TEMPLE_MEDIA_KINDS: TempleMediaKind[] = ['events', 'abbott', 'gallery'];
 
-/** Upload ảnh nhỏ sự kiện lên Storage (bucket temple-media). */
-export async function uploadEventImage(
+/** Upload ảnh lên Storage (bucket temple-media). kind: events | abbott | gallery */
+export async function uploadTempleMedia(
   formData: FormData,
 ): Promise<{ ok: boolean; url?: string; error?: string }> {
   const templeId = String(formData.get('templeId') ?? '').trim();
+  const kindRaw = String(formData.get('kind') ?? 'events').trim();
   const file = formData.get('file');
+  const kind = TEMPLE_MEDIA_KINDS.includes(kindRaw as TempleMediaKind)
+    ? (kindRaw as TempleMediaKind)
+    : null;
 
   if (!templeId) return { ok: false, error: 'Thiếu chùa.' };
+  if (!kind) {
+    return { ok: false, error: 'Loại ảnh không hợp lệ.' };
+  }
   if (!(file instanceof File) || file.size === 0) {
     return { ok: false, error: 'Chưa chọn ảnh.' };
   }
@@ -431,16 +440,16 @@ export async function uploadEventImage(
     return { ok: false, error: 'Không có quyền tải ảnh.' };
   }
 
-  if (!EVENT_IMAGE_MIME.has(file.type)) {
+  if (!TEMPLE_IMAGE_MIME.has(file.type)) {
     return { ok: false, error: 'Chỉ nhận ảnh JPG, PNG hoặc WebP.' };
   }
-  if (file.size > EVENT_IMAGE_MAX_BYTES) {
+  if (file.size > TEMPLE_IMAGE_MAX_BYTES) {
     return { ok: false, error: 'Ảnh tối đa 2MB. Hãy chọn ảnh nhỏ hơn.' };
   }
 
   const ext =
     file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const path = `events/${templeId}/${crypto.randomUUID()}.${ext}`;
+  const path = `${kind}/${templeId}/${crypto.randomUUID()}.${ext}`;
 
   const supabase = await createClient();
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -454,6 +463,80 @@ export async function uploadEventImage(
 
   const { data } = supabase.storage.from('temple-media').getPublicUrl(path);
   return { ok: true, url: data.publicUrl };
+}
+
+/** @deprecated Dùng uploadTempleMedia với kind=events */
+export async function uploadEventImage(
+  formData: FormData,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  if (!formData.get('kind')) formData.set('kind', 'events');
+  return uploadTempleMedia(formData);
+}
+
+export async function updateAbbottPortrait(input: {
+  templeId: string;
+  imageUrl: string | null;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+
+  const url = input.imageUrl?.trim() || null;
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('temples')
+    .update({
+      abbott_image_url: url,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.templeId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidateTag('temples', 'max');
+  revalidatePath('/quan-tri/hinh-anh');
+  revalidatePath('/');
+  return { ok: true };
+}
+
+export async function updateTempleGallery(input: {
+  templeId: string;
+  gallery: Array<{ url: string; alt?: string }>;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+
+  const gallery = (input.gallery ?? [])
+    .map((g) => ({
+      url: String(g.url ?? '').trim(),
+      alt: g.alt?.trim() || undefined,
+    }))
+    .filter((g) => Boolean(g.url));
+
+  if (gallery.length > 60) {
+    return { ok: false, error: 'Thư viện tối đa 60 ảnh.' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('temples')
+    .update({
+      gallery,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.templeId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidateTag('temples', 'max');
+  revalidatePath('/quan-tri/hinh-anh');
+  revalidatePath('/');
+  return { ok: true };
 }
 
 export async function upsertInventoryItem(input: {

@@ -19,6 +19,7 @@ export function AbbottSection({ temple }: Props) {
               fill
               className="object-cover object-top"
               sizes="(max-width: 1024px) 100vw, 40vw"
+              unoptimized={/^https?:\/\//i.test(temple.abbott_image_url)}
             />
           ) : (
             <div className="w-full h-full bg-fog flex items-center justify-center text-muted">
