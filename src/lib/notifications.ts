@@ -36,7 +36,6 @@ export interface NotifyResult {
 export async function sendDevoteeNotification(
   input: NotifyInput,
 ): Promise<NotifyResult> {
-  const admin = getSupabaseAdmin();
   const channel = resolveChannel(input.preferredChannel);
 
   let status: NotifyResult['status'] = 'queued';
@@ -63,6 +62,17 @@ export async function sendDevoteeNotification(
     status = 'failed';
     errorMessage = e instanceof Error ? e.message : 'Unknown error';
   }
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return {
+      ok: status === 'sent' || status === 'queued',
+      channel,
+      status,
+      error: errorMessage ?? undefined,
+    };
+  }
+
+  const admin = getSupabaseAdmin();
 
   if (input.logId) {
     await admin

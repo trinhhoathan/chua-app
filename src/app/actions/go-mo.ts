@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getCurrentTemple } from '@/lib/tenant';
-import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { supabase } from '@/lib/supabase';
 
 export type GoMoDedication = {
   id: string;
@@ -39,22 +39,14 @@ export async function submitGoMoDedication(input: {
   const sessionCount = Math.max(0, Math.min(100_000, Math.floor(input.sessionCount)));
   const dayCount = Math.max(0, Math.min(100_000, Math.floor(input.dayCount)));
 
-  try {
-    const admin = getSupabaseAdmin();
-    const { error } = await admin.from('go_mo_dedications').insert({
-      temple_id: temple.id,
-      devotee_name: name,
-      wish,
-      session_count: sessionCount,
-      day_count: dayCount,
-    });
-    if (error) return { ok: false, error: error.message };
-  } catch (e) {
-    return {
-      ok: false,
-      error: e instanceof Error ? e.message : 'Không ghi được hồi hướng.',
-    };
-  }
+  const { error } = await supabase.from('go_mo_dedications').insert({
+    temple_id: temple.id,
+    devotee_name: name,
+    wish,
+    session_count: sessionCount,
+    day_count: dayCount,
+  });
+  if (error) return { ok: false, error: error.message };
 
   revalidatePath('/go-mo');
   return { ok: true };
@@ -66,23 +58,14 @@ export async function listGoMoDedications(
   const temple = await getCurrentTemple();
   if (!temple) return { ok: false, rows: [], error: 'Không tìm thấy chùa.' };
 
-  try {
-    const admin = getSupabaseAdmin();
-    const { data, error } = await admin
-      .from('go_mo_dedications')
-      .select('id, devotee_name, wish, session_count, day_count, created_at')
-      .eq('temple_id', temple.id)
-      .order('created_at', { ascending: false })
-      .limit(Math.min(50, Math.max(1, limit)));
-    if (error) return { ok: false, rows: [], error: error.message };
-    return { ok: true, rows: (data ?? []) as GoMoDedication[] };
-  } catch (e) {
-    return {
-      ok: false,
-      rows: [],
-      error: e instanceof Error ? e.message : 'Lỗi tải bảng vàng.',
-    };
-  }
+  const { data, error } = await supabase
+    .from('go_mo_dedications')
+    .select('id, devotee_name, wish, session_count, day_count, created_at')
+    .eq('temple_id', temple.id)
+    .order('created_at', { ascending: false })
+    .limit(Math.min(50, Math.max(1, limit)));
+  if (error) return { ok: false, rows: [], error: error.message };
+  return { ok: true, rows: (data ?? []) as GoMoDedication[] };
 }
 
 export async function syncGoMoDailyScore(input: {
@@ -113,42 +96,35 @@ export async function syncGoMoDailyScore(input: {
     day: '2-digit',
   }).format(new Date());
 
-  try {
-    const admin = getSupabaseAdmin();
-    const { data: existing } = await admin
-      .from('go_mo_daily_scores')
-      .select('id, strike_count')
-      .eq('temple_id', temple.id)
-      .eq('client_key', clientKey)
-      .eq('day', day)
-      .maybeSingle();
+  const { data: existing, error: findErr } = await supabase
+    .from('go_mo_daily_scores')
+    .select('id, strike_count')
+    .eq('temple_id', temple.id)
+    .eq('client_key', clientKey)
+    .eq('day', day)
+    .maybeSingle();
+  if (findErr) return { ok: false, error: findErr.message };
 
-    if (existing?.id) {
-      const next = Math.max(existing.strike_count ?? 0, strikeCount);
-      const { error } = await admin
-        .from('go_mo_daily_scores')
-        .update({
-          strike_count: next,
-          display_name: displayName ?? undefined,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existing.id);
-      if (error) return { ok: false, error: error.message };
-    } else {
-      const { error } = await admin.from('go_mo_daily_scores').insert({
-        temple_id: temple.id,
-        client_key: clientKey,
-        display_name: displayName,
-        day,
-        strike_count: strikeCount,
-      });
-      if (error) return { ok: false, error: error.message };
-    }
-  } catch (e) {
-    return {
-      ok: false,
-      error: e instanceof Error ? e.message : 'Không đồng bộ điểm.',
-    };
+  if (existing?.id) {
+    const next = Math.max(existing.strike_count ?? 0, strikeCount);
+    const { error } = await supabase
+      .from('go_mo_daily_scores')
+      .update({
+        strike_count: next,
+        display_name: displayName ?? undefined,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', existing.id);
+    if (error) return { ok: false, error: error.message };
+  } else {
+    const { error } = await supabase.from('go_mo_daily_scores').insert({
+      temple_id: temple.id,
+      client_key: clientKey,
+      display_name: displayName,
+      day,
+      strike_count: strikeCount,
+    });
+    if (error) return { ok: false, error: error.message };
   }
 
   return { ok: true };
@@ -167,22 +143,13 @@ export async function listGoMoLeaderboard(
     day: '2-digit',
   }).format(new Date());
 
-  try {
-    const admin = getSupabaseAdmin();
-    const { data, error } = await admin
-      .from('go_mo_daily_scores')
-      .select('display_name, strike_count, client_key')
-      .eq('temple_id', temple.id)
-      .eq('day', day)
-      .order('strike_count', { ascending: false })
-      .limit(Math.min(50, Math.max(1, limit)));
-    if (error) return { ok: false, rows: [], error: error.message };
-    return { ok: true, rows: (data ?? []) as GoMoLeaderRow[] };
-  } catch (e) {
-    return {
-      ok: false,
-      rows: [],
-      error: e instanceof Error ? e.message : 'Lỗi bảng xếp hạng.',
-    };
-  }
+  const { data, error } = await supabase
+    .from('go_mo_daily_scores')
+    .select('display_name, strike_count, client_key')
+    .eq('temple_id', temple.id)
+    .eq('day', day)
+    .order('strike_count', { ascending: false })
+    .limit(Math.min(50, Math.max(1, limit)));
+  if (error) return { ok: false, rows: [], error: error.message };
+  return { ok: true, rows: (data ?? []) as GoMoLeaderRow[] };
 }

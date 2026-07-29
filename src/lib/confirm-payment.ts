@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { supabase } from '@/lib/supabase';
 import { sendDevoteeNotification } from '@/lib/notifications';
 import { extractOrderCodeFromContent } from '@/lib/payment';
 
@@ -19,21 +19,23 @@ export interface ConfirmPaymentResult {
   status?: number;
 }
 
+type WaterOrderRow = {
+  id: string;
+  temple_id: string;
+  order_code: string;
+  status: string;
+  total_amount: number;
+  customer_name: string;
+  customer_phone: string;
+};
+
 /**
  * Xác nhận thanh toán theo mã đơn (dùng bởi SePay / webhook nội bộ).
- * Cần SUPABASE_SERVICE_ROLE_KEY.
+ * Dùng anon + RPC SECURITY DEFINER (không bắt buộc service role).
  */
 export async function confirmWaterOrderPayment(
   input: ConfirmPaymentInput,
 ): Promise<ConfirmPaymentResult> {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return {
-      ok: false,
-      error: 'SUPABASE_SERVICE_ROLE_KEY chưa cấu hình',
-      status: 503,
-    };
-  }
-
   const orderCode = extractOrderCodeFromContent(input.contentOrCode);
   if (!orderCode) {
     return {
@@ -58,12 +60,17 @@ export async function confirmWaterOrderPayment(
     };
   }
 
-  const admin = getSupabaseAdmin();
-  const { data: order } = await admin
-    .from('water_orders')
-    .select('*, temples(payment_code, name)')
-    .eq('order_code', orderCode)
-    .maybeSingle();
+  const { data: orderRows, error: lookupErr } = await supabase.rpc(
+    'get_water_order_by_code',
+    { p_code: orderCode },
+  );
+  if (lookupErr) {
+    return { ok: false, error: lookupErr.message, status: 500, orderCode };
+  }
+
+  const order = (Array.isArray(orderRows) ? orderRows[0] : orderRows) as
+    | WaterOrderRow
+    | undefined;
 
   if (!order) {
     return { ok: false, error: 'Không tìm thấy đơn', status: 404 };
@@ -89,7 +96,7 @@ export async function confirmWaterOrderPayment(
     };
   }
 
-  const { data, error } = await admin.rpc('mark_water_order_paid', {
+  const { data, error } = await supabase.rpc('mark_water_order_paid', {
     p_order_id: order.id,
     p_payment_ref: input.paymentRef,
   });
@@ -109,14 +116,19 @@ export async function confirmWaterOrderPayment(
   }
 
   try {
+    const { data: temple } = await supabase
+      .from('temples')
+      .select('name')
+      .eq('id', order.temple_id)
+      .maybeSingle();
+
     await sendDevoteeNotification({
       templeId: order.temple_id,
       recipient: order.customer_phone,
       templateKey: 'water_order_paid',
       payload: {
         customerName: order.customer_name,
-        templeName:
-          (order as { temples?: { name?: string } }).temples?.name ?? 'Chùa',
+        templeName: temple?.name ?? 'Chùa',
         orderCode: order.order_code,
       },
       relatedOrderId: order.id,
