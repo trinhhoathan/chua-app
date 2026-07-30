@@ -7,7 +7,10 @@ import {
   resetTempleMemberPasswordAction,
   updateTempleMemberAction,
 } from '@/app/actions/members';
-import { formatPhoneDisplay } from '@/lib/admin-phone-auth';
+import {
+  DEFAULT_ADMIN_PIN,
+  formatPhoneDisplay,
+} from '@/lib/admin-phone-auth';
 
 export type MemberRow = {
   id: string;
@@ -37,7 +40,7 @@ export function MembersAdminPanel({
   const [pending, start] = useTransition();
 
   const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(DEFAULT_ADMIN_PIN);
   const [displayName, setDisplayName] = useState('');
   const [templeId, setTempleId] = useState(temples[0]?.id ?? '');
   const [role, setRole] = useState<'admin' | 'staff'>('admin');
@@ -66,7 +69,7 @@ export function MembersAdminPanel({
       }
       setMsg('Đã tạo tài khoản thành viên.');
       setPhone('');
-      setPassword('');
+      setPassword(DEFAULT_ADMIN_PIN);
       setDisplayName('');
       setAsSuper(false);
       const listed = await listTempleMembersAction();
@@ -191,8 +194,12 @@ export function MembersAdminPanel({
       <section className="border border-fog bg-paper p-6">
         <h2 className="font-display text-xl text-ink">Thêm trụ trì / thành viên</h2>
         <p className="mt-1 text-sm text-muted">
-          Đăng nhập bằng số điện thoại + mật khẩu 6 số. User thành viên = trụ trì
-          (hoặc ban quản lý) của một chùa.
+          Đăng nhập bằng số điện thoại + mật khẩu 6 số. Khi tạo tài khoản trụ
+          trì cho chùa mới, mật khẩu mặc định là{' '}
+          <span className="font-medium text-ink tracking-wider">
+            {DEFAULT_ADMIN_PIN}
+          </span>
+          .
         </p>
         <form onSubmit={createMember} className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="block text-xs text-muted">
@@ -217,16 +224,15 @@ export function MembersAdminPanel({
             />
           </label>
           <label className="block text-xs text-muted">
-            Mật khẩu (6 số)
+            Mật khẩu (6 số) — mặc định {DEFAULT_ADMIN_PIN}
             <input
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               inputMode="numeric"
               maxLength={6}
               pattern="[0-9]{6}"
               className="mt-1 w-full px-3 py-2 border border-fog bg-white tracking-[0.3em]"
-              placeholder="926011"
+              placeholder={DEFAULT_ADMIN_PIN}
             />
           </label>
           <label className="block text-xs text-muted">

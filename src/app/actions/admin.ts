@@ -412,10 +412,15 @@ export async function deleteTempleEvent(input: {
 
 const TEMPLE_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 const TEMPLE_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
-type TempleMediaKind = 'events' | 'abbott' | 'gallery';
-const TEMPLE_MEDIA_KINDS: TempleMediaKind[] = ['events', 'abbott', 'gallery'];
+type TempleMediaKind = 'events' | 'abbott' | 'gallery' | 'hero';
+const TEMPLE_MEDIA_KINDS: TempleMediaKind[] = [
+  'events',
+  'abbott',
+  'gallery',
+  'hero',
+];
 
-/** Upload ảnh lên Storage (bucket temple-media). kind: events | abbott | gallery */
+/** Upload ảnh lên Storage (bucket temple-media). kind: events | abbott | gallery | hero */
 export async function uploadTempleMedia(
   formData: FormData,
 ): Promise<{ ok: boolean; url?: string; error?: string }> {
@@ -489,6 +494,34 @@ export async function updateAbbottPortrait(input: {
     .from('temples')
     .update({
       abbott_image_url: url,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.templeId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidateTag('temples', 'max');
+  revalidatePath('/quan-tri/hinh-anh');
+  revalidatePath('/');
+  return { ok: true };
+}
+
+export async function updateTempleHero(input: {
+  templeId: string;
+  imageUrl: string | null;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+
+  const url = input.imageUrl?.trim() || null;
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('temples')
+    .update({
+      hero_image_url: url,
       updated_at: new Date().toISOString(),
     })
     .eq('id', input.templeId);

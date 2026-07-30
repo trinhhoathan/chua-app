@@ -1,32 +1,49 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import {
   updateAbbottPortrait,
   updateTempleGallery,
+  updateTempleHero,
   uploadTempleMedia,
 } from '@/app/actions/admin';
 import { compressImageForUpload } from '@/lib/compress-image';
 import type { GalleryImage } from '@/types/database';
+import { ImageCropDialog } from './ImageCropDialog';
 
 export type MediaTemple = {
   id: string;
   name: string;
   abbott_name: string | null;
   abbott_image_url: string | null;
+  hero_image_url: string | null;
   gallery: GalleryImage[];
+};
+
+const HERO_ASPECT = 16 / 9;
+const PORTRAIT_ASPECT = 3 / 4;
+
+type CropKind = 'hero' | 'abbott';
+
+type CropSession = {
+  kind: CropKind;
+  src: string;
+  fileName: string;
 };
 
 async function uploadCompressed(
   templeId: string,
-  kind: 'abbott' | 'gallery',
+  kind: 'abbott' | 'gallery' | 'hero',
   file: File,
+  skipCompress = false,
 ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   try {
-    const compressed = await compressImageForUpload(file, {
-      maxEdge: kind === 'abbott' ? 1400 : 1600,
-      quality: 0.84,
-    });
+    const compressed = skipCompress
+      ? file
+      : await compressImageForUpload(file, {
+          maxEdge: kind === 'abbott' ? 1400 : kind === 'hero' ? 1920 : 1600,
+          quality: 0.84,
+        });
     if (compressed.size > 2 * 1024 * 1024) {
       return {
         ok: false,
@@ -54,6 +71,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
   const [templeId, setTempleId] = useState(temples[0]?.id ?? '');
   const current = temples.find((t) => t.id === templeId) ?? temples[0];
   const [portrait, setPortrait] = useState(current?.abbott_image_url ?? '');
+  const [hero, setHero] = useState(current?.hero_image_url ?? '');
   const [gallery, setGallery] = useState<GalleryImage[]>(
     current?.gallery ?? [],
   );
@@ -61,28 +79,75 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const [uploading, setUploading] = useState(false);
+  const [cropSession, setCropSession] = useState<CropSession | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (cropSession?.src) URL.revokeObjectURL(cropSession.src);
+    };
+  }, [cropSession]);
 
   function onSelectTemple(id: string) {
     const t = temples.find((x) => x.id === id);
     setTempleId(id);
     setPortrait(t?.abbott_image_url ?? '');
+    setHero(t?.hero_image_url ?? '');
     setGallery(t?.gallery ?? []);
     setMsg(null);
     setErr(null);
+    closeCrop();
   }
 
-  async function onPortraitPick(file: File | null) {
-    if (!file || !templeId) return;
+  function closeCrop() {
+    setCropSession((prev) => {
+      if (prev?.src) URL.revokeObjectURL(prev.src);
+      return null;
+    });
+  }
+
+  function openCrop(kind: CropKind, file: File) {
     setErr(null);
     setMsg(null);
+    setCropSession((prev) => {
+      if (prev?.src) URL.revokeObjectURL(prev.src);
+      return {
+        kind,
+        src: URL.createObjectURL(file),
+        fileName: file.name,
+      };
+    });
+  }
+
+  async function onCroppedConfirm(file: File) {
+    if (!templeId || !cropSession) return;
+    const kind = cropSession.kind;
+    closeCrop();
     setUploading(true);
-    const up = await uploadCompressed(templeId, 'abbott', file);
+    setErr(null);
+    setMsg(null);
+
+    const up = await uploadCompressed(templeId, kind, file, true);
     setUploading(false);
     if (!up.ok) {
       setErr(up.error);
       return;
     }
+
     start(async () => {
+      if (kind === 'hero') {
+        const res = await updateTempleHero({
+          templeId,
+          imageUrl: up.url,
+        });
+        if (!res.ok) {
+          setErr(res.error ?? 'Không lưu được ảnh banner.');
+          return;
+        }
+        setHero(up.url);
+        setMsg('Đã cập nhật ảnh banner trang chủ.');
+        return;
+      }
+
       const res = await updateAbbottPortrait({
         templeId,
         imageUrl: up.url,
@@ -93,6 +158,21 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
       }
       setPortrait(up.url);
       setMsg('Đã cập nhật ảnh chân dung trụ trì.');
+    });
+  }
+
+  function removeHero() {
+    if (!templeId) return;
+    setErr(null);
+    setMsg(null);
+    start(async () => {
+      const res = await updateTempleHero({ templeId, imageUrl: null });
+      if (!res.ok) {
+        setErr(res.error ?? 'Không gỡ được ảnh banner.');
+        return;
+      }
+      setHero('');
+      setMsg('Đã gỡ ảnh banner.');
     });
   }
 
@@ -192,6 +272,8 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
     return <p className="text-sm text-muted">Chưa có chùa để cấu hình.</p>;
   }
 
+  const busy = uploading || pending;
+
   return (
     <div className="space-y-8">
       {temples.length > 1 ? (
@@ -226,10 +308,68 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
 
       <section className="border border-fog bg-paper p-5 md:p-6 space-y-4">
         <div>
+          <h2 className="font-display text-xl text-ink">Ảnh banner trang chủ</h2>
+          <p className="mt-1 text-sm text-muted">
+            Ảnh nền toàn màn hình phía trên trang chủ. Sau khi chọn ảnh, hãy
+            kéo/phóng để cắt khung 16:9 cho đẹp.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="relative w-full max-w-2xl aspect-video overflow-hidden bg-fog border border-fog">
+            {hero ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={hero}
+                alt="Banner trang chủ"
+                className="size-full object-cover"
+              />
+            ) : (
+              <div className="size-full flex items-center justify-center text-xs text-muted px-2 text-center">
+                Chưa có ảnh banner
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="inline-flex cursor-pointer px-4 py-2 text-sm text-white bg-ink hover:bg-jade-deep">
+              {busy ? 'Đang tải…' : 'Thay ảnh banner'}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/*"
+                disabled={busy}
+                className="sr-only"
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  e.target.value = '';
+                  if (f) openCrop('hero', f);
+                }}
+              />
+            </label>
+            {hero ? (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={removeHero}
+                className="text-xs text-lacquer underline"
+              >
+                Gỡ ảnh banner
+              </button>
+            ) : null}
+          </div>
+          <p className="text-[11px] text-muted max-w-lg">
+            JPG/PNG/WebP · cắt khung 16:9 · tự nén · tối đa ~2MB. Phần quan
+            trọng nên để giữa ảnh vì trên điện thoại hai bên có thể bị cắt thêm.
+          </p>
+        </div>
+      </section>
+
+      <section className="border border-fog bg-paper p-5 md:p-6 space-y-4">
+        <div>
           <h2 className="font-display text-xl text-ink">Ảnh chân dung trụ trì</h2>
           <p className="mt-1 text-sm text-muted">
             Hiện ở mục Trụ trì trên trang chủ
-            {current.abbott_name ? ` (${current.abbott_name})` : ''}.
+            {current.abbott_name ? ` (${current.abbott_name})` : ''}. Có thể cắt
+            khung 3:4 trước khi lưu.
           </p>
         </div>
 
@@ -250,23 +390,23 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
           </div>
           <div className="space-y-2">
             <label className="inline-flex cursor-pointer px-4 py-2 text-sm border border-fog bg-white hover:bg-mist">
-              {uploading || pending ? 'Đang tải…' : 'Chọn ảnh từ máy / điện thoại'}
+              {busy ? 'Đang tải…' : 'Chọn ảnh từ máy / điện thoại'}
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/*"
-                disabled={uploading || pending}
+                disabled={busy}
                 className="sr-only"
                 onChange={(e) => {
                   const f = e.target.files?.[0] ?? null;
                   e.target.value = '';
-                  void onPortraitPick(f);
+                  if (f) openCrop('abbott', f);
                 }}
               />
             </label>
             {portrait ? (
               <button
                 type="button"
-                disabled={pending}
+                disabled={busy}
                 onClick={removePortrait}
                 className="block text-xs text-lacquer underline"
               >
@@ -274,7 +414,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
               </button>
             ) : null}
             <p className="text-[11px] text-muted max-w-xs">
-              JPG/PNG/WebP · tự nén · tối đa ~2MB
+              JPG/PNG/WebP · cắt khung 3:4 · tự nén · tối đa ~2MB
             </p>
           </div>
         </div>
@@ -289,12 +429,12 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
             </p>
           </div>
           <label className="inline-flex cursor-pointer px-4 py-2 text-sm text-white bg-ink hover:bg-jade-deep">
-            {uploading || pending ? 'Đang tải…' : 'Thêm ảnh'}
+            {busy ? 'Đang tải…' : 'Thêm ảnh'}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/*"
               multiple
-              disabled={uploading || pending}
+              disabled={busy}
               className="sr-only"
               onChange={(e) => {
                 const files = e.target.files;
@@ -328,7 +468,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
                   <div className="flex gap-1">
                     <button
                       type="button"
-                      disabled={pending || idx === 0}
+                      disabled={busy || idx === 0}
                       onClick={() => moveGallery(idx, -1)}
                       className="px-1.5 py-0.5 border border-fog disabled:opacity-30"
                       title="Đưa lên trước"
@@ -337,7 +477,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
                     </button>
                     <button
                       type="button"
-                      disabled={pending || idx === gallery.length - 1}
+                      disabled={busy || idx === gallery.length - 1}
                       onClick={() => moveGallery(idx, 1)}
                       className="px-1.5 py-0.5 border border-fog disabled:opacity-30"
                       title="Đưa xuống sau"
@@ -347,7 +487,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
                   </div>
                   <button
                     type="button"
-                    disabled={pending}
+                    disabled={busy}
                     onClick={() => removeGalleryAt(idx)}
                     className="text-lacquer underline"
                   >
@@ -359,6 +499,28 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
           </ul>
         )}
       </section>
+
+      <ImageCropDialog
+        open={Boolean(cropSession)}
+        imageSrc={cropSession?.src ?? null}
+        fileName={cropSession?.fileName}
+        aspect={
+          cropSession?.kind === 'abbott' ? PORTRAIT_ASPECT : HERO_ASPECT
+        }
+        maxEdge={cropSession?.kind === 'abbott' ? 1400 : 1920}
+        title={
+          cropSession?.kind === 'abbott'
+            ? 'Cắt ảnh chân dung'
+            : 'Cắt ảnh banner'
+        }
+        hint={
+          cropSession?.kind === 'abbott'
+            ? 'Kéo ảnh và chỉnh phóng to để mặt trụ trì nằm đẹp trong khung dọc 3:4.'
+            : 'Kéo ảnh và chỉnh phóng to để cảnh chính nằm trong khung ngang 16:9.'
+        }
+        onCancel={closeCrop}
+        onConfirm={(file) => void onCroppedConfirm(file)}
+      />
     </div>
   );
 }

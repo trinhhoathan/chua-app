@@ -16,8 +16,8 @@ export default async function LoginPage({ searchParams }: Props) {
         </p>
         <h1 className="font-display text-3xl text-ink">Đăng nhập</h1>
         <p className="mt-2 text-sm text-muted">
-          Dùng số điện thoại và mật khẩu 6 số. Trụ trì chỉ thấy dữ liệu chùa được
-          gán; quản trị viên nền tảng thấy tất cả.
+          Dùng số điện thoại và mật khẩu (PIN 6 số cho trụ trì, hoặc mật khẩu
+          quản trị viên nền tảng). Trụ trì chỉ thấy dữ liệu chùa được gán.
         </p>
 
         {sp.error ? (
@@ -43,17 +43,16 @@ export default async function LoginPage({ searchParams }: Props) {
             />
           </label>
           <label className="block text-xs text-muted">
-            Mật khẩu (6 số)
+            Mật khẩu
             <input
               type="password"
               name="password"
               required
-              inputMode="numeric"
               autoComplete="current-password"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              className="mt-1 w-full px-3 py-2 border border-fog bg-white text-ink tracking-[0.35em]"
-              placeholder="••••••"
+              minLength={6}
+              maxLength={72}
+              className="mt-1 w-full px-3 py-2 border border-fog bg-white text-ink"
+              placeholder="••••••••"
             />
           </label>
           <button

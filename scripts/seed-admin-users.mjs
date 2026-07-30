@@ -25,12 +25,14 @@ const admin = createClient(url, serviceKey, {
 
 const PHONE_DOMAIN = 'phone.chua.app';
 const BAC_HONG_ID = 'a146d06d-8a26-45e4-863d-c90cb26c9ecd';
+const QUY_LINH_ID =
+  process.env.QUY_LINH_ID || '7f4788d3-fe84-4bbd-9e80-52e0eb6173ce';
 
 const ACCOUNTS = [
   {
     key: 'super',
-    phone: process.env.SUPER_ADMIN_PHONE || '0901000001',
-    password: process.env.SUPER_ADMIN_PASSWORD || '100001',
+    phone: process.env.SUPER_ADMIN_PHONE || '0941859999',
+    password: process.env.SUPER_ADMIN_PASSWORD || 'Mabugau2612@',
     displayName: 'Quản trị viên nền tảng',
     templeId: BAC_HONG_ID,
     role: 'admin',
@@ -45,6 +47,19 @@ const ACCOUNTS = [
     role: 'admin',
     isSuperAdmin: false,
   },
+  ...(QUY_LINH_ID
+    ? [
+        {
+          key: 'quy-linh',
+          phone: '0929643333',
+          password: process.env.QUY_LINH_ADMIN_PASSWORD || '123456',
+          displayName: 'Thích Lê Thiện',
+          templeId: QUY_LINH_ID,
+          role: 'admin',
+          isSuperAdmin: false,
+        },
+      ]
+    : []),
 ];
 
 function normalizePhone(raw) {

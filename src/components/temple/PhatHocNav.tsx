@@ -18,7 +18,7 @@ export function PhatHocNav({ temple }: Props) {
     const all = toolsByNavSection(section);
     const ready = all.filter((t) => t.status === 'ready');
     const soon = all.filter((t) => t.status === 'coming_soon');
-    return { section, tools: [...ready, ...soon].slice(0, 4) };
+    return { section, tools: [...ready, ...soon] };
   }).filter((g) => g.tools.length > 0);
 
   return (

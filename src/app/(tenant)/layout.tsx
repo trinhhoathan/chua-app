@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
 import { getCurrentTemple } from '@/lib/tenant';
+import {
+  getRequestOrigin,
+  getTemplePublicOrigin,
+  toAbsoluteMediaUrl,
+} from '@/lib/site-url';
 import { TopNav } from '@/components/temple/TopNav';
 import { TempleFooter } from '@/components/temple/TempleFooter';
 import { ContactDock } from '@/components/temple/ContactDock';
@@ -13,17 +18,56 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'Chưa kết nối website',
     };
   }
+
+  const requestOrigin = await getRequestOrigin();
+  const origin = getTemplePublicOrigin(temple, requestOrigin);
+  const description =
+    temple.slogan ?? temple.history_summary ?? undefined;
   const alt = temple.temple_alt_name ? ` | ${temple.temple_alt_name}` : '';
+  const title = `${temple.name}${alt}`;
+
+  // Ảnh OG tối ưu (nhẹ, 1200×630) — Zalo hay bỏ banner nếu file gốc quá nặng
+  // hoặc URL bị resolve nhầm sang domain Vercel mặc định.
+  const ogImage = temple.hero_image_url
+    ? {
+        url: `${origin}/api/social-image?t=${temple.id}`,
+        width: 1200,
+        height: 630,
+        alt: temple.name,
+      }
+    : null;
+  const fallbackImage = toAbsoluteMediaUrl(temple.hero_image_url, origin);
+
   return {
-    title: `${temple.name}${alt}`,
-    description: temple.slogan ?? temple.history_summary ?? undefined,
-    openGraph: temple.hero_image_url
-      ? {
-          title: temple.name,
-          description: temple.slogan ?? undefined,
-          images: [{ url: temple.hero_image_url }],
-        }
-      : undefined,
+    metadataBase: new URL(origin),
+    title,
+    description,
+    alternates: {
+      canonical: origin,
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'vi_VN',
+      url: origin,
+      siteName: temple.name,
+      title: temple.name,
+      description,
+      images: ogImage
+        ? [ogImage]
+        : fallbackImage
+          ? [{ url: fallbackImage, alt: temple.name }]
+          : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: temple.name,
+      description,
+      images: ogImage
+        ? [ogImage.url]
+        : fallbackImage
+          ? [fallbackImage]
+          : undefined,
+    },
   };
 }
 

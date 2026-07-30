@@ -37,9 +37,22 @@ export function loginEmailToPhone(email: string | null | undefined): string | nu
   return normalizeLoginPhone(lower.slice(0, -suffix.length));
 }
 
+/** Mật khẩu mặc định khi tạo tài khoản trụ trì / chùa mới. */
+export const DEFAULT_ADMIN_PIN = '123456';
+
 /** Mật khẩu quản trị: đúng 6 chữ số. */
 export function isNumericPin(password: string): boolean {
   return /^\d{6}$/.test(password);
+}
+
+/**
+ * Mật khẩu đăng nhập /quan-tri:
+ * - PIN 6 số (trụ trì / nhân sự chùa), hoặc
+ * - mật khẩu mạnh ≥ 8 ký tự (super admin).
+ */
+export function isValidLoginPassword(password: string): boolean {
+  if (isNumericPin(password)) return true;
+  return password.length >= 8 && password.length <= 72;
 }
 
 export function formatPhoneDisplay(phone: string): string {

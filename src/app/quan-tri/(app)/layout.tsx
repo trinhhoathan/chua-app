@@ -15,6 +15,7 @@ const NAV: Array<{ href: string; label: string; superOnly?: boolean }> = [
   { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu' },
   { href: '/quan-tri/phat-tu', label: 'Phật tử' },
   { href: '/quan-tri/kho', label: 'Kho vận' },
+  { href: '/quan-tri/doi-mat-khau', label: 'Đổi mật khẩu' },
   { href: '/quan-tri/thanh-vien', label: 'Thành viên', superOnly: true },
 ];
 
@@ -82,6 +83,12 @@ export default async function AdminLayout({
                 ? `${ctx.displayName}${ctx.phone ? ` · ${ctx.phone}` : ''}`
                 : (ctx.phone ?? ctx.email)}
             </span>
+            <Link
+              href="/quan-tri/doi-mat-khau"
+              className="px-3 py-1.5 border border-white/25 hover:bg-white/10 text-xs"
+            >
+              Đổi mật khẩu
+            </Link>
             <form action={logoutAction}>
               <button className="px-3 py-1.5 border border-white/25 hover:bg-white/10 text-xs">
                 Đăng xuất

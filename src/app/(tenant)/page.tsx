@@ -30,11 +30,11 @@ export default async function HomePage() {
     <main className="overflow-x-hidden">
       <TempleHero temple={temple} />
       <EventsSection temple={temple} events={events} />
+      <AbbottSection temple={temple} />
       <TempleStory temple={temple} />
       <TimelineSection temple={temple} />
       <FeaturesSection temple={temple} />
       <ExtraSections temple={temple} />
-      <AbbottSection temple={temple} />
       <TempleVideosSection temple={temple} />
       <GallerySection temple={temple} />
       <MapsReviewsSection temple={temple} />

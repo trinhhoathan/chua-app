@@ -15,17 +15,12 @@ export function FengShuiNav({ temple }: Props) {
   const primary = temple.primary_color || '#7A1F1F';
   const accent = primary === '#7A1F1F' ? '#c39a4a' : primary;
 
-  const bySection = PHONG_THUY_NAV_ORDER.filter((s) => s !== 'tham_khao').map(
-    (section) => {
-      const all = toolsByNavSection(section);
-      const ready = all.filter((t) => t.status === 'ready');
-      const soon = all.filter((t) => t.status === 'coming_soon');
-      return {
-        section,
-        tools: [...ready, ...soon].slice(0, section === 'hang_ngay' ? 4 : 6),
-      };
-    },
-  );
+  const bySection = PHONG_THUY_NAV_ORDER.map((section) => {
+    const all = toolsByNavSection(section);
+    const ready = all.filter((t) => t.status === 'ready');
+    const soon = all.filter((t) => t.status === 'coming_soon');
+    return { section, tools: [...ready, ...soon] };
+  }).filter((g) => g.tools.length > 0);
 
   return (
     <section id="phong-thuy" className="bg-ink text-white scroll-mt-8">

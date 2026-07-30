@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import {
+  DEFAULT_ADMIN_PIN,
   isNumericPin,
   normalizeLoginPhone,
   phoneToLoginEmail,
@@ -75,7 +76,7 @@ export async function listTempleMembersAction(): Promise<{
 
 export async function createTempleMemberAction(input: {
   phone: string;
-  password: string;
+  password?: string;
   templeId: string;
   displayName: string;
   role: 'admin' | 'staff';
@@ -91,7 +92,8 @@ export async function createTempleMemberAction(input: {
   if (!phone) {
     return { ok: false, error: 'Số điện thoại không hợp lệ (cần 10 số, bắt đầu bằng 0).' };
   }
-  if (!isNumericPin(input.password)) {
+  const password = String(input.password ?? '').trim() || DEFAULT_ADMIN_PIN;
+  if (!isNumericPin(password)) {
     return { ok: false, error: 'Mật khẩu phải đúng 6 chữ số.' };
   }
   const displayName = input.displayName.trim();
@@ -124,7 +126,7 @@ export async function createTempleMemberAction(input: {
   const email = phoneToLoginEmail(phone);
   const { data: created, error: createErr } = await admin.auth.admin.createUser({
     email,
-    password: input.password,
+    password,
     email_confirm: true,
     user_metadata: {
       phone,

@@ -22,9 +22,9 @@ interface Props {
 }
 
 const PRIMARY = [
-  { href: '/#gioi-thieu', label: 'Giới thiệu' },
   { href: '/#hoat-dong', label: 'Hoạt động' },
   { href: '/#tru-tri', label: 'Trụ trì' },
+  { href: '/#gioi-thieu', label: 'Giới thiệu' },
   { href: '/#dong-nuoc', label: 'Cúng dường' },
   { href: '/#dang-ky-phat-tu', label: 'Kết duyên' },
 ] as const;
