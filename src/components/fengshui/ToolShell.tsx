@@ -17,7 +17,7 @@ export function ToolShell({ tool, primaryColor, children }: Props) {
   return (
     <main className="pt-24 pb-16 px-6 md:px-12">
       <div
-        className={`mx-auto ${
+        className={`mx-auto min-w-0 w-full ${
           tool.slug === 'lich-van-nien' ||
           tool.slug === 'kinh-tung-thuong-dung'
             ? 'max-w-3xl'

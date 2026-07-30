@@ -19,8 +19,9 @@ interface Props {
   onShare?: () => void;
 }
 
-const SELECT =
-  'min-w-0 flex-1 border border-fog bg-white px-2 py-1.5 text-xs text-ink cursor-pointer hover:border-ink/30';
+/** text-base (16px) — tránh iOS Safari auto-zoom khi focus. */
+const FIELD =
+  'box-border block w-full min-w-0 max-w-full border border-fog bg-white px-2.5 py-2 text-base text-ink';
 
 type StepKey =
   | 'hour'
@@ -87,9 +88,9 @@ export function HoroscopeContextBar({
   }
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[0.65rem] text-muted leading-none">
+    <div className="space-y-1.5 min-w-0 w-full max-w-full">
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <p className="text-[0.65rem] text-muted leading-none truncate">
           Thời gian luận giải hiện tại
         </p>
         <div className="flex items-center gap-0.5 shrink-0">
@@ -177,10 +178,24 @@ export function HoroscopeContextBar({
           ) : null}
         </div>
       </div>
-      <div className="border border-fog bg-white px-2.5 py-2">
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-5 md:gap-2">
+
+      {/*
+        Mobile: xếp dọc — ô date iOS rất rộng, không để cạnh Lùi/Tiến.
+        Desktop: một hàng gọn hơn.
+      */}
+      <div className="border border-fog bg-white p-2.5 space-y-2 min-w-0 overflow-hidden">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value || todayDateInputValue())}
+          className={`${FIELD} appearance-none`}
+          style={{ WebkitAppearance: 'none' }}
+          aria-label="Ngày luận giải"
+        />
+
+        <div className="grid grid-cols-3 gap-1.5 min-w-0">
           <select
-            className={SELECT}
+            className={FIELD}
             defaultValue=""
             aria-label="Lùi thời gian"
             onChange={(e) => {
@@ -200,32 +215,23 @@ export function HoroscopeContextBar({
             ))}
           </select>
 
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value || todayDateInputValue())}
-            className="min-w-0 w-full border border-fog px-2 py-1.5 text-xs bg-white text-ink"
-          />
-
-          <label className="min-w-0 flex items-center justify-center border border-fog px-2 py-1.5 text-xs">
-            <span className="sr-only">Giờ địa chi</span>
-            <select
-              value={timeIndex}
-              onChange={(e) => setTime(Number(e.target.value))}
-              className="w-full min-w-0 border-0 bg-transparent text-xs font-medium underline underline-offset-2 cursor-pointer text-center"
-              style={{ color: primaryColor }}
-              title={`${slot.label} · ${slot.range}`}
-            >
-              {IZTRO_TIME_SLOTS.map((s) => (
-                <option key={s.index} value={s.index}>
-                  {s.label.replace(/^Giờ\s+/i, 'giờ ')}
-                </option>
-              ))}
-            </select>
-          </label>
+          <select
+            value={timeIndex}
+            onChange={(e) => setTime(Number(e.target.value))}
+            className={FIELD}
+            style={{ color: primaryColor }}
+            title={`${slot.label} · ${slot.range}`}
+            aria-label="Giờ địa chi"
+          >
+            {IZTRO_TIME_SLOTS.map((s) => (
+              <option key={s.index} value={s.index}>
+                {s.label.replace(/^Giờ\s+/i, 'giờ ')}
+              </option>
+            ))}
+          </select>
 
           <select
-            className={SELECT}
+            className={FIELD}
             defaultValue=""
             aria-label="Tiến thời gian"
             onChange={(e) => {
@@ -244,19 +250,19 @@ export function HoroscopeContextBar({
               </option>
             ))}
           </select>
-
-          <button
-            type="button"
-            className="min-w-0 w-full col-span-2 sm:col-span-1 md:col-span-1 px-2 py-1.5 text-xs border whitespace-nowrap text-white hover:opacity-90"
-            style={{
-              backgroundColor: primaryColor,
-              borderColor: primaryColor,
-            }}
-            onClick={() => onChange(nowContextValue())}
-          >
-            Hôm nay
-          </button>
         </div>
+
+        <button
+          type="button"
+          className="w-full min-w-0 px-2.5 py-2 text-base border text-white hover:opacity-90"
+          style={{
+            backgroundColor: primaryColor,
+            borderColor: primaryColor,
+          }}
+          onClick={() => onChange(nowContextValue())}
+        >
+          Hôm nay
+        </button>
       </div>
     </div>
   );

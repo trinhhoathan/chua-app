@@ -248,10 +248,10 @@ export function LapLaSoTuVi({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 min-w-0 max-w-full">
       <form
         onSubmit={submit}
-        className="border border-fog bg-white p-5 md:p-6 space-y-4"
+        className="border border-fog bg-white p-5 md:p-6 space-y-4 min-w-0 overflow-x-hidden"
       >
         <p
           className="text-[0.72rem] uppercase tracking-[0.25em]"
@@ -267,7 +267,8 @@ export function LapLaSoTuVi({
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Nguyễn Văn A"
-            className="mt-1 w-full border border-fog px-3 py-2.5 text-ink text-sm"
+            autoComplete="name"
+            className="mt-1 w-full min-w-0 border border-fog px-3 py-2.5 text-ink text-base"
           />
         </label>
 
@@ -332,13 +333,13 @@ export function LapLaSoTuVi({
           </div>
         </fieldset>
 
-        <div className="grid grid-cols-3 gap-2">
-          <label className="block text-xs text-muted">
+        <div className="grid grid-cols-3 gap-2 min-w-0">
+          <label className="block text-xs text-muted min-w-0">
             Ngày
             <select
               value={day}
               onChange={(e) => setDay(Number(e.target.value))}
-              className="mt-1 w-full border border-fog px-2 py-2 text-sm bg-white"
+              className="mt-1 w-full min-w-0 max-w-full border border-fog px-2 py-2 text-base bg-white"
             >
               {DAYS.map((d) => (
                 <option key={d} value={d}>
@@ -347,12 +348,12 @@ export function LapLaSoTuVi({
               ))}
             </select>
           </label>
-          <label className="block text-xs text-muted">
+          <label className="block text-xs text-muted min-w-0">
             Tháng
             <select
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
-              className="mt-1 w-full border border-fog px-2 py-2 text-sm bg-white"
+              className="mt-1 w-full min-w-0 max-w-full border border-fog px-2 py-2 text-base bg-white"
             >
               {MONTHS.map((m) => (
                 <option key={m} value={m}>
@@ -361,12 +362,12 @@ export function LapLaSoTuVi({
               ))}
             </select>
           </label>
-          <label className="block text-xs text-muted">
+          <label className="block text-xs text-muted min-w-0">
             Năm
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="mt-1 w-full border border-fog px-2 py-2 text-sm bg-white"
+              className="mt-1 w-full min-w-0 max-w-full border border-fog px-2 py-2 text-base bg-white"
             >
               {YEARS.map((y) => (
                 <option key={y} value={y}>
@@ -388,12 +389,12 @@ export function LapLaSoTuVi({
           </label>
         ) : null}
 
-        <label className="block text-xs text-muted">
+        <label className="block text-xs text-muted min-w-0">
           Giờ sinh (theo địa chi)
           <select
             value={timeIndex}
             onChange={(e) => setTimeIndex(Number(e.target.value))}
-            className="mt-1 w-full border border-fog px-2 py-2 text-sm bg-white"
+            className="mt-1 w-full min-w-0 max-w-full border border-fog px-2 py-2 text-base bg-white"
           >
             {IZTRO_TIME_SLOTS.map((slot) => (
               <option key={slot.index} value={slot.index}>
@@ -464,7 +465,7 @@ export function LapLaSoTuVi({
       ) : null}
 
       {result && chartInput ? (
-        <div className="space-y-5">
+        <div className="space-y-5 min-w-0 max-w-full">
           <div className="border border-fog bg-paper p-5 md:p-6">
             <p
               className="text-[0.7rem] uppercase tracking-[0.25em]"
