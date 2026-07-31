@@ -373,7 +373,7 @@ export function TopNav({ temple }: Props) {
                       </Link>
                     </div>
 
-                    <div className="px-6 py-5 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6 items-start auto-cols-fr">
+                    <div className="px-6 py-5 grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 items-start auto-cols-fr">
                       {phongThuyGrouped.map(({ section, tools }) => (
                         <NavSectionBlock
                           key={section}

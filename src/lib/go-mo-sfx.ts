@@ -129,32 +129,50 @@ export async function playKhanhStrike(volume = 0.42) {
   }
 }
 
-/** Đọc danh hiệu bằng SpeechSynthesis (đồng bộ nhịp gõ). */
+/** Đọc danh hiệu bằng SpeechSynthesis — resolve khi đọc xong (đồng bộ nhịp gõ). */
 export function speakNiemDanhHieu(
   text: string,
   opts?: { rate?: number; enabled?: boolean },
-) {
-  if (typeof window === 'undefined') return;
-  if (opts?.enabled === false) return;
-  if (!text.trim()) return;
-  if (!('speechSynthesis' in window)) return;
+): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (opts?.enabled === false) return Promise.resolve();
+  if (!text.trim()) return Promise.resolve();
+  if (!('speechSynthesis' in window)) return Promise.resolve();
 
-  try {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'vi-VN';
-    u.rate = opts?.rate ?? 1;
-    u.pitch = 1;
-    u.volume = 0.9;
-    const voices = window.speechSynthesis.getVoices();
-    const vi =
-      voices.find((v) => v.lang.toLowerCase().startsWith('vi')) ??
-      voices.find((v) => /vietnam|vietnamese/i.test(v.name));
-    if (vi) u.voice = vi;
-    window.speechSynthesis.speak(u);
-  } catch {
-    /* ignore */
-  }
+  return new Promise((resolve) => {
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'vi-VN';
+      // SpeechSynthesis: 0.1–10; map tốc độ gõ → tốc độ đọc rõ hơn
+      const rate = opts?.rate ?? 1;
+      u.rate = Math.min(10, Math.max(0.1, rate));
+      u.pitch = 1;
+      u.volume = 0.9;
+      const voices = window.speechSynthesis.getVoices();
+      const vi =
+        voices.find((v) => v.lang.toLowerCase().startsWith('vi')) ??
+        voices.find((v) => /vietnam|vietnamese/i.test(v.name));
+      if (vi) u.voice = vi;
+
+      let settled = false;
+      let safetyTimer: number | null = null;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        if (safetyTimer !== null) window.clearTimeout(safetyTimer);
+        resolve();
+      };
+      u.onend = done;
+      u.onerror = done;
+      // Fallback dài — chỉ khi trình duyệt không fire onend
+      safetyTimer = window.setTimeout(done, 20_000);
+
+      window.speechSynthesis.speak(u);
+    } catch {
+      resolve();
+    }
+  });
 }
 
 export function stopNiemSpeech() {

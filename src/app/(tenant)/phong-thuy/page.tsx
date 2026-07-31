@@ -3,10 +3,44 @@ import { getCurrentTemple } from '@/lib/tenant';
 import {
   NAV_SECTION_LABELS,
   PHONG_THUY_NAV_ORDER,
+  groupToolsByCategory,
   groupToolsByNavSection,
   phongThuyMenuTools,
   toolHref,
+  type FengShuiToolMeta,
 } from '@/lib/fengshui/tools';
+
+function ToolCardGrid({
+  tools,
+  muted,
+}: {
+  tools: FengShuiToolMeta[];
+  muted: boolean;
+}) {
+  return (
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {tools.map((tool) => (
+        <Link
+          key={tool.slug}
+          href={toolHref(tool)}
+          className={`group relative border p-4 transition-colors bg-white ${
+            muted
+              ? 'border-fog/80 hover:border-ink/20 opacity-95'
+              : 'border-fog hover:border-ink/30'
+          }`}
+        >
+          {tool.status === 'coming_soon' ? (
+            <span className="absolute top-3 right-3 text-[0.6rem] uppercase tracking-wide px-1.5 py-0.5 bg-mist text-muted">
+              Sắp có
+            </span>
+          ) : null}
+          <p className="font-display text-lg text-ink pr-14">{tool.title}</p>
+          <p className="mt-1 text-xs text-muted">{tool.subtitle}</p>
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 export default async function PhongThuyHub() {
   const temple = await getCurrentTemple();
@@ -65,29 +99,20 @@ export default async function PhongThuyHub() {
               >
                 {NAV_SECTION_LABELS[section]}
               </h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {tools.map((tool) => (
-                  <Link
-                    key={tool.slug}
-                    href={toolHref(tool)}
-                    className={`group relative border p-4 transition-colors bg-white ${
-                      section === 'tham_khao'
-                        ? 'border-fog/80 hover:border-ink/20 opacity-95'
-                        : 'border-fog hover:border-ink/30'
-                    }`}
-                  >
-                    {tool.status === 'coming_soon' ? (
-                      <span className="absolute top-3 right-3 text-[0.6rem] uppercase tracking-wide px-1.5 py-0.5 bg-mist text-muted">
-                        Sắp có
-                      </span>
-                    ) : null}
-                    <p className="font-display text-lg text-ink pr-14">
-                      {tool.title}
-                    </p>
-                    <p className="mt-1 text-xs text-muted">{tool.subtitle}</p>
-                  </Link>
-                ))}
-              </div>
+              {section === 'bat_cuc' ? (
+                <div className="space-y-8">
+                  {groupToolsByCategory(tools).map(([category, catTools]) => (
+                    <div key={category}>
+                      <p className="text-[0.7rem] tracking-[0.22em] uppercase text-muted mb-3">
+                        {category}
+                      </p>
+                      <ToolCardGrid tools={catTools} muted={false} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ToolCardGrid tools={tools} muted={section === 'tham_khao'} />
+              )}
             </section>
           ))}
         </div>

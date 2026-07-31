@@ -10,6 +10,7 @@ export type NavSection =
   | 'hang_ngay'
   | 'viec_he_trong'
   | 'tu_vi_bat_tu'
+  | 'bat_cuc'
   | 'tham_khao'
   | 'lich_le'
   | 'kinh_khan'
@@ -29,6 +30,10 @@ export type ToolCategory =
   | 'Kinh Dịch'
   | 'Thần số'
   | 'Tướng số'
+  | 'Định danh · giấy tờ'
+  | 'Kinh doanh · doanh nghiệp'
+  | 'Thời gian · sự kiện'
+  | 'Công nghệ · đời sống'
   | 'Lịch lễ'
   | 'Kinh sách'
   | 'Nghi lễ Phật'
@@ -60,6 +65,7 @@ export const NAV_SECTION_LABELS: Record<NavSection, string> = {
   hang_ngay: 'Dùng mỗi ngày',
   viec_he_trong: 'Việc hệ trọng',
   tu_vi_bat_tu: 'Tử vi · Bát tự',
+  bat_cuc: 'Bát Cực Linh Số',
   tham_khao: 'Tham khảo thêm',
   lich_le: 'Lịch lễ · Vía',
   kinh_khan: 'Kinh · Văn khấn',
@@ -73,6 +79,7 @@ export const NAV_SECTION_MENU_LABELS: Record<NavSection, string> = {
   hang_ngay: 'Mỗi ngày',
   viec_he_trong: 'Hệ trọng',
   tu_vi_bat_tu: 'Tử vi',
+  bat_cuc: 'Bát Cực Linh Số',
   tham_khao: 'Tham khảo',
   lich_le: 'Lịch lễ',
   kinh_khan: 'Kinh · khấn',
@@ -86,6 +93,7 @@ export const PHONG_THUY_NAV_ORDER: NavSection[] = [
   'hang_ngay',
   'viec_he_trong',
   'tu_vi_bat_tu',
+  'bat_cuc',
   'tham_khao',
 ];
 
@@ -487,16 +495,164 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     status: 'coming_soon',
     description: 'Khung chỉ tướng (bàn tay).',
   },
+  // —— Bát Cực Linh Số (14 trang · 4 nhóm con) ——
+  // Nhóm Định danh & giấy tờ
   {
     slug: 'boi-sim',
     title: 'Bói SIM · số điện thoại',
-    subtitle: 'Bát Cực Linh Số',
-    category: 'Thần số',
+    subtitle: 'Vận khí · ngoại giao · sự nghiệp',
+    category: 'Định danh · giấy tờ',
     domain: 'co_hoc',
-    navSection: 'tham_khao',
+    navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Du Niên 8 sao (Bát Cực Linh Số) + 81 Số Lý, Âm Dương, hợp mệnh Nạp Âm.',
+      'Luận giải sim theo sách Bát Cực Linh Số: 8 từ trường Du Niên, biến số 0·5, tổ hợp chế hóa, 3 số cuối, 5 phương diện + 81 Số Lý, Âm Dương, hợp mệnh Nạp Âm — kèm AI luận sâu và trò chuyện.',
+  },
+  {
+    slug: 'so-tai-khoan',
+    title: 'Số tài khoản ngân hàng',
+    subtitle: 'Dòng chảy tiền tệ',
+    category: 'Định danh · giấy tờ',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận cấu trúc sao của số tài khoản: tiền vào có thuận, có giữ được không — phân tích trên máy, số được che khi hỏi AI.',
+  },
+  {
+    slug: 'so-nha',
+    title: 'Số nhà · căn hộ',
+    subtitle: 'Năng lượng không gian sống',
+    category: 'Định danh · giấy tờ',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận số nhà / căn hộ theo quái số từng chữ số, cặp sao Bát Cực và tổng nút — kèm cách bài trí bù trừ.',
+  },
+  {
+    slug: 'bien-so-xe',
+    title: 'Biển số xe',
+    subtitle: 'An toàn · tài lộc làm ăn',
+    category: 'Định danh · giấy tờ',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Bóc mã tỉnh, seri chữ và dãy số chính của biển số VN — luận Bát Cực trọng tâm an toàn di chuyển và tài lộc.',
+  },
+  {
+    slug: 'so-can-cuoc',
+    title: 'Số CCCD · hộ chiếu',
+    subtitle: 'Trường năng lượng gốc',
+    category: 'Định danh · giấy tờ',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Giải mã cấu trúc CCCD 12 số (mã tỉnh, giới tính, năm sinh theo TT 07/2016/TT-BCA) và luận trường khí gốc — số được che khi hỏi AI.',
+  },
+  {
+    slug: 'so-the-atm',
+    title: 'Số thẻ ATM · tín dụng',
+    subtitle: 'Dòng chi tiêu · giữ tiền',
+    category: 'Định danh · giấy tờ',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Kiểm tra Luhn, tách mã BIN ngân hàng và luận cấu trúc sao phần số chính của thẻ — số được che khi hỏi AI.',
+  },
+  // Nhóm Kinh doanh & doanh nghiệp
+  {
+    slug: 'ma-so-thue',
+    title: 'Mã số thuế · ĐKKD',
+    subtitle: 'Vận khí · pháp lý công ty',
+    category: 'Kinh doanh · doanh nghiệp',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận MST 10/13 số về vận khí kinh doanh, quan hệ đối tác và sự ổn thỏa pháp lý của doanh nghiệp.',
+  },
+  {
+    slug: 'ma-nhan-vien',
+    title: 'Mã nhân viên',
+    subtitle: 'Thăng tiến · quan hệ công sở',
+    category: 'Kinh doanh · doanh nghiệp',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận mã nhân viên (kèm chữ cái được tách riêng) về đường thăng tiến và quan hệ đồng nghiệp – cấp trên.',
+  },
+  {
+    slug: 'so-phong-lam-viec',
+    title: 'Số phòng · tầng làm việc',
+    subtitle: 'Năng lượng nơi làm việc',
+    category: 'Kinh doanh · doanh nghiệp',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận số phòng / tầng theo quái số và cặp sao — hiệu quả công việc, hòa khí đội nhóm và cách bài trí bù trừ.',
+  },
+  {
+    slug: 'gia-niem-yet',
+    title: 'Giá bán · giá chốt',
+    subtitle: 'Kèm gợi ý giá đẹp ±3%',
+    category: 'Kinh doanh · doanh nghiệp',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận con số giá niêm yết / giá chốt và tự động gợi ý các mức giá đẹp lân cận, ưu tiên đuôi Thiên Y / Diên Niên.',
+  },
+  // Nhóm Thời gian & sự kiện
+  {
+    slug: 'ngay-sinh-linh-so',
+    title: 'Ngày sinh linh số',
+    subtitle: 'Tính cách · năng khiếu',
+    category: 'Thời gian · sự kiện',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Đổi ngày sinh thành dãy linh số ddMMyyyy và luận từ trường bẩm sinh — kèm âm lịch, can chi và mệnh Nạp Âm.',
+  },
+  {
+    slug: 'ngay-gio-su-kien',
+    title: 'Ngày giờ sự kiện',
+    subtitle: 'Khai trương · cưới hỏi · ký kết',
+    category: 'Thời gian · sự kiện',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận dãy số ngày giờ (ddMMyyyyhh) của việc trọng đại — có thuận không, nên xê dịch giờ thế nào.',
+  },
+  // Nhóm Công nghệ & đời sống
+  {
+    slug: 'mat-khau-ma-pin',
+    title: 'Mật khẩu · mã PIN',
+    subtitle: 'Phản xạ năng lượng hằng ngày',
+    category: 'Công nghệ · đời sống',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận cấu trúc sao của dãy số gõ hằng ngày — phân tích hoàn toàn trên máy, khi hỏi AI che kín số gốc, luôn nhắc bảo mật.',
+  },
+  {
+    slug: 'so-thu-tu-ghe',
+    title: 'Số thứ tự · bàn · ghế',
+    subtitle: 'Báo danh · ghế · bàn tiệc',
+    category: 'Công nghệ · đời sống',
+    domain: 'co_hoc',
+    navSection: 'bat_cuc',
+    status: 'ready',
+    description:
+      'Luận nhanh số báo danh, số ghế, số bàn theo quái số, cặp sao và tổng nút — nhẹ nhàng, trợ duyên tâm lý.',
   },
 
   // —— Phật học: lịch lễ ——

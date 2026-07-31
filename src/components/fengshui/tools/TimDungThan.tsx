@@ -532,18 +532,21 @@ export function TimDungThan({
             chartContext={chartContext}
             templeName={templeName}
             primaryColor={primaryColor}
+            contactPhone={contactPhone}
+            title="Luận dụng thần (mẫu)"
+            subtitle="Xem thử miễn phí dụng – hỷ – kỵ thần theo Bát tự — không luận sao Tử Vi hay vận hạn từng năm."
+            ctaTitle="Muốn luận dụng thần chuyên sâu hơn?"
             question={essayQuestion}
             focusFlag="dungThanFocus"
             topic="dung_than"
-            buttonLabel="Luận dụng thần chuyên sâu"
+            buttonLabel="Luận dụng thần"
             loadingLabel={`Trụ trì ${templeName} đang cân bát tự tìm dụng thần…`}
             notePrefix="Hỏi sâu dụng thần bát tự"
             onAskMore={() => setChatOpen(true)}
           />
 
           <p className="text-[0.75rem] text-muted">
-            Chat hỏi thêm: miễn phí 3 câu về dụng thần; từ câu 4 cần thỉnh
-            nước. Muốn xem nạp âm bốn trụ, dùng{' '}
+            Công cụ liên quan:{' '}
             <a
               href="/phong-thuy/nap-am-ngu-hanh"
               className="underline underline-offset-2"

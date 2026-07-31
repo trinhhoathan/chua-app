@@ -19,6 +19,7 @@ import { SaoChieuMenh } from '@/components/fengshui/tools/SaoChieuMenh';
 import { ThanSoHoc } from '@/components/fengshui/tools/ThanSoHoc';
 import { DanhGiaTinhDanh } from '@/components/fengshui/tools/DanhGiaTinhDanh';
 import { BoiSim } from '@/components/fengshui/tools/BoiSim';
+import { BatCucTool } from '@/components/fengshui/tools/BatCucTool';
 import { MaiHoaDichSo } from '@/components/fengshui/tools/MaiHoaDichSo';
 import { KhongMinhThanToan } from '@/components/fengshui/tools/KhongMinhThanToan';
 import { LucHao } from '@/components/fengshui/tools/LucHao';
@@ -190,7 +191,54 @@ function renderTool(
     case 'danh-gia-tinh-danh':
       return <DanhGiaTinhDanh primaryColor={primary} />;
     case 'boi-sim':
-      return <BoiSim primaryColor={primary} />;
+      return (
+        <BoiSim
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'so-tai-khoan':
+    case 'so-nha':
+    case 'bien-so-xe':
+    case 'so-can-cuoc':
+    case 'so-the-atm':
+    case 'ma-so-thue':
+    case 'ma-nhan-vien':
+    case 'so-phong-lam-viec':
+    case 'gia-niem-yet':
+    case 'ngay-sinh-linh-so':
+    case 'ngay-gio-su-kien':
+    case 'mat-khau-ma-pin':
+    case 'so-thu-tu-ghe': {
+      const topicBySlug = {
+        'so-tai-khoan': 'tai_khoan',
+        'so-nha': 'so_nha',
+        'bien-so-xe': 'bien_so',
+        'so-can-cuoc': 'can_cuoc',
+        'so-the-atm': 'the_atm',
+        'ma-so-thue': 'ma_so_thue',
+        'ma-nhan-vien': 'ma_nhan_vien',
+        'so-phong-lam-viec': 'so_phong',
+        'gia-niem-yet': 'gia_ban',
+        'ngay-sinh-linh-so': 'ngay_sinh',
+        'ngay-gio-su-kien': 'su_kien',
+        'mat-khau-ma-pin': 'mat_khau',
+        'so-thu-tu-ghe': 'so_ghe',
+      } as const;
+      return (
+        <BatCucTool
+          topic={topicBySlug[slug]}
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    }
     case 'mai-hoa-dich-so':
       return <MaiHoaDichSo primaryColor={primary} />;
     case 'khong-minh-than-toan':

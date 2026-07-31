@@ -377,18 +377,21 @@ export function HopTuoiMenh({
             chartContext={chartContext}
             templeName={templeName}
             primaryColor={primaryColor}
+            contactPhone={contactPhone}
+            title="Luận hợp tuổi (mẫu)"
+            subtitle="Xem thử miễn phí mức hợp – xung giữa hai tuổi — không luận lá số Tử Vi riêng từng người."
+            ctaTitle="Muốn luận hợp tuổi chuyên sâu hơn?"
             question={essayQuestion}
             focusFlag="hopTuoiFocus"
             topic="hop_tuoi"
-            buttonLabel="Luận hợp tuổi chuyên sâu"
+            buttonLabel="Luận hợp tuổi"
             loadingLabel={`Trụ trì ${templeName} đang luận hợp tuổi…`}
             notePrefix="Hỏi sâu hợp tuổi xung khắc"
             onAskMore={() => setChatOpen(true)}
           />
 
           <p className="text-[0.75rem] text-muted">
-            Chat hỏi thêm: miễn phí 3 câu về hợp tuổi; từ câu 4 cần thỉnh nước.
-            Muốn xem vận hạn từng người, dùng{' '}
+            Công cụ liên quan:{' '}
             <a
               href="/phong-thuy/xem-han-nam"
               className="underline underline-offset-2"

@@ -18,14 +18,8 @@ import {
   buildBatTuPromptContext,
   type BatTuView,
 } from '@/lib/fengshui/bat-tu';
-import {
-  resolveEssayFollowUps,
-  splitTuViReply,
-} from '@/lib/fengshui/tuvi-prompt';
 import { TuViChatPanel } from '@/components/fengshui/tools/TuViChatPanel';
-import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
-import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
-import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { TuViEssaySection } from '@/components/fengshui/tools/TuViEssaySection';
 
 interface Props {
   primaryColor: string;
@@ -54,203 +48,6 @@ function HanhChip({ hanh }: { hanh: string }) {
     >
       {hanh}
     </span>
-  );
-}
-
-/** Tách khỏi trang chính — stream không re-render form/bảng. */
-function BatTuEssaySection({
-  chartContext,
-  templeName,
-  primaryColor,
-  onAskMore,
-}: {
-  chartContext: string;
-  templeName: string;
-  primaryColor: string;
-  onAskMore: () => void;
-}) {
-  const [essay, setEssay] = useState('');
-  const [essayLoading, setEssayLoading] = useState(false);
-  const [essayError, setEssayError] = useState<string | null>(null);
-  const [teasers, setTeasers] = useState<string[]>([]);
-  const [cooldownSec, setCooldownSec] = useState(0);
-  const essayAbort = useRef<AbortController | null>(null);
-  const rafRef = useRef(0);
-  const pendingRef = useRef('');
-  const questionRef = useRef('');
-
-  useEffect(() => {
-    return () => {
-      essayAbort.current?.abort();
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (cooldownSec <= 0) return;
-    const t = window.setTimeout(() => setCooldownSec((s) => s - 1), 1000);
-    return () => window.clearTimeout(t);
-  }, [cooldownSec]);
-
-  function paintEssay(raw: string) {
-    pendingRef.current = raw;
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      setEssay(splitTuViReply(pendingRef.current).body);
-    });
-  }
-
-  async function runEssay() {
-    if (!chartContext || essayLoading || cooldownSec > 0) return;
-    essayAbort.current?.abort();
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    }
-    const controller = new AbortController();
-    essayAbort.current = controller;
-    setEssayLoading(true);
-    setEssayError(null);
-    setEssay('');
-    setTeasers([]);
-    pendingRef.current = '';
-
-    const question =
-      'Hãy luận giải chuyên sâu lá số Bát tự Tứ trụ của tôi: nhật chủ và lệnh tháng (được lệnh hay thất lệnh), tổ hợp thập thần nổi bật trên can và tàng can ảnh hưởng gì tới tính cách – công danh – tài lộc – hôn nhân – lục thân, thần sát và không vong điểm xuyết, thân cường nhược với dụng – hỷ – kỵ thần, rồi luận đại vận đang đi và lưu niên năm nay, kèm lời khuyên ứng dụng thực tế. Không luận sao cung Tử Vi đẩu số.';
-    questionRef.current = question;
-
-    try {
-      const res = await fetch('/api/tuvi/luan-giai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          question,
-          chartContext,
-          history: [],
-          templeName,
-          batTuFocus: true,
-        }),
-      });
-      if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as {
-          error?: string;
-          retryAfterSec?: number;
-        } | null;
-        if (res.status === 429) {
-          setCooldownSec(Math.max(3, data?.retryAfterSec ?? 12));
-        }
-        throw new Error(data?.error || 'Không luận được lá số Bát tự.');
-      }
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error('Không nhận được phản hồi luận giải.');
-      const decoder = new TextDecoder();
-      let acc = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(value, { stream: true });
-        paintEssay(acc);
-      }
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = 0;
-      }
-      const resolved = resolveEssayFollowUps(
-        acc,
-        questionRef.current,
-        'bat_tu',
-        5,
-      );
-      setEssay(resolved.body || acc);
-      setTeasers(resolved.suggestions);
-      if (!acc.trim()) throw new Error('Phản hồi luận giải trống.');
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return;
-      setEssayError(
-        e instanceof Error
-          ? e.message
-          : 'Không kết nối được để luận lá số Bát tự.',
-      );
-    } finally {
-      setEssayLoading(false);
-      essayAbort.current = null;
-    }
-  }
-
-  return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={essayLoading || cooldownSec > 0}
-          onClick={() => void runEssay()}
-          className="px-4 py-2.5 text-sm text-white disabled:opacity-50"
-          style={{ background: primaryColor }}
-        >
-          {essayLoading
-            ? 'Đang luận…'
-            : cooldownSec > 0
-              ? `Chờ ${cooldownSec}s`
-              : 'Luận giải lá số Bát tự'}
-        </button>
-        <button
-          type="button"
-          onClick={onAskMore}
-          className="px-4 py-2.5 text-sm border border-fog text-ink"
-        >
-          Hỏi trụ trì thêm
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            openWaterDonateForm({
-              note: 'Hỏi sâu lá số Bát tự',
-              qty: 10,
-            })
-          }
-          className="px-4 py-2.5 text-sm border border-fog text-ink"
-        >
-          Thỉnh nước hỏi sâu
-        </button>
-      </div>
-
-      {essayError ? (
-        <p className="text-sm text-lacquer">{essayError}</p>
-      ) : null}
-      {essay || essayLoading ? (
-        <div className="border border-fog bg-white p-4 md:p-5">
-          {essayLoading && !essay ? (
-            <p className="text-sm text-muted">
-              Trụ trì đang luận lá số Bát tự…
-            </p>
-          ) : (
-            <>
-              <TuViMarkdown
-                text={essay}
-                primaryColor={primaryColor}
-                className="text-ink"
-              />
-              {essayLoading ? (
-                <span
-                  className="inline-block w-[0.45em] h-[1em] ml-0.5 align-[-0.1em] animate-pulse"
-                  style={{ backgroundColor: primaryColor }}
-                  aria-hidden
-                />
-              ) : null}
-              {!essayLoading && teasers.length > 0 ? (
-                <TuViTeaserFollowUps
-                  suggestions={teasers}
-                  primaryColor={primaryColor}
-                  notePrefix="Hỏi sâu lá số Bát tự"
-                />
-              ) : null}
-            </>
-          )}
-        </div>
-      ) : null}
-    </div>
   );
 }
 
@@ -1038,17 +835,26 @@ export function LapBatTu({
             </div>
           ) : null}
 
-          <BatTuEssaySection
+          <TuViEssaySection
             key={`essay-${chatSessionId}`}
             chartContext={chartContext}
             templeName={templeName}
             primaryColor={primaryColor}
+            contactPhone={contactPhone}
+            title="Luận lá số Bát tự (mẫu)"
+            subtitle="Xem thử miễn phí tứ trụ Bát tự — thập thần, dụng thần, đại vận và lưu niên; không luận sao cung Tử Vi đẩu số."
+            ctaTitle="Muốn luận lá số Bát tự chuyên sâu hơn?"
+            question="Hãy luận giải chuyên sâu lá số Bát tự Tứ trụ của tôi: nhật chủ và lệnh tháng (được lệnh hay thất lệnh), tổ hợp thập thần nổi bật trên can và tàng can ảnh hưởng gì tới tính cách – công danh – tài lộc – hôn nhân – lục thân, thần sát và không vong điểm xuyết, thân cường nhược với dụng – hỷ – kỵ thần, rồi luận đại vận đang đi và lưu niên năm nay, kèm lời khuyên ứng dụng thực tế. Không luận sao cung Tử Vi đẩu số."
+            focusFlag="batTuFocus"
+            topic="bat_tu"
+            buttonLabel="Luận lá số Bát tự"
+            loadingLabel="Trụ trì đang luận lá số Bát tự…"
+            notePrefix="Hỏi sâu lá số Bát tự"
             onAskMore={() => setChatOpen(true)}
           />
 
           <p className="text-[0.75rem] text-muted">
-            Chat hỏi thêm: miễn phí 3 câu về lá số Bát tự; từ câu 4 cần thỉnh
-            nước. Công cụ liên quan:{' '}
+            Công cụ liên quan:{' '}
             <a
               href="/phong-thuy/tim-dung-than"
               className="underline underline-offset-2"

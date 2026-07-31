@@ -482,18 +482,21 @@ export function BatTuHaLac({
             chartContext={chartContext}
             templeName={templeName}
             primaryColor={primaryColor}
+            contactPhone={contactPhone}
+            title="Luận quẻ Hà Lạc (mẫu)"
+            subtitle="Xem thử miễn phí quẻ Tiên thiên – Hậu thiên theo Hà Lạc lý số — không luận sao Tử Vi hay vận hạn từng năm."
+            ctaTitle="Muốn luận quẻ Hà Lạc chuyên sâu hơn?"
             question={essayQuestion}
             focusFlag="haLacFocus"
             topic="ha_lac"
-            buttonLabel="Luận quẻ Hà Lạc chuyên sâu"
+            buttonLabel="Luận quẻ Hà Lạc"
             loadingLabel={`Trụ trì ${templeName} đang luận quẻ Hà Lạc…`}
             notePrefix="Hỏi sâu Bát tự Hà Lạc"
             onAskMore={() => setChatOpen(true)}
           />
 
           <p className="text-[0.75rem] text-muted">
-            Chat hỏi thêm: miễn phí 3 câu về quẻ Hà Lạc; từ câu 4 cần thỉnh
-            nước. Muốn xem ngũ hành tứ trụ chi tiết, dùng{' '}
+            Công cụ liên quan:{' '}
             <a
               href="/phong-thuy/nap-am-ngu-hanh"
               className="underline underline-offset-2"

@@ -1,73 +1,46 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { splitTuViReply } from '@/lib/fengshui/tuvi-prompt';
+import { resolveBatCucFollowUps } from '@/lib/fengshui/bat-cuc-prompt';
 import {
-  resolveEssayFollowUps,
-  splitTuViReply,
-  type FollowUpTopic,
-} from '@/lib/fengshui/tuvi-prompt';
+  BAT_CUC_TOPICS,
+  type BatCucTopicId,
+} from '@/lib/fengshui/bat-cuc-contexts';
 import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
 
-export type EssayFocusFlag =
-  | 'hopTuoiFocus'
-  | 'haLacFocus'
-  | 'dungThanFocus'
-  | 'vanHanFocus'
-  | 'daiVanFocus'
-  | 'napAmFocus'
-  | 'batTuFocus';
-
 interface Props {
-  /** Ngữ cảnh gửi AI (khối dữ liệu đã tính sẵn). */
-  chartContext: string;
+  /** Khối dữ liệu Bát Cực đã tính sẵn (đã mask nếu chủ đề bảo mật). */
+  analysisContext: string;
+  topic: BatCucTopicId;
   templeName: string;
   primaryColor: string;
   contactPhone?: string | null;
-  /** Tiêu đề khối (VD: «Luận hạn năm (mẫu)»). */
-  title: string;
-  /** Phụ đề dưới tiêu đề. */
-  subtitle: string;
-  /** Tiêu đề hộp CTA. */
-  ctaTitle: string;
-  /** Câu hỏi mẫu gửi AI khi bấm nút luận — không đổi theo trang. */
-  question: string;
-  /** Cờ hướng luận gửi API — không đổi theo trang. */
-  focusFlag: EssayFocusFlag;
-  /** Chủ đề chọn câu hỏi mồi khi model trả thiếu. */
-  topic: FollowUpTopic;
-  buttonLabel: string;
-  loadingLabel: string;
-  /** Tiền tố ghi chú đơn thỉnh nước. */
-  notePrefix: string;
   /** Mở khung chat hỏi trụ trì. */
   onAskMore: () => void;
 }
 
 /**
- * Template luận mẫu dùng chung (cùng bố cục «Luận cung Mệnh (mẫu)»):
- * — Luận giải mẫu (mệnh lệnh AI riêng từng trang)
+ * Template dùng chung cho 14 trang Bát Cực Linh Số
+ * (cùng bố cục với «Luận cung Mệnh (mẫu)» trên trang tử vi):
+ * — Luận giải mẫu (mệnh lệnh AI riêng từng chủ đề)
  * — Hộp CTA: Thỉnh nước (ưu tiên) · Gọi trụ trì · Hỏi trụ trì thêm
- *
- * Chỉ đổi UI — API `/api/tuvi/luan-giai`, question, focusFlag giữ nguyên.
+ * Luật chat: miễn phí 3 câu; từ câu 4 cần thỉnh nước.
  */
-export function TuViEssaySection({
-  chartContext,
+export function BatCucEssaySection({
+  analysisContext,
+  topic,
   templeName,
   primaryColor,
   contactPhone,
-  title,
-  subtitle,
-  ctaTitle,
-  question,
-  focusFlag,
-  topic,
-  buttonLabel,
-  loadingLabel,
-  notePrefix,
   onAskMore,
 }: Props) {
+  const cfg = BAT_CUC_TOPICS[topic];
+  const essaySubtitle = `Xem thử miễn phí ${cfg.dataLabel} theo Bát Cực Linh Số.`;
+  const ctaTitle = `Muốn luận ${cfg.dataLabel} chuyên sâu hơn?`;
+
   const [essay, setEssay] = useState('');
   const [essayLoading, setEssayLoading] = useState(false);
   const [essayError, setEssayError] = useState<string | null>(null);
@@ -84,13 +57,14 @@ export function TuViEssaySection({
     };
   }, []);
 
+  // Đổi dãy số / chủ đề → reset bài luận mẫu
   useEffect(() => {
     essayAbort.current?.abort();
     setEssay('');
     setEssayError(null);
     setTeasers([]);
     setEssayLoading(false);
-  }, [chartContext, question, focusFlag]);
+  }, [analysisContext, topic]);
 
   useEffect(() => {
     if (cooldownSec <= 0) return;
@@ -108,7 +82,7 @@ export function TuViEssaySection({
   }
 
   async function runEssay() {
-    if (!chartContext || essayLoading || cooldownSec > 0) return;
+    if (!analysisContext || essayLoading || cooldownSec > 0) return;
     essayAbort.current?.abort();
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
@@ -123,16 +97,16 @@ export function TuViEssaySection({
     pendingRef.current = '';
 
     try {
-      const res = await fetch('/api/tuvi/luan-giai', {
+      const res = await fetch('/api/bat-cuc/luan-giai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
-          question,
-          chartContext,
+          question: cfg.essayQuestion,
+          analysisContext,
           history: [],
           templeName,
-          [focusFlag]: true,
+          topic,
         }),
       });
       if (!res.ok) {
@@ -159,7 +133,7 @@ export function TuViEssaySection({
         cancelAnimationFrame(rafRef.current);
         rafRef.current = 0;
       }
-      const resolved = resolveEssayFollowUps(acc, question, topic, 5);
+      const resolved = resolveBatCucFollowUps(acc, topic, 5);
       setEssay(resolved.body || acc);
       setTeasers(resolved.suggestions);
       if (!acc.trim()) throw new Error('Phản hồi luận giải trống.');
@@ -186,13 +160,13 @@ export function TuViEssaySection({
             className="text-[0.7rem] uppercase tracking-[0.25em]"
             style={{ color: primaryColor }}
           >
-            {title}
+            Luận giải mẫu
           </p>
-          <p className="mt-1 text-sm text-muted">{subtitle}</p>
+          <p className="mt-1 text-sm text-muted">{essaySubtitle}</p>
         </div>
         <button
           type="button"
-          disabled={!chartContext || essayLoading || cooldownSec > 0}
+          disabled={!analysisContext || essayLoading || cooldownSec > 0}
           onClick={() => void runEssay()}
           className="px-3 py-2 text-sm text-white disabled:opacity-50"
           style={{ background: primaryColor }}
@@ -201,7 +175,7 @@ export function TuViEssaySection({
             ? 'Đang luận…'
             : cooldownSec > 0
               ? `Chờ ${cooldownSec}s`
-              : buttonLabel}
+              : 'Luận giải mẫu'}
         </button>
       </div>
 
@@ -210,7 +184,9 @@ export function TuViEssaySection({
       {essay || essayLoading ? (
         <div className="border border-fog bg-white p-3 md:p-4">
           {essayLoading && !essay ? (
-            <p className="text-sm text-muted">{loadingLabel}</p>
+            <p className="text-sm text-muted">
+              Trụ trì đang xem bảng sao của {cfg.dataLabel}…
+            </p>
           ) : (
             <>
               <TuViMarkdown
@@ -229,7 +205,7 @@ export function TuViEssaySection({
                 <TuViTeaserFollowUps
                   suggestions={teasers}
                   primaryColor={primaryColor}
-                  notePrefix={notePrefix}
+                  notePrefix={cfg.donateNote}
                 />
               ) : null}
             </>
@@ -269,7 +245,7 @@ export function TuViEssaySection({
             type="button"
             onClick={() =>
               openWaterDonateForm({
-                note: notePrefix.slice(0, 180),
+                note: cfg.donateNote.slice(0, 180),
                 qty: 10,
               })
             }

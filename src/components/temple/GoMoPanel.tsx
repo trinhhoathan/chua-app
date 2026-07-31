@@ -7,6 +7,7 @@ import {
   useState,
   type FormEvent,
 } from 'react';
+import Image from 'next/image';
 import {
   listGoMoDedications,
   listGoMoLeaderboard,
@@ -57,10 +58,11 @@ const SPEED_MS: Record<Speed, number> = {
   fast: 520,
 };
 
+/** Tốc độ giọng đọc — tăng cùng nhịp gõ (SpeechSynthesis rate). */
 const SPEECH_RATE: Record<Speed, number> = {
-  slow: 0.85,
+  slow: 0.75,
   medium: 1,
-  fast: 1.15,
+  fast: 1.55,
 };
 
 interface DayStats {
@@ -163,7 +165,9 @@ export function GoMoPanel({
   const [leaderboard, setLeaderboard] =
     useState<GoMoLeaderRow[]>(initialLeaderboard);
   const hitTimer = useRef<number | null>(null);
-  const autoRef = useRef<number | null>(null);
+  const autoLoopGen = useRef(0);
+  const strikeRef = useRef<() => Promise<void>>(async () => {});
+  const speedRef = useRef<Speed>(speed);
   const pendingSync = useRef(0);
   const dayTotalRef = useRef(0);
   const prevSessionRef = useRef(0);
@@ -172,6 +176,8 @@ export function GoMoPanel({
   const [celebrateOpen, setCelebrateOpen] = useState(false);
   const celebrateOpenRef = useRef(false);
   const [showWaterCta, setShowWaterCta] = useState(false);
+
+  speedRef.current = speed;
 
   useEffect(() => {
     const stats = loadDayStats(storageKey);
@@ -212,12 +218,13 @@ export function GoMoPanel({
     else await playMoStrike();
 
     const niemLabel = NIEM_OPTIONS.find((o) => o.id === niem)?.label ?? '';
-    if (niem !== 'none' && voiceOn && niemLabel) {
-      speakNiemDanhHieu(niemLabel, {
-        rate: SPEECH_RATE[speed],
-        enabled: true,
-      });
-    }
+    const speakPromise =
+      niem !== 'none' && voiceOn && niemLabel
+        ? speakNiemDanhHieu(niemLabel, {
+            rate: SPEECH_RATE[speed],
+            enabled: true,
+          })
+        : Promise.resolve();
 
     setSession((s) => s + 1);
     setDay((prev) => {
@@ -242,25 +249,53 @@ export function GoMoPanel({
     }
 
     if (hitTimer.current) window.clearTimeout(hitTimer.current);
-    hitTimer.current = window.setTimeout(() => setHitting(false), 160);
-    window.setTimeout(() => setFlashText(false), 320);
+    hitTimer.current = window.setTimeout(() => setHitting(false), 340);
+    window.setTimeout(() => setFlashText(false), 360);
+
+    // Chờ giọng đọc xong rồi mới cho vòng tự gõ tiếp
+    await speakPromise;
   }, [instrument, niem, voiceOn, speed, storageKey, syncScore]);
 
+  strikeRef.current = strike;
+
+  // Tự gõ tuần tự: gõ → (đọc xong) → nghỉ đúng 1 nhịp → lặp
   useEffect(() => {
     if (!auto) {
-      if (autoRef.current) {
-        window.clearInterval(autoRef.current);
-        autoRef.current = null;
-      }
+      autoLoopGen.current += 1;
+      stopNiemSpeech();
       return;
     }
-    autoRef.current = window.setInterval(() => {
-      void strike();
-    }, SPEED_MS[speed]);
+
+    const gen = ++autoLoopGen.current;
+    let timeoutId: number | null = null;
+    let wake: (() => void) | null = null;
+
+    const sleepBeat = (ms: number) =>
+      new Promise<void>((resolve) => {
+        wake = resolve;
+        timeoutId = window.setTimeout(() => {
+          timeoutId = null;
+          wake = null;
+          resolve();
+        }, ms);
+      });
+
+    void (async () => {
+      while (autoLoopGen.current === gen) {
+        await strikeRef.current();
+        if (autoLoopGen.current !== gen) break;
+        // Nghỉ đúng 1 nhịp giữa các lần gõ (sau khi giọng đọc đã xong)
+        await sleepBeat(SPEED_MS[speedRef.current]);
+      }
+    })();
+
     return () => {
-      if (autoRef.current) window.clearInterval(autoRef.current);
+      autoLoopGen.current += 1;
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      wake?.();
+      stopNiemSpeech();
     };
-  }, [auto, speed, strike]);
+  }, [auto]);
 
   useEffect(() => {
     return () => stopNiemSpeech();
@@ -482,26 +517,117 @@ export function GoMoPanel({
             background: `radial-gradient(circle at 35% 30%, #c9a227aa, ${primaryColor} 55%, #1a1714 100%)`,
           }}
         />
-        <div className="absolute inset-[12%] rounded-full bg-ink/25 backdrop-blur-[1px] flex flex-col items-center justify-center text-white">
-          {instrument === 'mo' ? (
-            <MoSvg className={`size-28 md:size-32 ${hitting ? 'go-mo-mallet' : ''}`} />
-          ) : instrument === 'chuong' ? (
-            <ChuongSvg
-              className={`size-28 md:size-32 ${hitting ? 'go-mo-mallet' : ''}`}
-            />
-          ) : (
-            <KhanhSvg
-              className={`size-28 md:size-32 ${hitting ? 'go-mo-mallet' : ''}`}
-            />
-          )}
-          <p
-            className={`mt-4 text-sm font-medium px-4 text-center transition-opacity ${
-              flashText ? 'opacity-100 scale-105' : 'opacity-80'
-            }`}
-          >
-            {niem === 'none' ? `Chạm để gõ ${instrumentLabel(instrument)}` : niemLabel}
-          </p>
-        </div>
+        <div className="absolute inset-[10%] z-0 rounded-full bg-ink/20 backdrop-blur-[1px] flex flex-col items-center justify-center overflow-hidden" />
+        {instrument === 'mo' ? (
+          <>
+            <div
+              className={`pointer-events-none absolute inset-[18%] z-30 ${
+                hitting ? 'go-mo-body-hit' : ''
+              }`}
+            >
+              <Image
+                src="/images/go-mo/mo-body.png"
+                alt="Mõ gỗ"
+                fill
+                sizes="280px"
+                className="object-contain drop-shadow-[0_8px_22px_rgba(0,0,0,0.5)]"
+                priority
+              />
+            </div>
+            <div
+              className={`pointer-events-none absolute right-[4%] top-[-2%] z-40 h-[48%] w-[34%] ${
+                hitting ? 'go-mo-mallet-strike' : 'go-mo-mallet-rest'
+              }`}
+              aria-hidden
+            >
+              <Image
+                src="/images/go-mo/mo-mallet.png"
+                alt=""
+                fill
+                sizes="140px"
+                className="object-contain drop-shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                priority
+              />
+            </div>
+          </>
+        ) : null}
+        {instrument === 'chuong' ? (
+          <>
+            <div
+              className={`pointer-events-none absolute inset-[16%] z-30 ${
+                hitting ? 'go-chuong-body-hit' : ''
+              }`}
+            >
+              <Image
+                src="/images/go-mo/chuong-xoay.png"
+                alt="Chuông xoay đồng vàng Nepal"
+                fill
+                sizes="280px"
+                className="object-contain drop-shadow-[0_8px_22px_rgba(0,0,0,0.5)]"
+                priority
+              />
+            </div>
+            <div
+              className={`pointer-events-none absolute right-[5%] top-[21%] z-40 h-[48%] w-[30%] ${
+                hitting ? 'go-chuong-mallet-strike' : 'go-chuong-mallet-rest'
+              }`}
+              aria-hidden
+            >
+              <Image
+                src="/images/go-mo/chuong-xoay-mallet-v3.png"
+                alt=""
+                fill
+                sizes="140px"
+                className="object-contain drop-shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                priority
+              />
+            </div>
+          </>
+        ) : null}
+        {instrument === 'khanh' ? (
+          <>
+            {/* Dịch chéo theo cán (lên-trái) để miệng khánh gần giữa vòng */}
+            <div className="pointer-events-none absolute left-[2%] top-[-2%] right-[20%] bottom-[22%] z-30">
+              <div
+                className={`relative h-full w-full ${
+                  hitting ? 'go-khanh-body-hit' : ''
+                }`}
+              >
+                <Image
+                  src="/images/go-mo/khanh-body.png"
+                  alt="Khánh đồng"
+                  fill
+                  sizes="280px"
+                  className="object-contain drop-shadow-[0_8px_22px_rgba(0,0,0,0.5)]"
+                  priority
+                />
+              </div>
+            </div>
+            {/* Dùi ngoài phải — đánh vào thành ngoài khánh */}
+            <div
+              className={`pointer-events-none absolute right-[8%] top-[20%] z-40 h-[50%] w-[26%] ${
+                hitting ? 'go-khanh-mallet-strike' : 'go-khanh-mallet-rest'
+              }`}
+              aria-hidden
+            >
+              <Image
+                src="/images/go-mo/khanh-mallet.png"
+                alt=""
+                fill
+                sizes="140px"
+                className="object-contain drop-shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                priority
+              />
+            </div>
+          </>
+        ) : null}
+        <p
+          className={`pointer-events-none absolute bottom-[7%] left-4 right-4 z-50 text-sm font-medium px-3 text-center text-white transition-opacity drop-shadow-[0_1px_4px_rgba(0,0,0,0.95)] ${
+            flashText ? 'opacity-100 scale-105' : 'opacity-90'
+          }`}
+        >
+          {niem === 'none' ? `Chạm để gõ ${instrumentLabel(instrument)}` : niemLabel}
+        </p>
       </button>
 
       <div className="mt-8 space-y-4">
@@ -823,54 +949,3 @@ function BangVang({
   );
 }
 
-function MoSvg({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 120" className={className} aria-hidden>
-      <ellipse cx="58" cy="62" rx="38" ry="34" fill="#5c3d1e" />
-      <ellipse cx="58" cy="58" rx="32" ry="28" fill="#8b5a2b" />
-      <ellipse cx="48" cy="50" rx="10" ry="8" fill="#c9a227" opacity=".35" />
-      <ellipse cx="72" cy="62" rx="8" ry="14" fill="#2a1a0c" />
-      <g transform="rotate(-25 95 30)">
-        <rect x="88" y="18" width="6" height="42" rx="2" fill="#3d2914" />
-        <circle cx="91" cy="16" r="8" fill="#6b4423" />
-      </g>
-    </svg>
-  );
-}
-
-function ChuongSvg({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 120" className={className} aria-hidden>
-      <path
-        d="M40 28c0 0 4-10 20-10s20 10 20 10v8c0 28-8 48-20 56-12-8-20-28-20-56v-8z"
-        fill="#c9a227"
-      />
-      <path
-        d="M44 32c2 26 8 42 16 48 8-6 14-22 16-48"
-        fill="none"
-        stroke="#8b6914"
-        strokeWidth="2"
-      />
-      <ellipse cx="60" cy="28" rx="18" ry="5" fill="#e8c56a" />
-      <line x1="60" y1="12" x2="60" y2="28" stroke="#5c4a1a" strokeWidth="3" />
-      <circle cx="60" cy="10" r="4" fill="#5c4a1a" />
-    </svg>
-  );
-}
-
-function KhanhSvg({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 120" className={className} aria-hidden>
-      <path
-        d="M30 48h60l-8 36H38L30 48z"
-        fill="#d4af37"
-        stroke="#8b6914"
-        strokeWidth="2"
-      />
-      <path d="M38 48l6 28h32l6-28" fill="none" stroke="#f5e6a8" strokeWidth="1.5" />
-      <rect x="56" y="22" width="8" height="28" rx="2" fill="#5c4a1a" />
-      <circle cx="60" cy="20" r="5" fill="#5c4a1a" />
-      <ellipse cx="78" cy="78" rx="7" ry="5" fill="#6b4423" opacity=".85" />
-    </svg>
-  );
-}

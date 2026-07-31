@@ -22,9 +22,7 @@ import {
   splitTuViReply,
 } from '@/lib/fengshui/tuvi-prompt';
 import { TuViChatPanel } from '@/components/fengshui/tools/TuViChatPanel';
-import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
-import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
-import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { TuViEssaySection } from '@/components/fengshui/tools/TuViEssaySection';
 
 interface Props {
   primaryColor: string;
@@ -136,204 +134,6 @@ const ScopeCard = memo(function ScopeCard({
     </div>
   );
 });
-
-/** Tách khỏi trang chính — stream không re-render form/bảng (tránh nháy cả trang). */
-function DaiVanEssaySection({
-  chartContext,
-  viewYear,
-  templeName,
-  primaryColor,
-  onAskMore,
-}: {
-  chartContext: string;
-  viewYear: number;
-  templeName: string;
-  primaryColor: string;
-  onAskMore: () => void;
-}) {
-  const [essay, setEssay] = useState('');
-  const [essayLoading, setEssayLoading] = useState(false);
-  const [essayError, setEssayError] = useState<string | null>(null);
-  const [teasers, setTeasers] = useState<string[]>([]);
-  const [cooldownSec, setCooldownSec] = useState(0);
-  const essayAbort = useRef<AbortController | null>(null);
-  const rafRef = useRef(0);
-  const pendingRef = useRef('');
-  const questionRef = useRef('');
-
-  useEffect(() => {
-    return () => {
-      essayAbort.current?.abort();
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (cooldownSec <= 0) return;
-    const t = window.setTimeout(() => setCooldownSec((s) => s - 1), 1000);
-    return () => window.clearTimeout(t);
-  }, [cooldownSec]);
-
-  function paintEssay(raw: string) {
-    pendingRef.current = raw;
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      setEssay(splitTuViReply(pendingRef.current).body);
-    });
-  }
-
-  async function runDaiVanEssay() {
-    if (!chartContext || essayLoading || cooldownSec > 0) return;
-    essayAbort.current?.abort();
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    }
-    const controller = new AbortController();
-    essayAbort.current = controller;
-    setEssayLoading(true);
-    setEssayError(null);
-    setEssay('');
-    setTeasers([]);
-    pendingRef.current = '';
-
-    const question = `Hãy luận đại vận và tiểu vận tại thời điểm xem ${viewYear}. Tập trung: đại hạn đang đi (cung đóng, đoạn tuổi, sao chính phụ, tứ hóa hạn), tiểu hạn đang đi và mối liên hệ với đại hạn, thuận–nghịch và việc nên–tránh trong chu kỳ. Có thể nhắc ngắn đại hạn kế tiếp. Không liệt kê lại cả lá số; không lấy lưu niên làm trọng tâm.`;
-    questionRef.current = question;
-
-    try {
-      const res = await fetch('/api/tuvi/luan-giai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          question,
-          chartContext,
-          history: [],
-          templeName,
-          daiVanFocus: true,
-        }),
-      });
-      if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as {
-          error?: string;
-          retryAfterSec?: number;
-        } | null;
-        if (res.status === 429) {
-          setCooldownSec(Math.max(3, data?.retryAfterSec ?? 12));
-        }
-        throw new Error(data?.error || 'Không luận được đại · tiểu vận.');
-      }
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error('Không nhận được phản hồi luận giải.');
-      const decoder = new TextDecoder();
-      let acc = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(value, { stream: true });
-        paintEssay(acc);
-      }
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = 0;
-      }
-      const resolved = resolveEssayFollowUps(
-        acc,
-        questionRef.current,
-        'dai_van',
-        5,
-      );
-      setEssay(resolved.body || acc);
-      setTeasers(resolved.suggestions);
-      if (!acc.trim()) throw new Error('Phản hồi luận giải trống.');
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return;
-      setEssayError(
-        e instanceof Error
-          ? e.message
-          : 'Không kết nối được để luận đại · tiểu vận.',
-      );
-    } finally {
-      setEssayLoading(false);
-      essayAbort.current = null;
-    }
-  }
-
-  return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={essayLoading || cooldownSec > 0}
-          onClick={() => void runDaiVanEssay()}
-          className="px-4 py-2.5 text-sm text-white disabled:opacity-50"
-          style={{ background: primaryColor }}
-        >
-          {essayLoading
-            ? 'Đang luận…'
-            : cooldownSec > 0
-              ? `Chờ ${cooldownSec}s`
-              : 'Luận đại · tiểu vận'}
-        </button>
-        <button
-          type="button"
-          onClick={onAskMore}
-          className="px-4 py-2.5 text-sm border border-fog text-ink"
-        >
-          Hỏi trụ trì thêm
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            openWaterDonateForm({
-              note: 'Hỏi sâu đại tiểu vận',
-              qty: 10,
-            })
-          }
-          className="px-4 py-2.5 text-sm border border-fog text-ink"
-        >
-          Thỉnh nước hỏi sâu
-        </button>
-      </div>
-
-      {essayError ? (
-        <p className="text-sm text-lacquer">{essayError}</p>
-      ) : null}
-      {essay || essayLoading ? (
-        <div className="border border-fog bg-white p-4 md:p-5">
-          {essayLoading && !essay ? (
-            <p className="text-sm text-muted">
-              Trụ trì đang luận đại · tiểu vận…
-            </p>
-          ) : (
-            <>
-              <TuViMarkdown
-                text={essay}
-                primaryColor={primaryColor}
-                className="text-ink"
-              />
-              {essayLoading ? (
-                <span
-                  className="inline-block w-[0.45em] h-[1em] ml-0.5 align-[-0.1em] animate-pulse"
-                  style={{ backgroundColor: primaryColor }}
-                  aria-hidden
-                />
-              ) : null}
-              {!essayLoading && teasers.length > 0 ? (
-                <TuViTeaserFollowUps
-                  suggestions={teasers}
-                  primaryColor={primaryColor}
-                  notePrefix="Hỏi sâu đại tiểu vận"
-                />
-              ) : null}
-            </>
-          )}
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 export function DaiVanHan({
   primaryColor,
@@ -743,18 +543,26 @@ export function DaiVanHan({
             </table>
           </div>
 
-          <DaiVanEssaySection
+          <TuViEssaySection
             key={`essay-${chatSessionId}-${viewYear}`}
             chartContext={chartContext}
-            viewYear={viewYear}
             templeName={templeName}
             primaryColor={primaryColor}
+            contactPhone={contactPhone}
+            title="Luận đại · tiểu vận (mẫu)"
+            subtitle={`Xem thử miễn phí đại hạn và tiểu hạn tại thời điểm ${viewYear} — không lấy lưu niên làm trọng tâm.`}
+            ctaTitle="Muốn luận đại · tiểu vận chuyên sâu hơn?"
+            question={`Hãy luận đại vận và tiểu vận tại thời điểm xem ${viewYear}. Tập trung: đại hạn đang đi (cung đóng, đoạn tuổi, sao chính phụ, tứ hóa hạn), tiểu hạn đang đi và mối liên hệ với đại hạn, thuận–nghịch và việc nên–tránh trong chu kỳ. Có thể nhắc ngắn đại hạn kế tiếp. Không liệt kê lại cả lá số; không lấy lưu niên làm trọng tâm.`}
+            focusFlag="daiVanFocus"
+            topic="dai_van"
+            buttonLabel="Luận đại · tiểu vận"
+            loadingLabel="Trụ trì đang luận đại · tiểu vận…"
+            notePrefix="Hỏi sâu đại tiểu vận"
             onAskMore={() => setChatOpen(true)}
           />
 
           <p className="text-[0.75rem] text-muted">
-            Chat hỏi thêm: miễn phí 3 câu về đại · tiểu vận; từ câu 4 cần thỉnh
-            nước. Muốn xem hạn năm (lưu niên), dùng{' '}
+            Công cụ liên quan:{' '}
             <a
               href="/phong-thuy/xem-han-nam"
               className="underline underline-offset-2"
@@ -762,7 +570,7 @@ export function DaiVanHan({
             >
               Xem hạn năm
             </a>
-            . Muốn luận cung / sao toàn cục, dùng{' '}
+            {' · '}
             <a
               href="/phong-thuy/luan-giai-tu-vi"
               className="underline underline-offset-2"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   HOROSCOPE_SCOPE_LABELS,
   IZTRO_TIME_SLOTS,
@@ -16,15 +16,9 @@ import {
   type IztroHoroscopeView,
   type YearDivideMethod,
 } from '@/lib/fengshui/iztro-chart';
-import {
-  buildHanNamPromptContext,
-  resolveEssayFollowUps,
-  splitTuViReply,
-} from '@/lib/fengshui/tuvi-prompt';
+import { buildHanNamPromptContext } from '@/lib/fengshui/tuvi-prompt';
 import { TuViChatPanel } from '@/components/fengshui/tools/TuViChatPanel';
-import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
-import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
-import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { TuViEssaySection } from '@/components/fengshui/tools/TuViEssaySection';
 
 interface Props {
   primaryColor: string;
@@ -90,13 +84,6 @@ export function XemHanNam({
   const [chatOpen, setChatOpen] = useState(false);
   const [chatSessionId, setChatSessionId] = useState(0);
 
-  const [essay, setEssay] = useState('');
-  const [essayLoading, setEssayLoading] = useState(false);
-  const [essayError, setEssayError] = useState<string | null>(null);
-  const [teasers, setTeasers] = useState<string[]>([]);
-  const [cooldownSec, setCooldownSec] = useState(0);
-  const essayAbort = useRef<AbortController | null>(null);
-
   const contextDate = useMemo(() => viewDateForYear(viewYear), [viewYear]);
   const contextTimeIndex = useMemo(() => nowContextValue().timeIndex, []);
 
@@ -114,15 +101,6 @@ export function XemHanNam({
     return buildHanNamPromptContext(result, horoscope);
   }, [result, horoscope]);
 
-  useEffect(() => {
-    return () => essayAbort.current?.abort();
-  }, []);
-
-  useEffect(() => {
-    if (cooldownSec <= 0) return;
-    const t = window.setTimeout(() => setCooldownSec((s) => s - 1), 1000);
-    return () => window.clearTimeout(t);
-  }, [cooldownSec]);
 
   function currentInput(): IztroChartInput {
     return {
@@ -150,75 +128,10 @@ export function XemHanNam({
       const chart = buildIztroChart(input);
       setChartInput(input);
       setResult(chart);
-      setEssay('');
-      setEssayError(null);
-      setTeasers([]);
       setChatOpen(false);
       setChatSessionId((n) => n + 1);
-      essayAbort.current?.abort();
     } catch {
       setErr('Không lập được lá số. Kiểm tra ngày tháng năm rồi thử lại.');
-    }
-  }
-
-  async function runHanNamEssay() {
-    if (!chartContext || essayLoading || cooldownSec > 0) return;
-    essayAbort.current?.abort();
-    const controller = new AbortController();
-    essayAbort.current = controller;
-    setEssayLoading(true);
-    setEssayError(null);
-    setEssay('');
-    setTeasers([]);
-
-    const question = `Hãy luận hạn năm (lưu niên) tại thời điểm xem ${viewYear}. Tập trung: cung lưu niên chiếu, tứ hóa lưu niên, liên hệ đại hạn–tiểu hạn đang đi, thuận–nghịch và việc nên–tránh trong năm. Không liệt kê lại cả lá số.`;
-
-    try {
-      const res = await fetch('/api/tuvi/luan-giai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          question,
-          chartContext,
-          history: [],
-          templeName,
-          vanHanFocus: true,
-        }),
-      });
-      if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as {
-          error?: string;
-          retryAfterSec?: number;
-        } | null;
-        // Chỉ khóa UI khi server trả 429 — không chặn quota free hợp lệ.
-        if (res.status === 429) {
-          setCooldownSec(Math.max(3, data?.retryAfterSec ?? 12));
-        }
-        throw new Error(data?.error || 'Không luận được hạn năm.');
-      }
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error('Không nhận được phản hồi luận giải.');
-      const decoder = new TextDecoder();
-      let acc = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(value, { stream: true });
-        setEssay(splitTuViReply(acc).body);
-      }
-      const resolved = resolveEssayFollowUps(acc, question, 'han_nam', 5);
-      setEssay(resolved.body || acc);
-      setTeasers(resolved.suggestions);
-      if (!acc.trim()) throw new Error('Phản hồi luận giải trống.');
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return;
-      setEssayError(
-        e instanceof Error ? e.message : 'Không kết nối được để luận hạn năm.',
-      );
-    } finally {
-      setEssayLoading(false);
-      essayAbort.current = null;
     }
   }
 
@@ -444,9 +357,6 @@ export function XemHanNam({
                   value={viewYear}
                   onChange={(e) => {
                     setViewYear(Number(e.target.value));
-                    setEssay('');
-                    setEssayError(null);
-                    setTeasers([]);
                     setChatSessionId((n) => n + 1);
                   }}
                   className="mt-1 block min-w-[7rem] border border-fog px-2 py-2 text-base bg-white text-ink"
@@ -542,72 +452,26 @@ export function XemHanNam({
             })}
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled={essayLoading || cooldownSec > 0}
-              onClick={() => void runHanNamEssay()}
-              className="px-4 py-2.5 text-sm text-white disabled:opacity-50"
-              style={{ background: primaryColor }}
-            >
-              {essayLoading
-                ? 'Đang luận…'
-                : cooldownSec > 0
-                  ? `Chờ ${cooldownSec}s`
-                  : 'Luận hạn năm'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setChatOpen(true)}
-              className="px-4 py-2.5 text-sm border border-fog text-ink"
-            >
-              Hỏi trụ trì thêm
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                openWaterDonateForm({
-                  note: 'Hỏi sâu xem hạn năm',
-                  qty: 10,
-                })
-              }
-              className="px-4 py-2.5 text-sm border border-fog text-ink"
-            >
-              Thỉnh nước hỏi sâu
-            </button>
-          </div>
-
-          {essayError ? (
-            <p className="text-sm text-lacquer">{essayError}</p>
-          ) : null}
-          {essay || essayLoading ? (
-            <div className="border border-fog bg-white p-4 md:p-5">
-              {essayLoading && !essay ? (
-                <p className="text-sm text-muted">
-                  Trụ trì đang luận hạn năm…
-                </p>
-              ) : (
-                <>
-                  <TuViMarkdown
-                    text={essay}
-                    primaryColor={primaryColor}
-                    className="text-ink"
-                  />
-                  {!essayLoading && teasers.length > 0 ? (
-                    <TuViTeaserFollowUps
-                      suggestions={teasers}
-                      primaryColor={primaryColor}
-                      notePrefix="Hỏi sâu xem hạn năm"
-                    />
-                  ) : null}
-                </>
-              )}
-            </div>
-          ) : null}
+          <TuViEssaySection
+            key={`essay-${chatSessionId}-${viewYear}`}
+            chartContext={chartContext}
+            templeName={templeName}
+            primaryColor={primaryColor}
+            contactPhone={contactPhone}
+            title="Luận hạn năm (mẫu)"
+            subtitle={`Xem thử miễn phí hạn năm (lưu niên) ${viewYear} — không liệt kê lại cả lá số.`}
+            ctaTitle="Muốn luận hạn năm chuyên sâu hơn?"
+            question={`Hãy luận hạn năm (lưu niên) tại thời điểm xem ${viewYear}. Tập trung: cung lưu niên chiếu, tứ hóa lưu niên, liên hệ đại hạn–tiểu hạn đang đi, thuận–nghịch và việc nên–tránh trong năm. Không liệt kê lại cả lá số.`}
+            focusFlag="vanHanFocus"
+            topic="han_nam"
+            buttonLabel="Luận hạn năm"
+            loadingLabel="Trụ trì đang luận hạn năm…"
+            notePrefix="Hỏi sâu xem hạn năm"
+            onAskMore={() => setChatOpen(true)}
+          />
 
           <p className="text-[0.75rem] text-muted">
-            Chat hỏi thêm: miễn phí 3 câu về hạn năm; từ câu 4 cần thỉnh nước.
-            Muốn luận cung / sao toàn cục, dùng{' '}
+            Công cụ liên quan:{' '}
             <a
               href="/phong-thuy/luan-giai-tu-vi"
               className="underline underline-offset-2"

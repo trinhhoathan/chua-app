@@ -1,42 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   analyzeBoiSim,
   elementLabel,
-  STAR_ORDER,
-  STARS,
   type BoiSimResult,
-  type StarId,
 } from '@/lib/fengshui/boi-sim';
+import {
+  analyzeBatCucTopic,
+  buildBatCucPromptContext,
+  parseBatCucInput,
+} from '@/lib/fengshui/bat-cuc-contexts';
+import {
+  AspectBars,
+  BAT_CUC_TABLE_NOTE,
+  EnergyChain,
+  MethodNote,
+  PairDetail,
+  StarLibrary,
+  kindBadge,
+} from '@/components/fengshui/tools/BatCucResultBlocks';
+import { BatCucEssaySection } from '@/components/fengshui/tools/BatCucEssaySection';
+import { BatCucChatPanel } from '@/components/fengshui/tools/BatCucChatPanel';
 import { inputCls, labelCls } from '../FieldStyles';
 
 interface Props {
   primaryColor: string;
+  templeId?: string;
+  templeName?: string;
+  templeHotline?: string | null;
+  templePhone?: string | null;
 }
 
-function verdictLabel(v: BoiSimResult['verdict']): string {
-  if (v === 'tot') return 'Tốt';
-  if (v === 'kha') return 'Khá';
-  if (v === 'yeu') return 'Yếu — nên cân nhắc';
-  return 'Trung bình';
-}
-
-function StarChip({ id, count }: { id: StarId; count: number }) {
-  const s = STARS[id];
-  if (!count) return null;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] border ${
-        s.kind === 'cat'
-          ? 'border-emerald-800/25 bg-emerald-50/70 text-ink'
-          : 'border-stone-400/40 bg-stone-100 text-ink'
-      }`}
-    >
-      {s.nameVi} ×{count}
-    </span>
-  );
-}
+const VERDICT_LABELS: Record<BoiSimResult['verdict'], string> = {
+  tot: 'Sim đẹp — nên giữ dùng',
+  kha: 'Khá — dùng tốt',
+  trung_binh: 'Trung bình — cát hung đan xen',
+  yeu: 'Yếu — nên cân nhắc đổi',
+};
 
 function ResultView({
   result,
@@ -46,10 +47,11 @@ function ResultView({
   primaryColor: string;
 }) {
   return (
-    <div className="mt-8 space-y-5">
+    <div className="space-y-5">
+      {/* Kết luận tổng */}
       <div className="border border-fog bg-gradient-to-b from-[#faf6ef] to-white px-4 py-5 sm:px-6">
         <p className="text-[10px] uppercase tracking-wide text-muted">
-          Bát Cực Linh Số · Du Niên
+          Bát Cực Linh Số · luận giải số điện thoại
         </p>
         <p className="font-display text-2xl text-ink mt-1 tabular-nums">
           {result.display}
@@ -67,78 +69,166 @@ function ResultView({
               <span className="text-base text-muted">/100</span>
             </p>
           </div>
-          <p className="text-sm text-ink pb-1">{verdictLabel(result.verdict)}</p>
+          <p className="text-sm text-ink pb-1 font-medium">
+            {VERDICT_LABELS[result.verdict]}
+          </p>
         </div>
         <p className="mt-3 text-sm text-ink leading-relaxed">{result.advice}</p>
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {STAR_ORDER.map((id) => (
-            <StarChip key={id} id={id} count={result.starCounts[id]} />
-          ))}
-        </div>
-        <p className="mt-3 text-xs text-muted">
+        <p className="mt-2 text-xs text-muted">
           Cát {result.catPairs}/{result.pairs.length} cặp · Hung{' '}
-          {result.hungPairs}/{result.pairs.length} · Điểm Du Niên{' '}
+          {result.hungPairs}/{result.pairs.length} cặp · Điểm Bát Cực{' '}
           {result.duNienScore}/100
         </p>
+        {result.tail.warning ? (
+          <p className="mt-3 text-[13px] leading-relaxed border border-red-800/30 bg-red-50/70 text-red-900 px-3 py-2">
+            {result.tail.warning}
+          </p>
+        ) : null}
       </div>
 
+      {/* Chuỗi năng lượng */}
+      <section className="border border-fog bg-white px-4 py-4">
+        <p className="text-[10px] uppercase tracking-wide text-muted">
+          Chuỗi năng lượng của dãy số
+        </p>
+        <p className="text-xs text-muted mt-0.5 mb-3">
+          Số 0 · 5 không thuộc quái — hiển thị nhỏ, đóng vai trò biến số. Ô
+          viền đậm là vùng đuôi (ảnh hưởng mạnh nhất).
+        </p>
+        <EnergyChain pairs={result.pairs} />
+      </section>
+
+      {/* Luận giải tổng hợp */}
+      <section className="border border-fog bg-white px-4 py-4">
+        <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
+          Luận giải tổng hợp
+        </p>
+        <div className="space-y-3">
+          {result.luanGiai.map((p, i) => (
+            <p key={i} className="text-sm text-ink leading-relaxed">
+              {p}
+            </p>
+          ))}
+        </div>
+      </section>
+
+      {/* 5 phương diện + 3 số cuối */}
+      <div className="grid sm:grid-cols-2 gap-3">
+        <section className="border border-fog bg-white px-4 py-4">
+          <p className="text-[10px] uppercase tracking-wide text-muted mb-3">
+            Năm phương diện
+          </p>
+          <AspectBars aspects={result.aspects} primaryColor={primaryColor} />
+        </section>
+
+        <section className="border border-fog bg-white px-4 py-4">
+          <p className="text-[10px] uppercase tracking-wide text-muted">
+            Ba số cuối — phần quyết định
+          </p>
+          <p className="font-display text-3xl text-ink mt-1 tabular-nums">
+            {result.tail.last3}
+          </p>
+          {result.tail.star ? (
+            <p className="text-sm text-ink mt-1">
+              Sao đóng đuôi:{' '}
+              <span className="font-medium">{result.tail.star.nameVi}</span>{' '}
+              <span className="text-muted text-xs">
+                ({result.tail.star.nameHan})
+              </span>{' '}
+              {kindBadge(result.tail.star.kind)}
+            </p>
+          ) : null}
+          <ul className="mt-2 space-y-1.5">
+            {result.tail.notes.map((n) => (
+              <li key={n} className="text-[13px] text-ink leading-relaxed">
+                · {n}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {/* Tổ hợp đặc biệt */}
+      {result.combos.length > 0 ? (
+        <section className="border border-fog bg-white">
+          <div className="px-4 py-3 border-b border-fog">
+            <p className="text-[10px] uppercase tracking-wide text-muted">
+              Tổ hợp năng lượng đặc biệt
+            </p>
+            <p className="text-sm text-ink mt-0.5">
+              Các sao liền kề chế hóa / cộng hưởng lẫn nhau
+            </p>
+          </div>
+          <ul className="divide-y divide-fog">
+            {result.combos.map((c, i) => (
+              <li key={`${c.title}-${i}`} className="px-4 py-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`text-[10px] uppercase tracking-wide px-2 py-0.5 text-white ${
+                      c.kind === 'hung' ? 'bg-stone-600' : 'bg-emerald-800'
+                    }`}
+                  >
+                    {c.kind === 'cat'
+                      ? 'Cát'
+                      : c.kind === 'che_hoa'
+                        ? 'Chế hóa'
+                        : 'Lưu ý'}
+                  </span>
+                  <p className="text-sm text-ink font-medium">{c.title}</p>
+                  <span className="text-xs text-muted tabular-nums">
+                    ({c.pairs})
+                  </span>
+                </div>
+                <p className="text-[13px] text-muted mt-1 leading-relaxed">
+                  {c.detail}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {/* Chi tiết từng cặp */}
       <section className="border border-fog bg-white">
         <div className="px-4 py-3 border-b border-fog">
           <p className="text-[10px] uppercase tracking-wide text-muted">
-            Từng cặp số liên tiếp
+            Chi tiết từng cặp quái số
           </p>
           <p className="text-sm text-ink mt-0.5">
-            Cặp cuối (đuôi sim) ảnh hưởng mạnh hơn
+            Bấm vào từng cặp để xem luận giải đầy đủ · 4 chấm là cường độ nội
+            bộ sao
           </p>
         </div>
-        <ul className="divide-y divide-fog">
+        <div className="divide-y divide-fog">
           {result.pairs.map((p, i) => (
-            <li
-              key={`${p.label}-${i}`}
-              className={`px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 ${
-                p.isTail ? 'bg-paper/80' : ''
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className="font-display text-lg tabular-nums w-8"
-                  style={{ color: primaryColor }}
-                >
-                  {p.label}
-                </span>
-                <div>
-                  <p className="text-sm text-ink">
-                    {p.star.nameVi}{' '}
-                    <span className="text-muted text-xs">
-                      ({p.star.nameHan})
-                    </span>
-                    {p.isTail ? (
-                      <span className="ml-1 text-[10px] text-muted">đuôi</span>
-                    ) : null}
-                  </p>
-                  <p className="text-[11px] text-muted leading-snug">
-                    {p.star.summary}
-                  </p>
-                </div>
-              </div>
-              <span
-                className={`text-[10px] uppercase tracking-wide px-2 py-0.5 ${
-                  p.star.kind === 'cat'
-                    ? 'bg-emerald-800 text-white'
-                    : 'bg-stone-600 text-white'
-                }`}
-              >
-                {p.star.kind === 'cat' ? 'Cát' : 'Hung'}
-              </span>
+            <PairDetail
+              key={`${p.raw}-${i}`}
+              pair={p}
+              primaryColor={primaryColor}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Nghề nghiệp */}
+      <section className="border border-fog bg-white px-4 py-4">
+        <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
+          Cấu trúc sao hợp với nghề
+        </p>
+        <ul className="space-y-1.5">
+          {result.careers.map((c) => (
+            <li key={c} className="text-sm text-ink leading-relaxed">
+              · {c}
             </li>
           ))}
         </ul>
       </section>
 
+      {/* Tham khảo phụ */}
       <div className="grid sm:grid-cols-2 gap-3">
         <section className="border border-fog bg-white px-4 py-4 space-y-1.5">
           <p className="text-[10px] uppercase tracking-wide text-muted">
-            81 Số Lý (4 số cuối)
+            81 Số Lý (4 số cuối) — hệ tham khảo phụ
           </p>
           <p className="font-display text-xl text-ink">
             Số {result.soLy81} — {result.soLyMeta.title}
@@ -159,20 +249,35 @@ function ResultView({
 
         <section className="border border-fog bg-white px-4 py-4 space-y-1.5">
           <p className="text-[10px] uppercase tracking-wide text-muted">
-            Âm Dương · Tổng nút · Đuôi
+            Âm Dương · Tổng nút · Cách cục
           </p>
           <p className="text-sm text-ink">
-            Âm (chẵn) {result.amCount} · Dương (lẻ) {result.duongCount}
+            Âm (chẵn) {result.amCount} · Dương (lẻ) {result.duongCount} —{' '}
+            {Math.abs(result.amCount - result.duongCount) <= 1
+              ? 'cân bằng tốt'
+              : Math.abs(result.amCount - result.duongCount) <= 3
+                ? 'tương đối cân'
+                : 'lệch nhiều, khí thiên lệch'}
           </p>
           <p className="text-sm text-ink">
             Tổng nút: <strong>{result.tongNut}</strong>
+            {result.tongNut === 8
+              ? ' — phát lộc (dân gian)'
+              : result.tongNut === 6
+                ? ' — lộc (dân gian)'
+                : result.tongNut === 1
+                  ? ' — khởi đầu, nhất quán'
+                  : ''}
           </p>
-          <p className="text-sm text-ink">
-            Đuôi {result.tail2}: {result.tailFolk}
-          </p>
+          <ul className="text-sm text-ink space-y-0.5">
+            {result.patterns.map((p) => (
+              <li key={p}>· {p}</li>
+            ))}
+          </ul>
         </section>
       </div>
 
+      {/* Hợp mệnh */}
       {result.napAm && result.elementRelation ? (
         <section className="border border-fog bg-white px-4 py-4 space-y-1.5">
           <p className="text-[10px] uppercase tracking-wide text-muted">
@@ -189,59 +294,33 @@ function ResultView({
           </p>
         </section>
       ) : null}
-
-      <section className="border border-fog bg-white px-4 py-4 space-y-1.5">
-        <p className="text-[10px] uppercase tracking-wide text-muted">
-          Cách cục hình thức
-        </p>
-        <ul className="text-sm text-ink space-y-0.5">
-          {result.patterns.map((p) => (
-            <li key={p}>· {p}</li>
-          ))}
-        </ul>
-      </section>
-
-      <div className="border border-fog bg-white px-4 py-4">
-        <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
-          Tám từ trường Bát Cực Linh Số
-        </p>
-        <ul className="grid sm:grid-cols-2 gap-2 text-xs">
-          {STAR_ORDER.map((id) => {
-            const s = STARS[id];
-            return (
-              <li
-                key={id}
-                className={`border px-2.5 py-2 ${
-                  s.kind === 'cat'
-                    ? 'border-emerald-800/20 bg-emerald-50/50'
-                    : 'border-fog bg-stone-50'
-                }`}
-              >
-                <p className="font-medium text-ink">
-                  {s.nameVi}{' '}
-                  <span className="text-muted font-normal">{s.nameHan}</span>
-                </p>
-                <p className="text-muted mt-0.5 leading-snug">{s.summary}</p>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      <p className="text-[11px] text-muted leading-relaxed border border-fog bg-white px-4 py-3">
-        Bát Cực Linh Số dựa trên Du Niên Bát Trạch (4 cát · 4 hung). Kết quả tham
-        khảo; việc hệ trọng nên kết hợp chánh kiến và thỉnh ý tại chùa — không
-        đổi sim chỉ vì một cặp hung.
-      </p>
     </div>
   );
 }
 
-export function BoiSim({ primaryColor }: Props) {
+export function BoiSim({
+  primaryColor,
+  templeId = '',
+  templeName = 'chùa',
+  templeHotline,
+  templePhone,
+}: Props) {
+  const contactPhone = templeHotline || templePhone || null;
   const [phone, setPhone] = useState('');
   const [birthYear, setBirthYear] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<BoiSimResult | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
+
+  // Ngữ cảnh AI: dùng chung engine + builder với 13 trang Bát Cực còn lại
+  const analysisContext = useMemo(() => {
+    if (!result) return '';
+    const parsed = parseBatCucInput('sim', result.digits.join(''));
+    if ('error' in parsed) return '';
+    const analysis = analyzeBatCucTopic('sim', parsed, result.birthYear);
+    if ('error' in analysis) return '';
+    return buildBatCucPromptContext('sim', parsed, analysis);
+  }, [result]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -259,11 +338,12 @@ export function BoiSim({ primaryColor }: Props) {
   return (
     <div>
       <p className="text-sm text-muted leading-relaxed mb-4">
-        Bói SIM theo{' '}
-        <span className="text-ink">Bát Cực Linh Số</span> — tách từng cặp số
-        liên tiếp đối chiếu 8 sao Du Niên (Sinh Khí · Thiên Y · Diên Niên · Phục
-        Vị · Họa Hại · Lục Sát · Ngũ Quỷ · Tuyệt Mệnh). Có thêm 81 Số Lý, Âm
-        Dương và hợp mệnh nếu nhập năm sinh.
+        Luận giải SIM theo <span className="text-ink">Bát Cực Linh Số</span> —
+        tách dãy số thành từng cặp quái số đối chiếu 8 từ trường (Sinh Khí ·
+        Thiên Y · Diên Niên · Phục Vị · Họa Hại · Lục Sát · Ngũ Quỷ · Tuyệt
+        Mệnh), xét biến số 0·5, tổ hợp chế hóa giữa các sao, 3 số cuối và 5
+        phương diện: tài lộc, sự nghiệp, tình cảm, sức khỏe, quý nhân. Nhập
+        thêm năm sinh để xem hợp mệnh Nạp Âm.
       </p>
 
       <form
@@ -302,12 +382,51 @@ export function BoiSim({ primaryColor }: Props) {
           className="px-5 py-2.5 text-sm text-white"
           style={{ backgroundColor: primaryColor }}
         >
-          Phân tích SIM
+          Luận giải SIM
         </button>
       </form>
 
       {result ? (
-        <ResultView result={result} primaryColor={primaryColor} />
+        <div className="mt-8 space-y-5">
+          <ResultView result={result} primaryColor={primaryColor} />
+
+          {/* Tra cứu 8 từ trường */}
+          <section className="border border-fog bg-white">
+            <div className="px-4 py-3 border-b border-fog">
+              <p className="text-[10px] uppercase tracking-wide text-muted">
+                Tra cứu tám từ trường Bát Cực Linh Số
+              </p>
+              <p className="text-sm text-ink mt-0.5">{BAT_CUC_TABLE_NOTE}</p>
+            </div>
+            <StarLibrary />
+          </section>
+
+          <MethodNote />
+
+          {/* Luận giải mẫu + CTA — đặt dưới cùng, theo mẫu tử vi */}
+          {analysisContext ? (
+            <BatCucEssaySection
+              analysisContext={analysisContext}
+              topic="sim"
+              templeName={templeName}
+              primaryColor={primaryColor}
+              contactPhone={contactPhone}
+              onAskMore={() => setChatOpen(true)}
+            />
+          ) : null}
+
+          <BatCucChatPanel
+            open={chatOpen}
+            onClose={() => setChatOpen(false)}
+            primaryColor={primaryColor}
+            templeName={templeName}
+            templeId={templeId}
+            contactPhone={contactPhone}
+            topic="sim"
+            analysisContext={analysisContext}
+            freeQuestionLimit={3}
+          />
+        </div>
       ) : null}
     </div>
   );
