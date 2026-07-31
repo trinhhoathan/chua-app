@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import type { PrayerRequest } from '@/types/database';
+import { resolveTempleScope } from '@/lib/temple-scope';
+import { TempleRequiredNotice } from '@/components/admin/TempleRequiredNotice';
 import { PrayerStatusForm } from './PrayerStatusForm';
 
 const TYPE_LABEL = { cau_an: 'Cầu an', cau_sieu: 'Cầu siêu' };
@@ -13,19 +15,27 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: 'Huỷ',
 };
 
-export default async function SoCauAdminPage() {
-  const ctx = await requireAdmin();
-  const templeId = ctx.temples[0]?.id;
-  const supabase = await createClient();
+interface Props {
+  searchParams: Promise<{ temple?: string }>;
+}
 
-  const { data } = templeId
-    ? await supabase
-        .from('prayer_requests')
-        .select('*')
-        .eq('temple_id', templeId)
-        .order('created_at', { ascending: false })
-        .limit(100)
-    : { data: [] };
+export default async function SoCauAdminPage({ searchParams }: Props) {
+  const ctx = await requireAdmin();
+  const sp = await searchParams;
+  const scope = await resolveTempleScope(ctx, sp.temple);
+  const templeId = scope.templeId;
+
+  if (!templeId) {
+    return <TempleRequiredNotice feature="Sớ cầu an/siêu" />;
+  }
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('prayer_requests')
+    .select('*')
+    .eq('temple_id', templeId)
+    .order('created_at', { ascending: false })
+    .limit(100);
 
   const rows = (data ?? []) as PrayerRequest[];
 
@@ -33,7 +43,7 @@ export default async function SoCauAdminPage() {
     <div>
       <h1 className="font-display text-3xl text-ink">Sổ cầu an / cầu siêu</h1>
       <p className="mt-2 text-sm text-muted">
-        Phật tử đăng ký tại{' '}
+        {scope.temple?.name} — Phật tử đăng ký tại{' '}
         <Link href="/so-cau" className="underline">
           /so-cau
         </Link>

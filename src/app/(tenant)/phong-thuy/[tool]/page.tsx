@@ -25,6 +25,14 @@ import { LucHao } from '@/components/fengshui/tools/LucHao';
 import { KinhDich64 } from '@/components/fengshui/tools/KinhDich64';
 import { SinhCon } from '@/components/fengshui/tools/SinhCon';
 import { LapLaSoTuVi } from '@/components/fengshui/tools/LapLaSoTuVi';
+import { LuanGiaiTuVi } from '@/components/fengshui/tools/LuanGiaiTuVi';
+import { XemHanNam } from '@/components/fengshui/tools/XemHanNam';
+import { DaiVanHan } from '@/components/fengshui/tools/DaiVanHan';
+import { NapAmNguHanh } from '@/components/fengshui/tools/NapAmNguHanh';
+import { HopTuoiMenh } from '@/components/fengshui/tools/HopTuoiMenh';
+import { BatTuHaLac } from '@/components/fengshui/tools/BatTuHaLac';
+import { LapBatTu } from '@/components/fengshui/tools/LapBatTu';
+import { TimDungThan } from '@/components/fengshui/tools/TimDungThan';
 import { DoiAmDuong } from '@/components/fengshui/tools/DoiAmDuong';
 import { GioHoangDao } from '@/components/fengshui/tools/GioHoangDao';
 import { XuatHanh } from '@/components/fengshui/tools/XuatHanh';
@@ -210,6 +218,89 @@ function renderTool(
           templePhone={temple.contact_links.phone}
           templeZalo={temple.contact_links.zalo}
           templeFacebook={temple.contact_links.facebook}
+        />
+      );
+    case 'luan-giai-tu-vi':
+      return (
+        <LuanGiaiTuVi
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeAddress={temple.address}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+          templeZalo={temple.contact_links.zalo}
+          templeFacebook={temple.contact_links.facebook}
+        />
+      );
+    case 'xem-han-nam':
+      return (
+        <XemHanNam
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'dai-van-han':
+      return (
+        <DaiVanHan
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'nap-am-ngu-hanh':
+      return (
+        <NapAmNguHanh
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'hop-tuoi-menh':
+      return (
+        <HopTuoiMenh
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'lap-bat-tu':
+      return (
+        <LapBatTu
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'bat-tu-ha-lac':
+      return (
+        <BatTuHaLac
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
+        />
+      );
+    case 'tim-dung-than':
+      return (
+        <TimDungThan
+          primaryColor={primary}
+          templeId={templeId}
+          templeName={templeName}
+          templeHotline={temple.hotline}
+          templePhone={temple.contact_links.phone}
         />
       );
     default:

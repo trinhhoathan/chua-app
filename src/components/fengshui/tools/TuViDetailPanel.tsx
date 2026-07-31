@@ -6,7 +6,10 @@ import {
   type IztroChartView,
   type IztroHoroscopeView,
 } from '@/lib/fengshui/iztro-chart';
-import { buildTuViPromptContext } from '@/lib/fengshui/tuvi-prompt';
+import {
+  buildTuViPromptContext,
+  type TuViSchool,
+} from '@/lib/fengshui/tuvi-prompt';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
 import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import {
@@ -23,6 +26,7 @@ interface Props {
   templeId: string;
   chart: IztroChartView;
   horoscope: IztroHoroscopeView | null;
+  school?: TuViSchool;
   palaceEssays: PalaceEssay[];
   onPalaceEssaysChange: (essays: PalaceEssay[]) => void;
   onRequestFullShare?: () => void;
@@ -66,6 +70,7 @@ async function fetchPalaceEssay(opts: {
   templeName: string;
   orderCode?: string;
   freeTeaser?: boolean;
+  school?: TuViSchool;
   signal?: AbortSignal;
 }): Promise<string> {
   const res = await fetch('/api/tuvi/luan-giai-cung', {
@@ -79,6 +84,7 @@ async function fetchPalaceEssay(opts: {
       templeName: opts.templeName,
       orderCode: opts.orderCode,
       freeTeaser: opts.freeTeaser,
+      school: opts.school,
     }),
   });
   const data = (await res.json()) as { content?: string; error?: string };
@@ -261,6 +267,7 @@ export function TuViDetailPanel({
   templeId,
   chart,
   horoscope,
+  school = 'bac_phai',
   palaceEssays,
   onPalaceEssaysChange,
   onRequestFullShare,
@@ -422,6 +429,7 @@ export function TuViDetailPanel({
         chartContext,
         templeName,
         freeTeaser: true,
+        school,
       });
       setTeaser(content);
       setOpenAccordion(menhPalace.name);
@@ -465,6 +473,7 @@ export function TuViDetailPanel({
             chartContext,
             templeName,
             orderCode: code,
+            school,
           });
           return { name: palace.name, content } satisfies PalaceEssay;
         },

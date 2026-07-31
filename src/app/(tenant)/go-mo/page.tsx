@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { getCurrentTemple } from '@/lib/tenant';
 import { GoMoPanel } from '@/components/temple/GoMoPanel';
+import { LiveChantingSection } from '@/components/temple/LiveChantingSection';
 import { solarToLunar } from '@/lib/fengshui/lunar';
 import { BUDDHIST_OBSERVANCES } from '@/lib/fengshui/buddhist-calendar';
 import {
   listGoMoDedications,
   listGoMoLeaderboard,
 } from '@/app/actions/go-mo';
+import { getPublicChantingSchedules } from '@/app/actions/chanting';
 
 function buildThoiKhoaNote(): string | null {
   const n = new Date();
@@ -35,9 +37,10 @@ export default async function GoMoPage() {
   const primary = temple.primary_color || '#7A1F1F';
   const note = buildThoiKhoaNote();
 
-  const [dedications, leaderboard] = await Promise.all([
+  const [dedications, leaderboard, chanting] = await Promise.all([
     listGoMoDedications(20),
     listGoMoLeaderboard(15),
+    getPublicChantingSchedules(temple.id, 'go_mo'),
   ]);
 
   return (
@@ -55,6 +58,16 @@ export default async function GoMoPage() {
         >
           Phật học
         </Link>
+      </div>
+      <div className="mx-auto max-w-lg">
+        <LiveChantingSection
+          templeId={temple.id}
+          templeName={temple.name}
+          primaryColor={primary}
+          schedules={chanting}
+          compact
+          scope="go_mo"
+        />
       </div>
       <GoMoPanel
         primaryColor={primary}

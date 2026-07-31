@@ -1,6 +1,8 @@
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, searchTemples } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import type { GalleryImage } from '@/types/database';
+import { resolveTempleScope } from '@/lib/temple-scope';
+import { TempleRequiredNotice } from '@/components/admin/TempleRequiredNotice';
 import { MediaAdminBoard, type MediaTemple } from './MediaAdminBoard';
 
 function asGallery(raw: unknown): GalleryImage[] {
@@ -18,15 +20,35 @@ function asGallery(raw: unknown): GalleryImage[] {
   return out;
 }
 
-export default async function HinhAnhPage() {
-  const ctx = await requireAdmin();
-  const templeIds = ctx.temples.map((t) => t.id);
-  if (templeIds.length === 0) return null;
+interface Props {
+  searchParams: Promise<{ temple?: string }>;
+}
 
+export default async function HinhAnhPage({ searchParams }: Props) {
+  const ctx = await requireAdmin();
+  const sp = await searchParams;
+  const scope = await resolveTempleScope(ctx, sp.temple);
   const supabase = await createClient();
+
+  let templeIds: string[] = [];
+  if (scope.templeId) {
+    templeIds = [scope.templeId];
+  } else if (!ctx.isSuperAdmin) {
+    templeIds = ctx.temples.map((t) => t.id);
+  } else {
+    const found = await searchTemples('', 30);
+    templeIds = found.map((t) => t.id);
+  }
+
+  if (templeIds.length === 0) {
+    return <TempleRequiredNotice feature="Hình ảnh" />;
+  }
+
   const { data } = await supabase
     .from('temples')
-    .select('id, name, abbott_name, abbott_image_url, hero_image_url, gallery')
+    .select(
+      'id, name, abbott_name, abbott_image_url, hero_image_url, gallery, maps_url, address',
+    )
     .in('id', templeIds)
     .eq('is_active', true)
     .order('name');
@@ -38,6 +60,8 @@ export default async function HinhAnhPage() {
     abbott_image_url: (t.abbott_image_url as string) ?? null,
     hero_image_url: (t.hero_image_url as string) ?? null,
     gallery: asGallery(t.gallery),
+    maps_url: (t.maps_url as string) ?? null,
+    address: (t.address as string) ?? null,
   }));
 
   return (
@@ -49,7 +73,10 @@ export default async function HinhAnhPage() {
         hoặc máy tính.
       </p>
       <div className="mt-8">
-        <MediaAdminBoard temples={temples} />
+        <MediaAdminBoard
+          temples={temples}
+          isSuperAdmin={ctx.isSuperAdmin}
+        />
       </div>
     </div>
   );

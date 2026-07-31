@@ -3,6 +3,7 @@ import {
   buildKinhDichQueUserBlock,
   buildKinhDichSystemPrompt,
 } from '@/lib/fengshui/kinh-dich-prompt';
+import { assertAiRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,6 +33,9 @@ function isPaidStatus(status: string | null | undefined): boolean {
 }
 
 export async function POST(req: Request) {
+  const limited = assertAiRateLimit(req, 'stream');
+  if (limited) return limited;
+
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
     return Response.json(

@@ -617,6 +617,32 @@ export async function upsertInventoryItem(input: {
   return { ok: true };
 }
 
+export async function deleteInventoryItem(input: {
+  templeId: string;
+  id: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await assertTempleAccess(input.templeId);
+  } catch {
+    return { ok: false, error: 'Không có quyền.' };
+  }
+  if (!input.id) return { ok: false, error: 'Thiếu mã vật phẩm.' };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('inventory_items')
+    .update({
+      is_active: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.id)
+    .eq('temple_id', input.templeId);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/quan-tri/kho');
+  return { ok: true };
+}
+
 export async function adjustInventory(input: {
   templeId: string;
   itemId: string;

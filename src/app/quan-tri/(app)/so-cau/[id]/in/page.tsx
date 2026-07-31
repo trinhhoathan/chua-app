@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, getTempleById } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import type { PrayerRequest } from '@/types/database';
 import { PrintButton } from './PrintButton';
@@ -27,7 +27,9 @@ export default async function InSoPage({ params }: Props) {
     notFound();
   }
 
-  const temple = ctx.temples.find((t) => t.id === prayer.temple_id);
+  const temple =
+    ctx.temples.find((t) => t.id === prayer.temple_id) ??
+    (await getTempleById(prayer.temple_id));
   const isSieu = prayer.request_type === 'cau_sieu';
 
   return (

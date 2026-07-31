@@ -320,3 +320,137 @@ export interface GoMoDailyScoreRow {
   strike_count: number;
   updated_at: string;
 }
+
+export type ChantingRecurrence = 'daily' | 'weekly' | 'once';
+export type ChantingDisplayScope = 'both' | 'home' | 'go_mo' | 'hidden';
+
+/** Lịch tụng kinh livestream YouTube */
+export interface ChantingSchedule {
+  id: string;
+  temple_id: string;
+  title: string;
+  description: string | null;
+  youtube_channel_id: string | null;
+  youtube_channel_url: string | null;
+  recurrence: ChantingRecurrence;
+  /** 0=CN … 6=T7 (theo Date.getDay) */
+  days_of_week: number[];
+  /** YYYY-MM-DD — bắt buộc khi recurrence = once */
+  start_date: string | null;
+  /** HH:mm:ss */
+  start_time: string;
+  duration_minutes: number;
+  display_scope: ChantingDisplayScope;
+  is_live: boolean;
+  live_video_url: string | null;
+  live_started_at: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const CHANTING_RECURRENCE_LABELS: Record<ChantingRecurrence, string> = {
+  daily: 'Hằng ngày',
+  weekly: 'Theo thứ trong tuần',
+  once: 'Một lần',
+};
+
+export const CHANTING_SCOPE_LABELS: Record<ChantingDisplayScope, string> = {
+  both: 'Trang chủ + Gõ mõ',
+  home: 'Chỉ trang chủ',
+  go_mo: 'Chỉ trang gõ mõ',
+  hidden: 'Ẩn (không công bố)',
+};
+
+export const WEEKDAY_LABELS: Record<number, string> = {
+  0: 'CN',
+  1: 'T2',
+  2: 'T3',
+  3: 'T4',
+  4: 'T5',
+  5: 'T6',
+  6: 'T7',
+};
+
+/** Vai trò thành viên hộ viết sớ */
+export type SoMemberRole = 'chu_ho' | 'chinh_tien' | 'gia_quyen';
+export type SoGender = 'nam' | 'nu';
+
+export const SO_MEMBER_ROLE_LABELS: Record<SoMemberRole, string> = {
+  chu_ho: 'Chủ hộ',
+  chinh_tien: 'Chính tiến',
+  gia_quyen: 'Gia quyến',
+};
+
+export const SO_GENDER_LABELS: Record<SoGender, string> = {
+  nam: 'Nam',
+  nu: 'Nữ',
+};
+
+/** Hộ gia đình viết sớ */
+export interface SoHousehold {
+  id: string;
+  temple_id: string;
+  chu_ho: string;
+  phone: string | null;
+  dia_chi_tinh: string | null;
+  dia_chi_huyen: string | null;
+  dia_chi_xa: string | null;
+  dia_chi_chi_tiet: string | null;
+  /** Địa chỉ đã dịch Hán/Nôm (in sớ) */
+  dia_chi_nho: string | null;
+  noi_cung: string | null;
+  nam_cung: number | null;
+  thang_cung: number | null;
+  ngay_cung: number | null;
+  gio_cung: string | null;
+  ngach_so_rieng: string | null;
+  ghi_chu: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Thành viên / tín chủ trong hộ */
+export interface SoHouseholdMember {
+  id: string;
+  household_id: string;
+  temple_id: string;
+  print_selected: boolean;
+  is_chu_ho: boolean;
+  xung_ho: string | null;
+  ho_ten: string;
+  ho_ten_nho: string | null;
+  gioi_tinh: SoGender | null;
+  nam_sinh: number | null;
+  ngay_sinh: number | null;
+  thang_sinh: number | null;
+  vai_tro: SoMemberRole;
+  phap_danh: string | null;
+  phap_danh_nho: string | null;
+  ngach_so_rieng: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Gia tiên / chính tiến */
+export interface SoAncestor {
+  id: string;
+  household_id: string;
+  temple_id: string;
+  print_selected: boolean;
+  xung_ho: string | null;
+  ten_hieu: string;
+  ten_nho: string | null;
+  nam_mat: number | null;
+  thang_mat: number | null;
+  ngay_mat: number | null;
+  gio_mat: string | null;
+  an_tang: string | null;
+  an_tang_nho: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}

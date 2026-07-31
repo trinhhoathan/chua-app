@@ -18,6 +18,8 @@ export type MediaTemple = {
   abbott_image_url: string | null;
   hero_image_url: string | null;
   gallery: GalleryImage[];
+  maps_url?: string | null;
+  address?: string | null;
 };
 
 const HERO_ASPECT = 16 / 9;
@@ -67,7 +69,13 @@ async function uploadCompressed(
   }
 }
 
-export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
+export function MediaAdminBoard({
+  temples,
+  isSuperAdmin = false,
+}: {
+  temples: MediaTemple[];
+  isSuperAdmin?: boolean;
+}) {
   const [templeId, setTempleId] = useState(temples[0]?.id ?? '');
   const current = temples.find((t) => t.id === templeId) ?? temples[0];
   const [portrait, setPortrait] = useState(current?.abbott_image_url ?? '');
@@ -75,10 +83,12 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
   const [gallery, setGallery] = useState<GalleryImage[]>(
     current?.gallery ?? [],
   );
+  const [mapsUrlInput, setMapsUrlInput] = useState(current?.maps_url ?? '');
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const [uploading, setUploading] = useState(false);
+  const [importingMaps, setImportingMaps] = useState(false);
   const [cropSession, setCropSession] = useState<CropSession | null>(null);
 
   useEffect(() => {
@@ -93,9 +103,70 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
     setPortrait(t?.abbott_image_url ?? '');
     setHero(t?.hero_image_url ?? '');
     setGallery(t?.gallery ?? []);
+    setMapsUrlInput(t?.maps_url ?? '');
     setMsg(null);
     setErr(null);
     closeCrop();
+  }
+
+  async function importFromGoogleMaps() {
+    if (!templeId || !isSuperAdmin) return;
+    setErr(null);
+    setMsg(null);
+    setImportingMaps(true);
+    try {
+      const res = await fetch('/api/quan-tri/google-maps-media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templeId,
+          mapsUrl: mapsUrlInput.trim() || undefined,
+          replaceGallery: true,
+          maxImages: 40,
+          maxReviews: 60,
+        }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        gallery?: GalleryImage[];
+        hero_image_url?: string | null;
+        galleryCount?: number;
+        reviewsCount?: number;
+        googleRating?: number | null;
+        googleReviewCount?: number | null;
+        heroUpdated?: boolean;
+        mapsUrl?: string;
+      };
+      if (!res.ok || !data.ok) {
+        setErr(data.error ?? 'Không lấy được dữ liệu Google Maps.');
+        return;
+      }
+
+      if (Array.isArray(data.gallery)) setGallery(data.gallery);
+      if (data.hero_image_url) setHero(data.hero_image_url);
+      if (data.mapsUrl) setMapsUrlInput(data.mapsUrl);
+
+      const parts = [
+        `Đã lấy ${data.galleryCount ?? data.gallery?.length ?? 0} link ảnh`,
+        `${data.reviewsCount ?? 0} đánh giá`,
+      ];
+      if (data.googleRating != null) {
+        parts.push(`${data.googleRating}★ (${data.googleReviewCount ?? 0})`);
+      }
+      if (data.heroUpdated) parts.push('đã gắn banner từ Maps');
+      setMsg(
+        `${parts.join(' · ')}. Chỉ lưu link CDN — không tải file về server.`,
+      );
+    } catch (e) {
+      setErr(
+        e instanceof Error
+          ? e.message
+          : 'Lỗi kết nối khi gọi Google Maps / Apify.',
+      );
+    } finally {
+      setImportingMaps(false);
+    }
   }
 
   function closeCrop() {
@@ -272,7 +343,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
     return <p className="text-sm text-muted">Chưa có chùa để cấu hình.</p>;
   }
 
-  const busy = uploading || pending;
+  const busy = uploading || pending || importingMaps;
 
   return (
     <div className="space-y-8">
@@ -429,7 +500,7 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
             </p>
           </div>
           <label className="inline-flex cursor-pointer px-4 py-2 text-sm text-white bg-ink hover:bg-jade-deep">
-            {busy ? 'Đang tải…' : 'Thêm ảnh'}
+            {busy && !importingMaps ? 'Đang tải…' : 'Thêm ảnh'}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/*"
@@ -444,6 +515,43 @@ export function MediaAdminBoard({ temples }: { temples: MediaTemple[] }) {
             />
           </label>
         </div>
+
+        {isSuperAdmin ? (
+          <div className="rounded-sm border border-dashed border-fog bg-mist/40 p-4 space-y-3">
+            <div>
+              <p className="text-sm font-medium text-ink">
+                SuperAdmin · Lấy từ Google Maps (Apify)
+              </p>
+              <p className="mt-1 text-xs text-muted leading-relaxed">
+                Một lần nhấn: lấy link ảnh CDN + đánh giá Google Maps, ghi vào
+                thư viện và review của chùa. Không tải file ảnh về server.
+                Có thể mất 1–3 phút.
+              </p>
+            </div>
+            <label className="block text-xs text-muted">
+              Link Google Maps (tuỳ chọn — để trống sẽ dùng maps_url hoặc tìm theo
+              tên/địa chỉ)
+              <input
+                type="url"
+                value={mapsUrlInput}
+                onChange={(e) => setMapsUrlInput(e.target.value)}
+                placeholder="https://www.google.com/maps/place/..."
+                disabled={busy}
+                className="mt-1 w-full border border-fog px-3 py-2 bg-white text-sm text-ink"
+              />
+            </label>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void importFromGoogleMaps()}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-jade-deep hover:bg-ink disabled:opacity-50"
+            >
+              {importingMaps
+                ? 'Đang lấy từ Google Maps…'
+                : 'Lấy ảnh & đánh giá Google Maps'}
+            </button>
+          </div>
+        ) : null}
 
         {gallery.length === 0 ? (
           <p className="text-sm text-muted py-6 text-center border border-dashed border-fog">

@@ -1,6 +1,8 @@
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import type { WaterOrder, SettlementEntry } from '@/types/database';
+import { resolveTempleScope } from '@/lib/temple-scope';
+import { TempleRequiredNotice } from '@/components/admin/TempleRequiredNotice';
 import { MarkPaidButton } from './MarkPaidButton';
 
 interface Props {
@@ -20,8 +22,14 @@ export default async function DoiSoatPage({ searchParams }: Props) {
   const ctx = await requireAdmin();
   const sp = await searchParams;
   const month = sp.month ?? currentMonth();
-  const templeId = sp.temple || ctx.temples[0]?.id;
-  const templeObj = ctx.temples.find((t) => t.id === templeId);
+  const scope = await resolveTempleScope(ctx, sp.temple);
+  const templeId = scope.templeId;
+  const templeObj = scope.temple;
+
+  if (!templeId) {
+    return <TempleRequiredNotice feature="Đối soát" />;
+  }
+
   const supabase = await createClient();
 
   const monthStart = `${month}-01T00:00:00Z`;
@@ -79,21 +87,7 @@ export default async function DoiSoatPage({ searchParams }: Props) {
           </p>
         </div>
         <form className="flex items-center gap-3 text-sm">
-          {ctx.temples.length > 1 ? (
-            <select
-              name="temple"
-              defaultValue={templeId}
-              className="px-3 py-2 border border-fog bg-white text-ink"
-            >
-              {ctx.temples.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input type="hidden" name="temple" value={templeId} />
-          )}
+          <input type="hidden" name="temple" value={templeId} />
           <input
             type="month"
             name="month"

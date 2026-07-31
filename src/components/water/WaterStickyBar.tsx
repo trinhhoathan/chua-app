@@ -182,16 +182,16 @@ export function WaterStickyBar({
               <div className="mt-5 space-y-3">
                 <label className="block text-xs text-muted">
                   Số thùng
-                  <div className="mt-1.5 flex flex-wrap gap-1.5 md:hidden">
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {QUICK_QTY.map((q) => (
                       <button
                         key={q}
                         type="button"
                         onClick={() => setQty(q)}
-                        className={`text-xs px-2.5 py-1.5 border ${
+                        className={`min-w-[3.25rem] text-xs px-2.5 py-1.5 border transition-colors ${
                           qty === q
                             ? 'border-ink text-ink bg-mist'
-                            : 'border-fog text-muted'
+                            : 'border-fog text-muted hover:border-ink/40 hover:text-ink'
                         }`}
                       >
                         {q}

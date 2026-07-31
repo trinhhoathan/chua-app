@@ -2,10 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  buildDaiVanPromptContext,
+  buildHanNamPromptContext,
   buildTuViPromptContext,
   ensureFollowUpBlock,
   splitTuViReply,
+  type TuViSchool,
 } from '@/lib/fengshui/tuvi-prompt';
+import { buildPhiTinhPromptBlock } from '@/lib/fengshui/tuvi-phi-tinh';
+import {
+  getSavedUnlockOrderCode,
+  savePaidOrderCode,
+} from '@/lib/fengshui/tuvi-html';
 import type {
   IztroChartView,
   IztroHoroscopeView,
@@ -25,17 +33,97 @@ interface Props {
   onClose: () => void;
   primaryColor: string;
   templeName: string;
-  chart: IztroChartView;
+  /** Lá số Tử Vi — có thể bỏ trống khi dùng contextOverride (hợp tuổi, Hà Lạc…). */
+  chart?: IztroChartView | null;
   horoscope: IztroHoroscopeView | null;
+  school?: TuViSchool;
+  /** Không đưa vận hạn vào ngữ cảnh / prompt (trang luận giải cung). */
+  noVanHan?: boolean;
+  /** Chỉ luận hạn năm / lưu niên. */
+  vanHanFocus?: boolean;
+  /** Chỉ luận đại vận · tiểu vận. */
+  daiVanFocus?: boolean;
+  /** Chỉ luận nạp âm · ngũ hành tứ trụ. */
+  napAmFocus?: boolean;
+  /** Chỉ luận hợp tuổi · xung khắc hai người. */
+  hopTuoiFocus?: boolean;
+  /** Chỉ luận Bát tự Hà Lạc. */
+  haLacFocus?: boolean;
+  /** Chỉ luận dụng thần Bát tự. */
+  dungThanFocus?: boolean;
+  /** Luận lá số Bát tự Tứ trụ (Tử Bình). */
+  batTuFocus?: boolean;
+  /** Ghi đè ngữ cảnh gửi AI (vd. khối nạp âm thay vì lá số). */
+  contextOverride?: string;
+  /** Số câu hỏi miễn phí; từ câu tiếp theo cần thỉnh nước. */
+  freeQuestionLimit?: number;
+  templeId?: string;
+  contactPhone?: string | null;
   onEssaysChange?: (essays: { question: string; answer: string }[]) => void;
   onOpenDetail12?: () => void;
 }
 
-const SUGGESTIONS = [
+const SUGGESTIONS_FULL = [
   'Luận tổng quan lá số này',
   'Cách cục của lá số này là gì?',
   'Vận hạn tại thời gian xem thế nào?',
   'Luận cung Mệnh và cung Thân',
+];
+
+const SUGGESTIONS_NO_VAN_HAN = [
+  'Luận tổng quan lá số này',
+  'Cách cục / cung Mệnh thế nào?',
+  'Tam hợp và đối cung nổi bật?',
+  'Luận cung Mệnh và cung Thân',
+];
+
+const SUGGESTIONS_HAN_NAM = [
+  'Luận hạn năm / lưu niên năm xem',
+  'Đại hạn và tiểu hạn đang đi thế nào?',
+  'Năm này nên–tránh điều gì?',
+  'Tứ hóa lưu niên ảnh hưởng ra sao?',
+];
+
+const SUGGESTIONS_DAI_VAN = [
+  'Luận đại hạn đang đi',
+  'Tiểu hạn năm này thế nào?',
+  'Đại hạn kế tiếp sẽ ra sao?',
+  'Nên–tránh trong chu kỳ đại vận này?',
+];
+
+const SUGGESTIONS_NAP_AM = [
+  'Luận sâu mệnh nạp âm của tôi',
+  'Ngũ hành tôi vượng gì, khuyết gì?',
+  'Bổ khuyết ngũ hành thế nào cho hợp?',
+  'Nạp âm các trụ sinh khắc ra sao?',
+];
+
+const SUGGESTIONS_HOP_TUOI = [
+  'Hai tuổi này hợp nhau ở điểm nào nhất?',
+  'Điểm xung khắc nào cần hóa giải?',
+  'Cách hóa giải xung khắc thế nào?',
+  'Nên cưới / hợp tác vào năm nào đẹp?',
+];
+
+const SUGGESTIONS_HA_LAC = [
+  'Quẻ tiên thiên của tôi nói gì?',
+  'Hào nguyên đường báo điều gì?',
+  'Quẻ hậu thiên — hậu vận ra sao?',
+  'Thiên số địa số của tôi mạnh yếu gì?',
+];
+
+const SUGGESTIONS_DUNG_THAN = [
+  'Vì sao tôi thân vượng / thân nhược?',
+  'Dụng thần của tôi ứng dụng thế nào?',
+  'Nghề nghiệp nào hợp dụng thần?',
+  'Kỵ thần cần tránh những gì?',
+];
+
+const SUGGESTIONS_BAT_TU = [
+  'Luận tổng quan lá số Bát tự này',
+  'Thập thần trong tứ trụ nói gì về tôi?',
+  'Đại vận đang đi và lưu niên năm nay?',
+  'Công danh · tài lộc theo bát tự thế nào?',
 ];
 
 function renderSimpleMarkdown(text: string) {
@@ -87,6 +175,20 @@ function renderSimpleMarkdown(text: string) {
   });
 }
 
+async function verifyOrderPaid(code: string): Promise<boolean> {
+  try {
+    const res = await fetch(
+      `/api/orders/${encodeURIComponent(code)}/status`,
+      { cache: 'no-store' },
+    );
+    if (!res.ok) return false;
+    const data = (await res.json()) as { paid?: boolean };
+    return Boolean(data.paid);
+  } catch {
+    return false;
+  }
+}
+
 export function TuViChatPanel({
   open,
   onClose,
@@ -94,6 +196,19 @@ export function TuViChatPanel({
   templeName,
   chart,
   horoscope,
+  school = 'bac_phai',
+  noVanHan = false,
+  vanHanFocus = false,
+  daiVanFocus = false,
+  napAmFocus = false,
+  hopTuoiFocus = false,
+  haLacFocus = false,
+  dungThanFocus = false,
+  batTuFocus = false,
+  contextOverride,
+  freeQuestionLimit,
+  templeId = '',
+  contactPhone,
   onEssaysChange,
   onOpenDetail12,
 }: Props) {
@@ -102,15 +217,64 @@ export function TuViChatPanel({
   const [streaming, setStreaming] = useState(false);
   const [streamingId, setStreamingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [orderCode, setOrderCode] = useState('');
+  const [unlocking, setUnlocking] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const streamAccRef = useRef('');
 
   const abbottLabel = `trụ trì ${templeName.trim() || 'chùa'}`;
+  const starterSuggestions = hopTuoiFocus
+    ? SUGGESTIONS_HOP_TUOI
+    : haLacFocus
+      ? SUGGESTIONS_HA_LAC
+      : batTuFocus
+        ? SUGGESTIONS_BAT_TU
+        : dungThanFocus
+        ? SUGGESTIONS_DUNG_THAN
+        : napAmFocus
+          ? SUGGESTIONS_NAP_AM
+          : daiVanFocus
+            ? SUGGESTIONS_DAI_VAN
+            : vanHanFocus
+              ? SUGGESTIONS_HAN_NAM
+              : noVanHan
+                ? SUGGESTIONS_NO_VAN_HAN
+                : SUGGESTIONS_FULL;
+  const limit =
+    typeof freeQuestionLimit === 'number' && freeQuestionLimit > 0
+      ? freeQuestionLimit
+      : null;
 
-  const chartContext = useMemo(
-    () => buildTuViPromptContext(chart, horoscope),
-    [chart, horoscope],
+  const chartContext = useMemo(() => {
+    if (contextOverride) return contextOverride;
+    if (!chart) return '';
+    if (daiVanFocus && horoscope) {
+      return buildDaiVanPromptContext(chart, horoscope);
+    }
+    if (vanHanFocus && horoscope) {
+      return buildHanNamPromptContext(chart, horoscope);
+    }
+    const base = buildTuViPromptContext(chart, horoscope, {
+      noVanHan: noVanHan || undefined,
+    });
+    if (school !== 'phi_tinh') return base;
+    const phi = buildPhiTinhPromptBlock(chart);
+    return phi ? `${base}\n\n${phi}` : base;
+  }, [
+    chart,
+    horoscope,
+    school,
+    noVanHan,
+    vanHanFocus,
+    daiVanFocus,
+    contextOverride,
+  ]);
+
+  const userQuestionCount = useMemo(
+    () => messages.filter((m) => m.role === 'user').length,
+    [messages],
   );
 
   const assistantCount = useMemo(
@@ -120,6 +284,19 @@ export function TuViChatPanel({
       ).length,
     [messages],
   );
+
+  const lockedForChat =
+    limit != null && !unlocked && userQuestionCount >= limit;
+
+  useEffect(() => {
+    if (!templeId || limit == null) return;
+    const saved = getSavedUnlockOrderCode(templeId);
+    if (!saved) return;
+    setOrderCode(saved);
+    void verifyOrderPaid(saved).then((ok) => {
+      if (ok) setUnlocked(true);
+    });
+  }, [templeId, limit]);
 
   useEffect(() => {
     if (!onEssaysChange) return;
@@ -160,11 +337,40 @@ export function TuViChatPanel({
     return () => abortRef.current?.abort();
   }, []);
 
-  if (!open) return null;
+  async function unlockWithCode() {
+    const code = orderCode.trim().toUpperCase();
+    if (!code) {
+      setError('Vui lòng nhập mã đơn thỉnh nước.');
+      return;
+    }
+    setUnlocking(true);
+    setError(null);
+    try {
+      const ok = await verifyOrderPaid(code);
+      if (!ok) {
+        setError(
+          'Mã đơn chưa thanh toán hoặc không hợp lệ. Thỉnh nước rồi nhập lại mã.',
+        );
+        return;
+      }
+      setOrderCode(code);
+      setUnlocked(true);
+      if (templeId) savePaidOrderCode(code, templeId);
+    } finally {
+      setUnlocking(false);
+    }
+  }
 
   async function sendQuestion(raw: string) {
     const question = raw.trim();
     if (!question || streaming) return;
+
+    if (limit != null && !unlocked && userQuestionCount >= limit) {
+      setError(
+        `Đã dùng hết ${limit} câu hỏi miễn phí. Thỉnh nước ủng hộ chùa để hỏi tiếp.`,
+      );
+      return;
+    }
 
     setError(null);
     setInput('');
@@ -202,15 +408,37 @@ export function TuViChatPanel({
           chartContext,
           history,
           templeName,
+          school,
+          noVanHan:
+            vanHanFocus ||
+            daiVanFocus ||
+            napAmFocus ||
+            hopTuoiFocus ||
+            haLacFocus ||
+            dungThanFocus ||
+            batTuFocus
+              ? undefined
+              : noVanHan || undefined,
+          vanHanFocus: vanHanFocus || undefined,
+          daiVanFocus: daiVanFocus || undefined,
+          napAmFocus: napAmFocus || undefined,
+          hopTuoiFocus: hopTuoiFocus || undefined,
+          haLacFocus: haLacFocus || undefined,
+          dungThanFocus: dungThanFocus || undefined,
+          batTuFocus: batTuFocus || undefined,
         }),
       });
 
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as {
           error?: string;
+          code?: string;
         } | null;
         throw new Error(
-          data?.error || 'Không luận giải được lúc này. Quý vị thử lại sau.',
+          data?.error ||
+            (res.status === 429
+              ? 'Quý vị thao tác hơi nhanh. Vui lòng đợi giây lát rồi thử lại.'
+              : 'Không luận giải được lúc này. Quý vị thử lại sau.'),
         );
       }
 
@@ -298,6 +526,12 @@ export function TuViChatPanel({
     setStreamingId(null);
   }
 
+  if (!open) return null;
+
+  const phoneHref = contactPhone
+    ? `tel:${contactPhone.replace(/\s+/g, '')}`
+    : null;
+
   return (
     <div className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center bg-ink/40 p-0 sm:p-4">
       <div
@@ -334,18 +568,32 @@ export function TuViChatPanel({
           {messages.length === 0 ? (
             <div className="space-y-3">
               <p className="text-sm text-muted leading-relaxed">
-                Hỏi bất kỳ điều gì về lá số — {abbottLabel} sẽ xem toàn bộ cung,
-                sao, đối/tam hợp và vận hạn hiện tại rồi luận giải tận tình theo
-                phương pháp của chùa.
+                {batTuFocus
+                  ? `Hỏi về lá số Bát tự — ${abbottLabel} luận tứ trụ, thập thần, thần sát và vận trình đại vận – lưu niên (không luận sao cung Tử Vi).`
+                  : napAmFocus
+                  ? `Hỏi về nạp âm / ngũ hành — ${abbottLabel} tập trung mệnh nạp âm và ngũ hành tứ trụ (không luận sao cung hay vận hạn).`
+                  : daiVanFocus
+                  ? `Hỏi về đại vận / tiểu vận — ${abbottLabel} tập trung đại hạn và tiểu hạn đang đi (không lập lại cả lá số).`
+                  : vanHanFocus
+                    ? `Hỏi về hạn năm / lưu niên — ${abbottLabel} tập trung vận hạn năm xem (không lập lại cả lá số).`
+                    : noVanHan
+                      ? `Hỏi về cung, sao, cách cục hoặc phi tinh trên lá số — ${abbottLabel} luận theo hướng đã chọn (không luận vận hạn trong phần này).`
+                      : `Hỏi bất kỳ điều gì về lá số — ${abbottLabel} sẽ xem toàn bộ cung, sao, đối/tam hợp và vận hạn hiện tại rồi luận giải tận tình theo phương pháp của chùa.`}
+                {limit != null ? (
+                  <span className="block mt-1 text-[0.75rem]">
+                    Miễn phí {limit} câu hỏi; từ câu {limit + 1} cần thỉnh nước
+                    ủng hộ chùa.
+                  </span>
+                ) : null}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {SUGGESTIONS.map((s) => (
+                {starterSuggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
-                    disabled={streaming}
-                    onClick={() => sendQuestion(s)}
-                    className="text-left text-xs border border-fog bg-white px-2 py-1.5 text-ink hover:border-ink/30"
+                    disabled={streaming || lockedForChat}
+                    onClick={() => void sendQuestion(s)}
+                    className="text-left text-xs border border-fog bg-white px-2 py-1.5 text-ink hover:border-ink/30 disabled:opacity-50"
                   >
                     {s}
                   </button>
@@ -417,9 +665,9 @@ export function TuViChatPanel({
                         <button
                           key={s}
                           type="button"
-                          disabled={streaming}
-                          onClick={() => sendQuestion(s)}
-                          className="text-left text-xs border border-fog bg-white px-2 py-1.5 text-ink hover:border-ink/30"
+                          disabled={streaming || lockedForChat}
+                          onClick={() => void sendQuestion(s)}
+                          className="text-left text-xs border border-fog bg-white px-2 py-1.5 text-ink hover:border-ink/30 disabled:opacity-50"
                         >
                           {s}
                         </button>
@@ -431,7 +679,62 @@ export function TuViChatPanel({
             );
           })}
 
-          {assistantCount >= 2 && !streaming ? (
+          {lockedForChat && !streaming ? (
+            <div className="border border-fog bg-white p-3 space-y-2">
+              <p className="text-xs font-medium text-ink">
+                Đã hết {limit} câu hỏi miễn phí
+              </p>
+              <p className="text-[0.7rem] text-muted leading-relaxed">
+                Thỉnh nước ủng hộ chùa để hỏi tiếp, luận 12 cung chuyên sâu,
+                hoặc liên hệ trụ trì trực tiếp.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() =>
+                    openWaterDonateForm({
+                      note: 'Hỏi tiếp luận giải tử vi',
+                      qty: 10,
+                    })
+                  }
+                  className="text-xs px-2.5 py-1.5 text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  Thỉnh nước
+                </button>
+                {phoneHref ? (
+                  <a
+                    href={phoneHref}
+                    className="text-xs px-2.5 py-1.5 border border-fog text-ink"
+                  >
+                    Gọi trụ trì
+                    {contactPhone ? ` · ${contactPhone}` : ''}
+                  </a>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap gap-1.5 items-end pt-1">
+                <label className="flex-1 min-w-[8rem] text-[0.65rem] text-muted">
+                  Mã đơn đã thanh toán
+                  <input
+                    value={orderCode}
+                    onChange={(e) => setOrderCode(e.target.value.toUpperCase())}
+                    placeholder="VD: BH…"
+                    className="mt-0.5 w-full border border-fog px-2 py-1.5 text-sm text-ink bg-white"
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={unlocking}
+                  onClick={() => void unlockWithCode()}
+                  className="text-xs px-2.5 py-1.5 border border-fog text-ink disabled:opacity-50"
+                >
+                  {unlocking ? 'Đang kiểm…' : 'Mở khóa'}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {limit == null && assistantCount >= 2 && !streaming ? (
             <div className="border border-fog bg-white p-3 space-y-2">
               <p className="text-xs font-medium text-ink">
                 Muốn xem trọn bộ luận giải 12 cung chi tiết?
@@ -476,39 +779,41 @@ export function TuViChatPanel({
           </p>
         ) : null}
 
-        <form
-          className="shrink-0 border-t border-fog p-2.5 flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void sendQuestion(input);
-          }}
-        >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={streaming}
-            placeholder={`Hỏi ${abbottLabel}…`}
-            className="min-w-0 flex-1 border border-fog px-2.5 py-2 text-sm bg-white text-ink"
-          />
-          {streaming ? (
-            <button
-              type="button"
-              onClick={stopStream}
-              className="shrink-0 px-3 py-2 text-xs border border-fog text-ink"
-            >
-              Dừng
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="shrink-0 px-3 py-2 text-xs text-white disabled:opacity-50"
-              style={{ backgroundColor: primaryColor }}
-            >
-              Gửi
-            </button>
-          )}
-        </form>
+        {lockedForChat ? null : (
+          <form
+            className="shrink-0 border-t border-fog p-2.5 flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void sendQuestion(input);
+            }}
+          >
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={streaming}
+              placeholder={`Hỏi ${abbottLabel}…`}
+              className="min-w-0 flex-1 border border-fog px-2.5 py-2 text-sm bg-white text-ink"
+            />
+            {streaming ? (
+              <button
+                type="button"
+                onClick={stopStream}
+                className="shrink-0 px-3 py-2 text-xs border border-fog text-ink"
+              >
+                Dừng
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={!input.trim()}
+                className="shrink-0 px-3 py-2 text-xs text-white disabled:opacity-50"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Gửi
+              </button>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );

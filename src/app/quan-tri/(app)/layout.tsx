@@ -1,35 +1,34 @@
-import Link from 'next/link';
+import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { requireAdmin } from '@/lib/auth';
+import { Suspense } from 'react';
 import { logoutAction } from '@/app/actions/auth';
+import { AdminNav } from '@/components/admin/AdminNav';
+import { TempleScopePicker } from '@/components/admin/TempleScopePicker';
+import { requireAdmin, getTempleById, type TempleBrief } from '@/lib/auth';
+import { ADMIN_TEMPLE_COOKIE, PLATFORM_HQ } from '@/lib/platform-hq';
 
-const NAV: Array<{ href: string; label: string; superOnly?: boolean }> = [
-  { href: '/quan-tri', label: 'Tổng quan' },
-  { href: '/quan-tri/hoat-dong', label: 'Hoạt động' },
-  { href: '/quan-tri/gui-tin', label: 'Gửi tin' },
-  { href: '/quan-tri/don-hang', label: 'Thỉnh nước' },
-  { href: '/quan-tri/don-gia', label: 'Đơn giá', superOnly: true },
-  { href: '/quan-tri/lien-he', label: 'Liên hệ' },
-  { href: '/quan-tri/hinh-anh', label: 'Hình ảnh' },
-  { href: '/quan-tri/doi-soat', label: 'Đối soát' },
-  { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu' },
-  { href: '/quan-tri/phat-tu', label: 'Phật tử' },
-  { href: '/quan-tri/kho', label: 'Kho vận' },
-  { href: '/quan-tri/doi-mat-khau', label: 'Đổi mật khẩu' },
-  { href: '/quan-tri/thanh-vien', label: 'Thành viên', superOnly: true },
-];
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const ctx = await requireAdmin();
+    if (ctx.isSuperAdmin) {
+      return {
+        title: PLATFORM_HQ.title,
+        description: `${PLATFORM_HQ.monastery} — ${PLATFORM_HQ.author}`,
+      };
+    }
+    const name = ctx.temples[0]?.name ?? 'Quản trị chùa';
+    return { title: `Quản trị · ${name}` };
+  } catch {
+    return { title: 'Quản trị' };
+  }
+}
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Login page has its own layout branch via route group — this layout
-  // wraps authenticated pages. dang-nhap is outside this folder structure
-  // wait - dang-nhap is under quan-tri so it would use this layout.
-  // We'll detect UNAUTHENTICATED and not force here for dang-nhap —
-  // actually dang-nhap should NOT use this layout. Use a route group.
-
   let ctx;
   try {
     ctx = await requireAdmin();
@@ -62,33 +61,63 @@ export default async function AdminLayout({
     throw e;
   }
 
+  const cookieStore = await cookies();
+  const cookieTempleId = cookieStore.get(ADMIN_TEMPLE_COOKIE)?.value ?? null;
+  let selected: TempleBrief | null = null;
+  if (cookieTempleId) {
+    if (
+      ctx.isSuperAdmin ||
+      ctx.temples.some((t) => t.id === cookieTempleId)
+    ) {
+      selected =
+        ctx.temples.find((t) => t.id === cookieTempleId) ??
+        (await getTempleById(cookieTempleId));
+    }
+  }
+  if (!ctx.isSuperAdmin && !selected && ctx.temples[0]) {
+    selected = ctx.temples[0];
+  }
+
   return (
     <div className="min-h-screen bg-mist">
       <header className="bg-ink text-white">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[0.65rem] tracking-[0.3em] uppercase text-white/50">
-              Quản trị chùa
-            </p>
-            <p className="font-display text-lg">
-              {ctx.temples[0]?.name ?? 'Dashboard'}
-              {ctx.isSuperAdmin ? (
-                <span className="ml-2 text-xs text-gilt">Super admin</span>
-              ) : null}
-            </p>
+            {ctx.isSuperAdmin ? (
+              <>
+                <p className="text-[0.65rem] tracking-[0.3em] uppercase text-white/50">
+                  {PLATFORM_HQ.eyebrow}
+                </p>
+                <p className="font-display text-lg">{PLATFORM_HQ.title}</p>
+                <p className="text-xs text-gilt mt-0.5">
+                  {PLATFORM_HQ.author} · {PLATFORM_HQ.role}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[0.65rem] tracking-[0.3em] uppercase text-white/50">
+                  Quản trị chùa
+                </p>
+                <p className="font-display text-lg">
+                  {selected?.name ?? ctx.temples[0]?.name ?? 'Dashboard'}
+                </p>
+              </>
+            )}
           </div>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-3 text-sm flex-wrap justify-end">
+            <Suspense fallback={null}>
+              <TempleScopePicker
+                isSuperAdmin={ctx.isSuperAdmin}
+                temples={ctx.temples}
+                selected={selected}
+                templeCount={ctx.templeCount}
+              />
+            </Suspense>
             <span className="text-white/60 hidden sm:inline">
               {ctx.displayName
                 ? `${ctx.displayName}${ctx.phone ? ` · ${ctx.phone}` : ''}`
                 : (ctx.phone ?? ctx.email)}
             </span>
-            <Link
-              href="/quan-tri/doi-mat-khau"
-              className="px-3 py-1.5 border border-white/25 hover:bg-white/10 text-xs"
-            >
-              Đổi mật khẩu
-            </Link>
             <form action={logoutAction}>
               <button className="px-3 py-1.5 border border-white/25 hover:bg-white/10 text-xs">
                 Đăng xuất
@@ -96,21 +125,7 @@ export default async function AdminLayout({
             </form>
           </div>
         </div>
-        <nav className="border-t border-white/10">
-          <div className="mx-auto max-w-6xl px-4 md:px-6 flex gap-1 overflow-x-auto no-scrollbar">
-            {NAV.filter((item) => !item.superOnly || ctx.isSuperAdmin).map(
-              (item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="shrink-0 px-3 py-2.5 text-sm text-white/70 hover:text-white border-b-2 border-transparent hover:border-gilt"
-                >
-                  {item.label}
-                </Link>
-              ),
-            )}
-          </div>
-        </nav>
+        <AdminNav isSuperAdmin={ctx.isSuperAdmin} />
       </header>
       <div className="mx-auto max-w-6xl px-4 md:px-6 py-8">{children}</div>
     </div>

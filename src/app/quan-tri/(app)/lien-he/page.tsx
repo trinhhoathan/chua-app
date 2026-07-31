@@ -1,14 +1,34 @@
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, searchTemples } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeContactLinks } from '@/lib/contact-links';
+import { resolveTempleScope } from '@/lib/temple-scope';
+import { TempleRequiredNotice } from '@/components/admin/TempleRequiredNotice';
 import { ContactLinksForm } from './ContactLinksForm';
 
-export default async function LienHePage() {
-  const ctx = await requireAdmin();
-  const templeIds = ctx.temples.map((t) => t.id);
-  if (templeIds.length === 0) return null;
+interface Props {
+  searchParams: Promise<{ temple?: string }>;
+}
 
+export default async function LienHePage({ searchParams }: Props) {
+  const ctx = await requireAdmin();
+  const sp = await searchParams;
+  const scope = await resolveTempleScope(ctx, sp.temple);
   const supabase = await createClient();
+
+  let templeIds: string[] = [];
+  if (scope.templeId) {
+    templeIds = [scope.templeId];
+  } else if (!ctx.isSuperAdmin) {
+    templeIds = ctx.temples.map((t) => t.id);
+  } else {
+    const found = await searchTemples('', 30);
+    templeIds = found.map((t) => t.id);
+  }
+
+  if (templeIds.length === 0) {
+    return <TempleRequiredNotice feature="Liên hệ" />;
+  }
+
   const { data } = await supabase
     .from('temples')
     .select('id, name, hotline, contact_links')
@@ -20,7 +40,10 @@ export default async function LienHePage() {
     id: String(t.id),
     name: String(t.name),
     hotline: (t.hotline as string) ?? null,
-    contact_links: normalizeContactLinks(t.contact_links, t.hotline as string | null),
+    contact_links: normalizeContactLinks(
+      t.contact_links,
+      t.hotline as string | null,
+    ),
   }));
 
   return (

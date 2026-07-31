@@ -3,6 +3,11 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { loginEmailToPhone } from '@/lib/admin-phone-auth';
 import type { Temple } from '@/types/database';
 
+export type TempleBrief = Pick<
+  Temple,
+  'id' | 'name' | 'domain' | 'primary_color'
+>;
+
 export interface TempleAdminRow {
   id: string;
   user_id: string;
@@ -21,7 +26,10 @@ export interface AdminContext {
   displayName: string | null;
   isSuperAdmin: boolean;
   memberships: TempleAdminRow[];
-  temples: Pick<Temple, 'id' | 'name' | 'domain' | 'primary_color'>[];
+  /** Chùa trong membership (trụ trì) — SuperAdmin không nhận full list 15k. */
+  temples: TempleBrief[];
+  /** Tổng số Phật tự active (chỉ meaningful khi isSuperAdmin). */
+  templeCount: number;
 }
 
 export async function getSessionUser() {
@@ -55,19 +63,38 @@ export async function requireAdmin(): Promise<AdminContext> {
   }
 
   const isSuperAdmin = rows.some((r) => r.is_super_admin);
-  const templeIds = rows.map((r) => r.temple_id);
+  const templeIds = [...new Set(rows.map((r) => r.temple_id))];
 
-  let templesQuery = supabase
-    .from('temples')
-    .select('id, name, domain, primary_color')
-    .eq('is_active', true)
-    .order('name');
+  let temples: TempleBrief[] = [];
+  let templeCount = 0;
 
-  if (!isSuperAdmin) {
-    templesQuery = templesQuery.in('id', templeIds);
+  if (isSuperAdmin) {
+    const [{ count }, membershipTemples] = await Promise.all([
+      supabase
+        .from('temples')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_active', true),
+      templeIds.length
+        ? supabase
+            .from('temples')
+            .select('id, name, domain, primary_color')
+            .in('id', templeIds)
+            .eq('is_active', true)
+            .order('name')
+        : Promise.resolve({ data: [] as TempleBrief[] }),
+    ]);
+    templeCount = count ?? 0;
+    temples = (membershipTemples.data ?? []) as TempleBrief[];
+  } else {
+    const { data } = await supabase
+      .from('temples')
+      .select('id, name, domain, primary_color')
+      .in('id', templeIds)
+      .eq('is_active', true)
+      .order('name');
+    temples = (data ?? []) as TempleBrief[];
+    templeCount = temples.length;
   }
-
-  const { data: temples } = await templesQuery;
 
   const phoneFromMeta =
     typeof user.user_metadata?.phone === 'string'
@@ -85,7 +112,8 @@ export async function requireAdmin(): Promise<AdminContext> {
     displayName: rows.find((r) => r.display_name)?.display_name ?? null,
     isSuperAdmin,
     memberships: rows,
-    temples: (temples ?? []) as AdminContext['temples'],
+    temples,
+    templeCount,
   };
 }
 
@@ -98,6 +126,43 @@ export async function assertTempleAccess(
     throw new Error('FORBIDDEN');
   }
   return ctx;
+}
+
+export async function getTempleById(
+  id: string,
+): Promise<TempleBrief | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('temples')
+    .select('id, name, domain, primary_color')
+    .eq('id', id)
+    .eq('is_active', true)
+    .maybeSingle();
+  return (data as TempleBrief | null) ?? null;
+}
+
+export async function searchTemples(
+  q: string,
+  limit = 20,
+): Promise<TempleBrief[]> {
+  await requireAdmin();
+  const supabase = await createClient();
+  const trimmed = q.trim().replace(/[%_,]/g, ' ').slice(0, 80);
+  let query = supabase
+    .from('temples')
+    .select('id, name, domain, primary_color')
+    .eq('is_active', true)
+    .order('name')
+    .limit(limit);
+
+  if (trimmed) {
+    query = query.or(
+      `name.ilike.%${trimmed}%,domain.ilike.%${trimmed}%`,
+    );
+  }
+
+  const { data } = await query;
+  return (data ?? []) as TempleBrief[];
 }
 
 /** Prefer service role when available; fall back to user session client. */

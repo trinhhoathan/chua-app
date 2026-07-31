@@ -42,3 +42,10 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Lòng sớ mẫu (~1GB JSON) — giữ local / seed lên Storage, không commit
+/so-data/*
+!/so-data/README.md
+/so-data-gz/
+/so-data*.zip
+/so-data*.tar.gz

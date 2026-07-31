@@ -1,0 +1,414 @@
+/* Font viết sớ — Quốc ngữ + Hán-Nôm VN + thư pháp Trung (OFL) */
+
+@font-face {
+  font-family: 'UVN Bo Quen';
+  src: url('/fonts/so/UVN-BoQuen.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+/* —— Quốc ngữ (SIL OFL, hỗ trợ tiếng Việt) —— */
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  src: url('/fonts/so/BeVietnamPro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  src: url('/fonts/so/BeVietnamPro-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro Medium';
+  src: url('/fonts/so/BeVietnamPro-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mulish';
+  src: url('/fonts/so/Mulish.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/so/Nunito.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/so/Inter.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  src: url('/fonts/so/SourceSans3.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/fonts/so/IBMPlexSans.ttf') format('truetype');
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('/fonts/so/EBGaramond.ttf') format('truetype');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Literata';
+  src: url('/fonts/so/Literata.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/so/Lora.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/so/SourceSerif4.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spectral';
+  src: url('/fonts/so/Spectral-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Serif';
+  src: url('/fonts/so/IBMPlexSerif-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/so/PlayfairDisplay.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('/fonts/so/LibreBaskerville.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Alegreya';
+  src: url('/fonts/so/Alegreya.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/so/CormorantGaramond.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  src: url('/fonts/so/Newsreader.ttf') format('truetype');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Serif';
+  src: url('/fonts/so/NotoSerif.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Crimson Pro';
+  src: url('/fonts/so/CrimsonPro.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Han-Nom Kai';
+  src: url('/fonts/so/Han-Nom-Kai.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+/* Template cũ ghi Chu Nom Khai → cùng file Han-Nom Kai */
+@font-face {
+  font-family: 'Chu Nom Khai';
+  src: url('/fonts/so/Han-Nom-Kai.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Nom Na Tong';
+  src: url('/fonts/so/NomNaTong-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nom Na Tong Light';
+  src: url('/fonts/so/NomNaTong-Light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* HAN NOM A + B (VietUnicode 2005): B bổ sung Extension B */
+@font-face {
+  font-family: 'HAN NOM';
+  src: url('/fonts/so/Han-Nom-A.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HAN NOM';
+  src: url('/fonts/so/Han-Nom-B.ttf') format('truetype');
+  unicode-range: U+20000-2A6DF, U+2A700-2B73F, U+2B740-2B81F, U+2B820-2CEAF;
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HAN NOM A';
+  src: url('/fonts/so/Han-Nom-A.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HAN NOM B';
+  src: url('/fonts/so/Han-Nom-B.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* —— Thư pháp / Hán Trung (SIL OFL, miễn phí thương mại) —— */
+
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('/fonts/so/LXGWWenKai-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW ZhenKai';
+  src: url('/fonts/so/LXGWZhenKai-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Liyu Shoushu';
+  src: url('/fonts/so/LiyuShoushu.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW Neo ZhiSong';
+  src: url('/fonts/so/LXGWNeoZhiSong.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Xuandong Kaishu';
+  src: url('/fonts/so/XuandongKaishu.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ma Shan Zheng';
+  src: url('/fonts/so/MaShanZheng-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Long Cang';
+  src: url('/fonts/so/LongCang-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Liu Jian Mao Cao';
+  src: url('/fonts/so/LiuJianMaoCao-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zhi Mang Xing';
+  src: url('/fonts/so/ZhiMangXing-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ZCOOL XiaoWei';
+  src: url('/fonts/so/ZCOOLXiaoWei-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yuji Boku';
+  src: url('/fonts/so/YujiBoku-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yuji Mai';
+  src: url('/fonts/so/YujiMai-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yuji Syuku';
+  src: url('/fonts/so/YujiSyuku-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Klee One';
+  src: url('/fonts/so/KleeOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Potta One';
+  src: url('/fonts/so/PottaOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Train One';
+  src: url('/fonts/so/TrainOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zen Kurenaido';
+  src: url('/fonts/so/ZenKurenaido-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Shippori Mincho';
+  src: url('/fonts/so/ShipporiMincho-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ZCOOL QingKe HuangYou';
+  src: url('/fonts/so/ZCOOLQingKeHuangYou-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW Heart Serif';
+  src: url('/fonts/so/LXGWHeartSerif.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.so-page,
+.so-page * {
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}

@@ -2,15 +2,210 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { formatVnd } from '@/lib/tenant';
+import { PLATFORM_HQ } from '@/lib/platform-hq';
+import { resolveTempleScope } from '@/lib/temple-scope';
+import { TempleRequiredNotice } from '@/components/admin/TempleRequiredNotice';
 
 function currentMonth(): string {
   const d = new Date();
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
-export default async function AdminHomePage() {
+interface Props {
+  searchParams: Promise<{ temple?: string }>;
+}
+
+export default async function AdminHomePage({ searchParams }: Props) {
   const ctx = await requireAdmin();
-  const templeId = ctx.temples[0]?.id;
+  const sp = await searchParams;
+  const scope = await resolveTempleScope(ctx, sp.temple);
+
+  if (ctx.isSuperAdmin && scope.mode === 'all') {
+    return <SuperAdminDashboard templeCount={ctx.templeCount} />;
+  }
+
+  const templeId = scope.templeId;
+  if (!templeId) {
+    return <TempleRequiredNotice feature="Tổng quan theo chùa" />;
+  }
+
+  return (
+    <TempleDashboard
+      templeId={templeId}
+      templeName={scope.temple?.name ?? ''}
+      isSuperAdmin={ctx.isSuperAdmin}
+    />
+  );
+}
+
+async function SuperAdminDashboard({ templeCount }: { templeCount: number }) {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+
+  const [
+    abbots,
+    devotees,
+    campaigns,
+    upcomingEvents,
+    lowStockSample,
+  ] = await Promise.all([
+    supabase
+      .from('temple_admins')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true)
+      .eq('is_super_admin', false),
+    supabase.from('devotees').select('id', { count: 'exact', head: true }),
+    supabase
+      .from('broadcast_campaigns')
+      .select('id', { count: 'exact', head: true })
+      .gte(
+        'created_at',
+        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      ),
+    supabase
+      .from('temple_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_published', true)
+      .gt('ends_at', now),
+    supabase
+      .from('inventory_items')
+      .select('id, name, quantity_on_hand, reorder_level, temples(name)')
+      .eq('is_active', true)
+      .limit(200),
+  ]);
+
+  const lowStock = (lowStockSample.data ?? []).filter(
+    (i) => Number(i.quantity_on_hand) <= Number(i.reorder_level),
+  );
+
+  const cards = [
+    {
+      label: 'Phật tự đang hoạt động',
+      value: templeCount.toLocaleString('vi-VN'),
+      href: '/quan-tri/chua',
+    },
+    {
+      label: 'Trụ trì / nhân sự',
+      value: (abbots.count ?? 0).toLocaleString('vi-VN'),
+      href: '/quan-tri/thanh-vien',
+    },
+    {
+      label: 'Phật tử toàn hệ',
+      value: (devotees.count ?? 0).toLocaleString('vi-VN'),
+      href: '/quan-tri/phat-tu',
+    },
+    {
+      label: 'Tin nhắn 30 ngày',
+      value: (campaigns.count ?? 0).toLocaleString('vi-VN'),
+      href: '/quan-tri/gui-tin',
+    },
+    {
+      label: 'Sự kiện sắp / đang diễn ra',
+      value: (upcomingEvents.count ?? 0).toLocaleString('vi-VN'),
+      href: '/quan-tri/hoat-dong',
+    },
+    {
+      label: 'Cảnh báo kho (mẫu)',
+      value: String(lowStock.length),
+      href: '/quan-tri/kho',
+    },
+  ];
+
+  return (
+    <div>
+      <h1 className="font-display text-3xl text-ink">{PLATFORM_HQ.title}</h1>
+      <p className="mt-2 text-muted text-sm">
+        {PLATFORM_HQ.monastery} · {PLATFORM_HQ.author} · {PLATFORM_HQ.role}
+      </p>
+      <p className="mt-1 text-sm text-muted">
+        Chỉ huy tổng các Phật tự — chọn một Phật tự trên header khi cần thao tác
+        sâu vào từng nơi.
+      </p>
+
+      <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {cards.map((c) => (
+          <Link
+            key={c.label}
+            href={c.href}
+            className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
+          >
+            <p className="text-[10px] uppercase tracking-widest text-muted">
+              {c.label}
+            </p>
+            <p className="font-display text-2xl text-ink mt-2">{c.value}</p>
+          </Link>
+        ))}
+      </div>
+
+      {lowStock.length > 0 ? (
+        <div className="mt-10">
+          <h2 className="font-display text-xl text-ink">Kho sắp hết (mẫu)</h2>
+          <ul className="mt-4 border border-fog bg-paper divide-y divide-fog">
+            {lowStock.slice(0, 8).map((i) => {
+              const templeName =
+                (i.temples as { name?: string } | null)?.name ?? '—';
+              return (
+                <li
+                  key={i.id}
+                  className="px-4 py-3 text-sm flex justify-between gap-3"
+                >
+                  <span>
+                    <span className="text-muted">{templeName}</span>
+                    <span className="mx-2 text-fog">·</span>
+                    {i.name}
+                  </span>
+                  <span className="tabular-nums text-lacquer">
+                    {i.quantity_on_hand}/{i.reorder_level}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+
+      <div className="mt-10 flex flex-wrap gap-3 text-sm">
+        <Link href="/quan-tri/chua" className="px-4 py-2 bg-ink text-white">
+          Quản lý Phật tự
+        </Link>
+        <Link
+          href="/quan-tri/phat-tu"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Phật tử
+        </Link>
+        <Link
+          href="/quan-tri/kho"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Kho vận
+        </Link>
+        <Link
+          href="/quan-tri/gui-tin"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Tin nhắn
+        </Link>
+        <Link
+          href="/quan-tri/hoat-dong"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Hoạt động
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+async function TempleDashboard({
+  templeId,
+  templeName,
+  isSuperAdmin,
+}: {
+  templeId: string;
+  templeName: string;
+  isSuperAdmin: boolean;
+}) {
   const supabase = await createClient();
   const month = currentMonth();
 
@@ -21,64 +216,59 @@ export default async function AdminHomePage() {
   let devoteeCount = 0;
   let lowStock = 0;
 
-  if (templeId) {
-    const monthStart = `${month}-01T00:00:00Z`;
-    const [y, m] = month.split('-').map(Number);
-    const nextMonth =
-      m === 12
-        ? `${y + 1}-01-01T00:00:00Z`
-        : `${y}-${String(m + 1).padStart(2, '0')}-01T00:00:00Z`;
+  const monthStart = `${month}-01T00:00:00Z`;
+  const [y, m] = month.split('-').map(Number);
+  const nextMonth =
+    m === 12
+      ? `${y + 1}-01-01T00:00:00Z`
+      : `${y}-${String(m + 1).padStart(2, '0')}-01T00:00:00Z`;
 
-    const [pending, paid, ledger, prayers, devotees, inventory] =
-      await Promise.all([
-        supabase
-          .from('water_orders')
-          .select('id', { count: 'exact', head: true })
-          .eq('temple_id', templeId)
-          .eq('status', 'pending_payment'),
-        supabase
-          .from('water_orders')
-          .select('quantity')
-          .eq('temple_id', templeId)
-          .eq('status', 'paid')
-          .gte('paid_at', monthStart)
-          .lt('paid_at', nextMonth),
-        supabase
-          .from('settlement_ledger')
-          .select('amount')
-          .eq('temple_id', templeId)
-          .eq('period_month', month),
-        supabase
-          .from('prayer_requests')
-          .select('id', { count: 'exact', head: true })
-          .eq('temple_id', templeId)
-          .eq('status', 'pending'),
-        supabase
-          .from('devotees')
-          .select('id', { count: 'exact', head: true })
-          .eq('temple_id', templeId),
-        supabase
-          .from('inventory_items')
-          .select('id, quantity_on_hand, reorder_level')
-          .eq('temple_id', templeId)
-          .eq('is_active', true),
-      ]);
+  const [pending, paid, ledger, prayers, devotees, inventory] =
+    await Promise.all([
+      supabase
+        .from('water_orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId)
+        .eq('status', 'pending_payment'),
+      supabase
+        .from('water_orders')
+        .select('quantity')
+        .eq('temple_id', templeId)
+        .eq('status', 'paid')
+        .gte('paid_at', monthStart)
+        .lt('paid_at', nextMonth),
+      supabase
+        .from('settlement_ledger')
+        .select('amount')
+        .eq('temple_id', templeId)
+        .eq('period_month', month),
+      supabase
+        .from('prayer_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId)
+        .eq('status', 'pending'),
+      supabase
+        .from('devotees')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId),
+      supabase
+        .from('inventory_items')
+        .select('id, quantity_on_hand, reorder_level')
+        .eq('temple_id', templeId)
+        .eq('is_active', true),
+    ]);
 
-    pendingCount = pending.count ?? 0;
-    paidQty = (paid.data ?? []).reduce(
-      (s, o) => s + Number(o.quantity),
-      0,
-    );
-    templeShare = (ledger.data ?? []).reduce(
-      (s, e) => s + Number(e.amount),
-      0,
-    );
-    prayerPending = prayers.count ?? 0;
-    devoteeCount = devotees.count ?? 0;
-    lowStock = (inventory.data ?? []).filter(
-      (i) => i.quantity_on_hand <= i.reorder_level,
-    ).length;
-  }
+  pendingCount = pending.count ?? 0;
+  paidQty = (paid.data ?? []).reduce((s, o) => s + Number(o.quantity), 0);
+  templeShare = (ledger.data ?? []).reduce(
+    (s, e) => s + Number(e.amount),
+    0,
+  );
+  prayerPending = prayers.count ?? 0;
+  devoteeCount = devotees.count ?? 0;
+  lowStock = (inventory.data ?? []).filter(
+    (i) => i.quantity_on_hand <= i.reorder_level,
+  ).length;
 
   const cards = [
     {
@@ -113,27 +303,24 @@ export default async function AdminHomePage() {
     },
   ];
 
-  let waterPrice = 0;
-  let hotline = '';
-  if (templeId) {
-    const { data: templeRow } = await supabase
-      .from('temples')
-      .select('water_price_vnd, hotline, contact_links')
-      .eq('id', templeId)
-      .maybeSingle();
-    waterPrice = Number(templeRow?.water_price_vnd ?? 0);
-    const links = templeRow?.contact_links as { phone?: string } | null;
-    hotline =
-      (templeRow?.hotline as string)?.trim() ||
-      links?.phone?.trim() ||
-      '';
-  }
+  const { data: templeRow } = await supabase
+    .from('temples')
+    .select('water_price_vnd, hotline, contact_links')
+    .eq('id', templeId)
+    .maybeSingle();
+  const waterPrice = Number(templeRow?.water_price_vnd ?? 0);
+  const links = templeRow?.contact_links as { phone?: string } | null;
+  const hotline =
+    (templeRow?.hotline as string)?.trim() ||
+    links?.phone?.trim() ||
+    '';
 
   return (
     <div>
       <h1 className="font-display text-3xl text-ink">Tổng quan</h1>
       <p className="mt-2 text-muted text-sm">
-        Tháng {month} · {ctx.temples.map((t) => t.name).join(', ')}
+        Tháng {month} · {templeName}
+        {isSuperAdmin ? ' · ngữ cảnh SuperAdmin' : ''}
       </p>
 
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -149,7 +336,7 @@ export default async function AdminHomePage() {
             <p className="font-display text-2xl text-ink mt-2">{c.value}</p>
           </Link>
         ))}
-        {ctx.isSuperAdmin ? (
+        {isSuperAdmin ? (
           <Link
             href="/quan-tri/don-gia"
             className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"

@@ -25,10 +25,10 @@ export function TuViMarkdown({
           const body = trimmed.replace(/^#{1,6}\s+/, '').replace(/^#{1,6}\s+/, '');
           const size =
             level <= 1
-              ? 'mt-3 mb-1 text-sm font-semibold leading-snug'
+              ? 'mt-3 mb-1 text-base font-semibold leading-snug'
               : level === 2
-                ? 'mt-3 mb-1 text-[0.85rem] font-semibold leading-snug'
-                : 'mt-2.5 mb-1 text-[0.8rem] font-semibold leading-snug';
+                ? 'mt-3 mb-1 text-[0.95rem] font-semibold leading-snug'
+                : 'mt-2.5 mb-1 text-sm font-semibold leading-snug';
           return (
             <p
               key={i}
@@ -47,7 +47,7 @@ export function TuViMarkdown({
           return (
             <p
               key={i}
-              className="pl-3 text-xs leading-relaxed text-ink"
+              className="pl-3 text-sm leading-relaxed text-ink"
               dangerouslySetInnerHTML={{
                 __html: `• ${formatInline(
                   escapeHtml(trimmed.replace(/^[-*•]\s+/, '')),
@@ -60,7 +60,7 @@ export function TuViMarkdown({
         return (
           <p
             key={i}
-            className="text-xs leading-relaxed text-ink"
+            className="text-sm leading-relaxed text-ink"
             dangerouslySetInnerHTML={{ __html: inline }}
           />
         );

@@ -307,9 +307,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tử vi',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
+    status: 'ready',
     description:
-      'Luận giải vận hạn và cung Mệnh (gồm hướng Bắc phái / Nam phái / Phi tinh khi sẵn sàng).',
+      'Luận giải cung Mệnh và lá số theo Bắc phái / Nam phái / Phi tinh (bay tinh giữa các cung).',
   },
   {
     slug: 'xem-han-nam',
@@ -318,18 +318,20 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tử vi',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Xem vận hạn năm (lưu niên) theo lá số.',
+    status: 'ready',
+    description:
+      'Xem vận hạn năm (lưu niên): cung hạn, tứ hóa hạn, đại hạn–tiểu hạn đang đi — không lập lại cả lá số.',
   },
   {
     slug: 'dai-van-han',
     title: 'Đại vận · tiểu vận',
-    subtitle: 'Chu kỳ vận hạn',
+    subtitle: 'Đại hạn · tiểu hạn đang đi',
     category: 'Tử vi',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Theo dõi đại vận và tiểu vận trên lá số.',
+    status: 'ready',
+    description:
+      'Xem đại hạn (đại vận) và tiểu hạn (tiểu vận) đang đi, chu kỳ đại hạn theo tuổi — không lập lại cả lá số.',
   },
   {
     slug: 'lap-bat-tu',
@@ -338,8 +340,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tứ trụ',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Lập Tứ trụ Bát tự từ ngày giờ sinh.',
+    status: 'ready',
+    description:
+      'Lập Tứ trụ Bát tự Tử Bình từ ngày giờ sinh: thập thần, tàng can, nạp âm, trường sinh, không vong, thần sát, thai nguyên · mệnh cung, đại vận · lưu niên · lưu nguyệt — kèm luận giải chuyên sâu.',
   },
   {
     slug: 'nap-am-ngu-hanh',
@@ -348,8 +351,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tứ trụ',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Xác định nạp âm và ngũ hành của Tứ trụ.',
+    status: 'ready',
+    description:
+      'Bấm tứ trụ từ ngày giờ sinh: nạp âm và ngũ hành bốn trụ, mệnh nạp âm, hành vượng–khuyết và luận giải bổ khuyết.',
   },
   {
     slug: 'tim-dung-than',
@@ -358,8 +362,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tứ trụ',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Gợi ý dụng thần hỗ trợ luận mệnh và chọn ngày.',
+    status: 'ready',
+    description:
+      'Cân bát tự theo lệnh tháng và thập thần: thân vượng hay nhược, dụng – hỷ – kỵ thần và ứng dụng màu sắc, hướng, con số, nghề nghiệp.',
   },
   {
     slug: 'hop-tuoi-menh',
@@ -368,8 +373,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tứ trụ',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Xét hợp tuổi, xung khắc giữa các đương sự.',
+    status: 'ready',
+    description:
+      'Xét hợp tuổi hai người theo mệnh nạp âm, thiên can, địa chi (tam hợp · lục xung · hình · hại) và cung phi bát trạch — kèm luận giải và cách hóa giải.',
   },
   {
     slug: 'bat-tu-ha-lac',
@@ -378,8 +384,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tứ trụ',
     domain: 'co_hoc',
     navSection: 'tu_vi_bat_tu',
-    status: 'coming_soon',
-    description: 'Khung Bát tự Hà Lạc.',
+    status: 'ready',
+    description:
+      'Đổi can chi tứ trụ thành thiên số · địa số, hóa quẻ Tiên thiên – Hậu thiên và hào nguyên đường theo Hà Lạc lý số, kèm luận giải chuyên sâu.',
   },
 
   // —— Tham khảo (gom quẻ / thần số / tướng — không đẩy lên đầu) ——
