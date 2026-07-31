@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { supabase } from './supabase';
 
 export interface WaterTransparencyRecent {
@@ -22,7 +23,7 @@ const EMPTY: WaterTransparency = {
   recent: [],
 };
 
-export async function getTempleWaterTransparency(
+async function loadTempleWaterTransparency(
   templeId: string,
 ): Promise<WaterTransparency> {
   const { data, error } = await supabase.rpc('get_temple_water_transparency', {
@@ -51,6 +52,16 @@ export async function getTempleWaterTransparency(
       };
     }),
   };
+}
+
+export async function getTempleWaterTransparency(
+  templeId: string,
+): Promise<WaterTransparency> {
+  return unstable_cache(
+    () => loadTempleWaterTransparency(templeId),
+    ['water-transparency', templeId],
+    { revalidate: 60, tags: [`transparency-${templeId}`] },
+  )();
 }
 
 export function formatPaidAt(iso: string | null): string {

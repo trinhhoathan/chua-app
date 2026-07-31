@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_cache } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { supabase } from '@/lib/supabase';
 import { assertTempleAccess } from '@/lib/auth';
@@ -219,7 +219,7 @@ export async function toggleChantingLive(input: {
 
 export type PublicChantingScope = 'home' | 'go_mo';
 
-export async function getPublicChantingSchedules(
+async function loadPublicChantingSchedules(
   templeId: string,
   scope: PublicChantingScope,
 ): Promise<ChantingSchedule[]> {
@@ -237,4 +237,15 @@ export async function getPublicChantingSchedules(
     if (r.display_scope === 'both') return true;
     return r.display_scope === scope;
   });
+}
+
+export async function getPublicChantingSchedules(
+  templeId: string,
+  scope: PublicChantingScope,
+): Promise<ChantingSchedule[]> {
+  return unstable_cache(
+    () => loadPublicChantingSchedules(templeId, scope),
+    ['chanting-public', templeId, scope],
+    { revalidate: 30, tags: [`chanting-${templeId}`] },
+  )();
 }

@@ -1,10 +1,24 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+/**
+ * Chỉ xác thực Supabase trên khu vực /quan-tri.
+ * Trang public không gọi auth.getUser() — tránh +300–400ms mỗi request
+ * (Vercel US ↔ Supabase).
+ */
 export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-current-domain', host);
+
+  const path = request.nextUrl.pathname;
+  const isAdminArea = path.startsWith('/quan-tri');
+
+  if (!isAdminArea) {
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+  }
 
   let supabaseResponse = NextResponse.next({
     request: { headers: requestHeaders },
@@ -37,11 +51,9 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-  const isAdminArea =
-    path.startsWith('/quan-tri') && !path.startsWith('/quan-tri/dang-nhap');
+  const isLoginPage = path.startsWith('/quan-tri/dang-nhap');
 
-  if (isAdminArea && !user) {
+  if (!isLoginPage && !user) {
     // Allow legacy ADMIN_KEY query for doi-soat during transition.
     const key = request.nextUrl.searchParams.get('key');
     const adminKey = process.env.ADMIN_KEY;
@@ -53,7 +65,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  if (path.startsWith('/quan-tri/dang-nhap') && user) {
+  if (isLoginPage && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/quan-tri';
     url.search = '';
@@ -65,6 +77,9 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Bỏ qua static assets — không chạy proxy (kể cả font viết sớ).
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt|xml|woff2?|ttf|otf|mp3|wav|webm|mp4)$).*)',
   ],
 };

@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { supabase } from './supabase';
 import type { TempleEvent } from '@/types/database';
 
@@ -6,7 +7,7 @@ import type { TempleEvent } from '@/types/database';
  * RLS đã lọc `is_published = true` và `ends_at > now()`.
  * Sắp xếp theo `sort_order` giảm dần rồi `starts_at` tăng dần.
  */
-export async function getUpcomingTempleEvents(
+async function loadUpcomingTempleEvents(
   templeId: string,
 ): Promise<TempleEvent[]> {
   const { data } = await supabase
@@ -17,4 +18,14 @@ export async function getUpcomingTempleEvents(
     .order('starts_at', { ascending: true });
 
   return (data ?? []) as TempleEvent[];
+}
+
+export async function getUpcomingTempleEvents(
+  templeId: string,
+): Promise<TempleEvent[]> {
+  return unstable_cache(
+    () => loadUpcomingTempleEvents(templeId),
+    ['temple-events', templeId],
+    { revalidate: 60, tags: ['temples', `events-${templeId}`] },
+  )();
 }

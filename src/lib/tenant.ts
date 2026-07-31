@@ -1,10 +1,12 @@
+import { cache } from 'react';
 import { headers } from 'next/headers';
 import { unstable_cache } from 'next/cache';
 import { supabase } from './supabase';
 import type { Temple } from '@/types/database';
 import { normalizeContactLinks } from '@/lib/contact-links';
 
-const CACHE_SECONDS = 30;
+/** Cache temple theo domain — đủ dài để trang public nhanh, CMS vẫn revalidateTag. */
+const CACHE_SECONDS = 300;
 
 /**
  * Extract the tenant domain from the current request headers (set by
@@ -62,10 +64,11 @@ export async function getTempleByDomain(
   return cachedLoad(domain);
 }
 
-export async function getCurrentTemple(): Promise<Temple | null> {
+/** Dedupe trong cùng 1 request (layout + page + metadata). */
+export const getCurrentTemple = cache(async (): Promise<Temple | null> => {
   const domain = await getCurrentDomain();
   return getTempleByDomain(domain);
-}
+});
 
 function normalizeTemple(row: Record<string, unknown>): Temple {
   const asArray = (v: unknown) => (Array.isArray(v) ? v : []);
