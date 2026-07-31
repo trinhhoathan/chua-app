@@ -1,9 +1,16 @@
+# Không đẩy dữ liệu nặng / dump local lên Vercel CLI
+so-data
+so-data-gz
+so-data*.zip
+so-data*.tar.gz
+.env*
 apify-*.json
-*-snippet.txt
-maps-*.json
 cms-*.json
+maps-*.json
 bh-*.sql
-bh-sql/
+bh-sql
+*.sql
+!supabase/migrations/**/*.sql
 place-snippet.txt
-scripts/
-*.html
+agent-transcripts
+.cursor
