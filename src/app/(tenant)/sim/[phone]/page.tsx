@@ -2,16 +2,20 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
+import { Suspense } from 'react';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
 import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
 import {
   getSimByPhone,
-  getSimilarSims,
   recordSimView,
   NETWORK_LABELS,
   SIM_PURPOSE_GROUPS,
   SIM_PURPOSES,
 } from '@/lib/sim/catalog';
+import {
+  SimSimilarSection,
+  SimSimilarSkeleton,
+} from '@/components/sim/SimSimilarSection';
 import {
   buildSimDungThan,
   parseBirthParams,
@@ -33,7 +37,6 @@ import { SimActivationHours } from '@/components/sim/SimActivationHours';
 import { SimOrderForm } from '@/components/sim/SimOrderForm';
 import { SimSaleCountdown } from '@/components/sim/SimSaleCountdown';
 import {
-  SimCard,
   SimScoreRing,
   VERDICT_COLORS,
   ELEMENT_BADGE,
@@ -78,7 +81,6 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
   const dungThan = birth ? buildSimDungThan(birth) : null;
   const personal = dungThan ? personalizeSimScore(sim, dungThan, goal) : null;
 
-  const similar = await getSimilarSims(sim);
   const discount = discountPercent(sim);
   const tag = primaryTag(sim);
   const el = ELEMENT_BADGE[sim.element];
@@ -679,30 +681,10 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
         {/* Quẻ Kinh Dịch của sim */}
         <SimKinhDichSection phone={sim.phone} primaryColor={primary} />
 
-        {/* Sim tương tự */}
-        {similar.length > 0 ? (
-          <section className="mt-12">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="font-display text-2xl text-ink">Số tương đương trong kho</h2>
-              <div className="flex items-baseline gap-4">
-                <Link
-                  href={`/sim/so-sanh?so=${[sim.phone, ...similar.slice(0, 2).map((s) => s.phone)].join(',')}`}
-                  className="text-xs text-lacquer underline underline-offset-2"
-                >
-                  So sánh các số này →
-                </Link>
-                <Link href="/sim" className="text-xs text-lacquer underline underline-offset-2">
-                  Xem cả kho →
-                </Link>
-              </div>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {similar.map((s) => (
-                <SimCard key={s.id} sim={s} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        {/* Sim tương tự — stream riêng, không chặn phần luận giải phía trên */}
+        <Suspense fallback={<SimSimilarSkeleton />}>
+          <SimSimilarSection sim={sim} />
+        </Suspense>
       </div>
     </main>
   );

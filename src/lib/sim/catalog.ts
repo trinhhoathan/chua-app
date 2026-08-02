@@ -415,17 +415,58 @@ export interface SimQueryResult {
   pageSize: number;
 }
 
+/** Browse mặc định (không lọc) — dùng exact count đã cache, không estimated. */
+function isBroadBrowse(filters: SimQueryFilters): boolean {
+  return (
+    !filters.q &&
+    !filters.network &&
+    !filters.tag &&
+    !filters.element &&
+    !(filters.elements && filters.elements.length > 0) &&
+    !filters.verdict &&
+    filters.priceMin == null &&
+    filters.priceMax == null &&
+    filters.minScore == null &&
+    !filters.tailYear &&
+    filters.nut == null &&
+    filters.que == null &&
+    !filters.avoid47 &&
+    !filters.purpose &&
+    filters.onlyAvailable !== false &&
+    (!filters.sort || filters.sort === 'score')
+  );
+}
+
+/** Exact COUNT available — cache 5 phút (hiển thị "Tìm thấy N sim" chuẩn khi không lọc). */
+export async function getAvailableSimCount(templeId: string): Promise<number> {
+  return unstable_cache(
+    async () => {
+      const { count, error } = await supabase
+        .from('sim_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId)
+        .eq('status', 'available');
+      if (error) return 0;
+      return count ?? 0;
+    },
+    ['sim-available-count', templeId],
+    { revalidate: 300, tags: ['sims', `sims-${templeId}`] },
+  )();
+}
+
 async function querySimsUncached(
   templeId: string,
   filters: SimQueryFilters,
 ): Promise<SimQueryResult> {
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = Math.min(60, Math.max(6, filters.pageSize ?? 24));
+  const broad = isBroadBrowse(filters);
 
-  // count: 'estimated' — tránh COUNT(*) exact trên ~124k dòng mỗi request
+  // Browse mặc định: không COUNT trong query list (lấy exact song song từ cache).
+  // Có lọc: estimated — tránh COUNT(*) exact đắt trên tập lớn.
   let query = supabase
     .from('sim_listings')
-    .select(SIM_LIST_COLUMNS, { count: 'estimated' })
+    .select(SIM_LIST_COLUMNS, broad ? undefined : { count: 'estimated' })
     .eq('temple_id', templeId);
 
   if (filters.onlyAvailable !== false) {
@@ -511,13 +552,19 @@ async function querySimsUncached(
   }
 
   const from = (page - 1) * pageSize;
-  const { data, count, error } = await query.range(from, from + pageSize - 1);
+  const listPromise = query.range(from, from + pageSize - 1);
+  const exactPromise = broad ? getAvailableSimCount(templeId) : Promise.resolve(null);
+
+  const [{ data, count, error }, exactTotal] = await Promise.all([
+    listPromise,
+    exactPromise,
+  ]);
   if (error) {
     return { sims: [], total: 0, page, pageSize };
   }
   return {
     sims: (data ?? []) as SimListing[],
-    total: count ?? 0,
+    total: exactTotal ?? count ?? 0,
     page,
     pageSize,
   };
@@ -550,15 +597,21 @@ export async function getFeaturedSims(
   templeId: string,
   limit = 8,
 ): Promise<SimListing[]> {
-  const { data } = await supabase
-    .from('sim_listings')
-    .select(SIM_LIST_COLUMNS)
-    .eq('temple_id', templeId)
-    .eq('status', 'available')
-    .order('featured', { ascending: false })
-    .order('overall_score', { ascending: false })
-    .limit(limit);
-  return (data ?? []) as SimListing[];
+  return unstable_cache(
+    async () => {
+      const { data } = await supabase
+        .from('sim_listings')
+        .select(SIM_LIST_COLUMNS)
+        .eq('temple_id', templeId)
+        .eq('status', 'available')
+        .order('featured', { ascending: false })
+        .order('overall_score', { ascending: false })
+        .limit(limit);
+      return (data ?? []) as SimListing[];
+    },
+    ['featured-sims', templeId, String(limit)],
+    { revalidate: 120, tags: ['sims', `sims-${templeId}`] },
+  )();
 }
 
 export async function getSimByPhone(
@@ -594,26 +647,39 @@ export async function recordSimView(
 
 /** Sim tương tự: cùng tầm giá hoặc cùng hành, điểm cao, loại trừ chính nó. */
 export async function getSimilarSims(
-  sim: SimListing,
+  sim: Pick<SimListing, 'id' | 'temple_id' | 'price_vnd' | 'element'>,
   limit = 4,
 ): Promise<SimListing[]> {
-  const { data } = await supabase
-    .from('sim_listings')
-    .select(SIM_LIST_COLUMNS)
-    .eq('temple_id', sim.temple_id)
-    .eq('status', 'available')
-    .neq('id', sim.id)
-    .gte('price_vnd', Math.floor(sim.price_vnd * 0.4))
-    .lte('price_vnd', Math.ceil(sim.price_vnd * 2.5))
-    .order('overall_score', { ascending: false })
-    .limit(limit * 3);
-  const rows = ((data ?? []) as SimListing[]).sort((a, b) => {
-    const aSame = a.element === sim.element ? 1 : 0;
-    const bSame = b.element === sim.element ? 1 : 0;
-    if (aSame !== bSame) return bSame - aSame;
-    return b.overall_score - a.overall_score;
-  });
-  return rows.slice(0, limit);
+  return unstable_cache(
+    async () => {
+      const { data } = await supabase
+        .from('sim_listings')
+        .select(SIM_LIST_COLUMNS)
+        .eq('temple_id', sim.temple_id)
+        .eq('status', 'available')
+        .neq('id', sim.id)
+        .gte('price_vnd', Math.floor(sim.price_vnd * 0.4))
+        .lte('price_vnd', Math.ceil(sim.price_vnd * 2.5))
+        .order('overall_score', { ascending: false })
+        .limit(limit * 3);
+      const rows = ((data ?? []) as SimListing[]).sort((a, b) => {
+        const aSame = a.element === sim.element ? 1 : 0;
+        const bSame = b.element === sim.element ? 1 : 0;
+        if (aSame !== bSame) return bSame - aSame;
+        return b.overall_score - a.overall_score;
+      });
+      return rows.slice(0, limit);
+    },
+    [
+      'similar-sims',
+      sim.temple_id,
+      sim.id,
+      String(sim.price_vnd),
+      sim.element,
+      String(limit),
+    ],
+    { revalidate: 120, tags: ['sims', `sims-${sim.temple_id}`] },
+  )();
 }
 
 /* ------------------------------------------------------------------ */
