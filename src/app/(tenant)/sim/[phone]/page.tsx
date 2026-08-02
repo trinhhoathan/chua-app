@@ -488,104 +488,112 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
 
         {/* Luận giải Âm Dương Ngũ Hành chi tiết */}
         {!('error' in analysis) ? (
-          <section className="mt-10 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-            <div>
-              <h2 className="font-display text-2xl text-ink">
-                Luận giải nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận
-              </h2>
-              <div className="mt-4 space-y-3 text-sm leading-relaxed text-ink/80">
-                {analysis.luanGiai.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
-
-              <div
-                className="mt-5 border-l-2 bg-mist/50 px-4 py-3 text-sm leading-relaxed text-ink/85"
-                style={{ borderColor: primary }}
-              >
-                <span className="font-medium" style={{ color: primary }}>
-                  Lời thầy:
-                </span>{' '}
-                {analysis.advice}
+          <section className="mt-10 grid min-w-0 gap-6 lg:grid-cols-[1.3fr_1fr]">
+            <div className="min-w-0 space-y-5">
+              <div className="min-w-0 border border-fog bg-paper px-4 py-4 md:px-5 md:py-5">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted">
+                  Luận giải tổng hợp
+                </p>
+                <h2 className="mt-1.5 break-words font-display text-xl leading-snug text-ink md:text-2xl">
+                  Nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận
+                </h2>
+                <div className="mt-4 space-y-3 break-words text-sm leading-relaxed text-ink/85">
+                  {analysis.luanGiai.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+                <div
+                  className="mt-5 break-words border-l-2 bg-mist/50 px-4 py-3 text-sm leading-relaxed text-ink/85"
+                  style={{ borderColor: primary }}
+                >
+                  <span className="font-medium" style={{ color: primary }}>
+                    Lời thầy:
+                  </span>{' '}
+                  {analysis.advice}
+                </div>
               </div>
 
               {/* Dòng chảy từ trường */}
-              <h3 className="mt-8 font-display text-xl text-ink">
-                Sơ đồ dòng chảy từ trường
-              </h3>
-              <div className="mt-4">
-                <SimEnergyFlow pairs={analysis.pairs} />
+              <div className="min-w-0 border border-fog bg-paper px-4 py-4 md:px-5">
+                <h3 className="font-display text-xl text-ink">
+                  Sơ đồ dòng chảy từ trường
+                </h3>
+                <div className="mt-4 min-w-0">
+                  <SimEnergyFlow pairs={analysis.pairs} />
+                </div>
               </div>
 
               {/* Cặp quái số */}
-              <h3 className="mt-8 font-display text-xl text-ink">
-                Cấu trúc cặp quái số
-              </h3>
-              <div className="mt-3 w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain border border-fog [-webkit-overflow-scrolling:touch]">
-                <table className="w-full min-w-[28rem] text-left text-xs">
-                  <thead className="bg-mist text-muted">
-                    <tr>
-                      <th className="p-2.5">Cặp số</th>
-                      <th className="p-2.5">Sao</th>
-                      <th className="p-2.5">Cát / Hung</th>
-                      <th className="p-2.5">Chủ về</th>
-                      <th className="p-2.5 text-right">Điểm</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analysis.pairs.map((p, i) => (
-                      <tr key={i} className={`border-t border-fog ${p.isTail ? 'bg-[#B08D42]/8' : ''}`}>
-                        <td className="p-2.5 font-mono text-sm font-semibold text-ink">
-                          {p.label}
-                          {p.isTail ? (
-                            <span className="ml-1 text-[0.6rem] font-normal text-[#B08D42]">đuôi</span>
-                          ) : null}
-                        </td>
-                        <td className="p-2.5 text-ink">
-                          {p.star.nameVi}{' '}
-                          <span className="text-muted">({p.star.nameHan})</span>
-                        </td>
-                        <td className="p-2.5">
-                          <span
-                            className="px-1.5 py-0.5 text-[0.62rem] font-medium text-white"
-                            style={{
-                              backgroundColor: p.star.kind === 'cat' ? '#1B6B3A' : '#9b3535',
-                            }}
-                          >
-                            {p.star.kind === 'cat' ? 'Cát' : 'Hung'}
-                          </span>
-                        </td>
-                        <td className="p-2.5 text-muted">{p.star.chuVe}</td>
-                        <td className="p-2.5 text-right font-medium text-ink">
-                          {Math.round(p.effectiveScore)}
-                        </td>
+              <div className="min-w-0 border border-fog bg-paper px-4 py-4 md:px-5">
+                <h3 className="font-display text-xl text-ink">
+                  Cấu trúc cặp quái số
+                </h3>
+                <div className="mt-3 w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain border border-fog [-webkit-overflow-scrolling:touch]">
+                  <table className="w-full min-w-[28rem] text-left text-xs">
+                    <thead className="bg-mist text-muted">
+                      <tr>
+                        <th className="p-2.5">Cặp số</th>
+                        <th className="p-2.5">Sao</th>
+                        <th className="p-2.5">Cát / Hung</th>
+                        <th className="p-2.5">Chủ về</th>
+                        <th className="p-2.5 text-right">Điểm</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {analysis.combos.length > 0 ? (
-                <div className="mt-4 space-y-2">
-                  {analysis.combos.map((c, i) => (
-                    <div
-                      key={i}
-                      className="border border-fog bg-paper px-3 py-2.5 text-xs leading-relaxed"
-                    >
-                      <span
-                        className="mr-1.5 font-semibold"
-                        style={{ color: c.kind === 'hung' ? '#9b3535' : '#1B6B3A' }}
-                      >
-                        {c.title}
-                      </span>
-                      <span className="text-muted">{c.detail}</span>
-                    </div>
-                  ))}
+                    </thead>
+                    <tbody>
+                      {analysis.pairs.map((p, i) => (
+                        <tr key={i} className={`border-t border-fog ${p.isTail ? 'bg-[#B08D42]/8' : ''}`}>
+                          <td className="p-2.5 font-mono text-sm font-semibold text-ink">
+                            {p.label}
+                            {p.isTail ? (
+                              <span className="ml-1 text-[0.6rem] font-normal text-[#B08D42]">đuôi</span>
+                            ) : null}
+                          </td>
+                          <td className="p-2.5 text-ink">
+                            {p.star.nameVi}{' '}
+                            <span className="text-muted">({p.star.nameHan})</span>
+                          </td>
+                          <td className="p-2.5">
+                            <span
+                              className="px-1.5 py-0.5 text-[0.62rem] font-medium text-white"
+                              style={{
+                                backgroundColor: p.star.kind === 'cat' ? '#1B6B3A' : '#9b3535',
+                              }}
+                            >
+                              {p.star.kind === 'cat' ? 'Cát' : 'Hung'}
+                            </span>
+                          </td>
+                          <td className="p-2.5 text-muted">{p.star.chuVe}</td>
+                          <td className="p-2.5 text-right font-medium text-ink">
+                            {Math.round(p.effectiveScore)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ) : null}
+
+                {analysis.combos.length > 0 ? (
+                  <div className="mt-4 space-y-2">
+                    {analysis.combos.map((c, i) => (
+                      <div
+                        key={i}
+                        className="border border-fog bg-mist/40 px-3 py-2.5 text-xs leading-relaxed"
+                      >
+                        <span
+                          className="mr-1.5 font-semibold"
+                          style={{ color: c.kind === 'hung' ? '#9b3535' : '#1B6B3A' }}
+                        >
+                          {c.title}
+                        </span>
+                        <span className="text-muted">{c.detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="min-w-0 space-y-5">
               {/* 81 số lý */}
               <div className="border border-fog bg-paper p-5">
                 <p className="text-[0.68rem] uppercase tracking-[0.25em] text-muted">
