@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
@@ -167,7 +166,12 @@ export default async function SimReportPage({ params, searchParams }: Props) {
             margin: 0 !important;
             padding: 0 !important;
           }
-          header, footer, [data-print-hide], .print\\:hidden { display: none !important; }
+          /* Chỉ ẩn chrome site — KHÔNG ẩn banner logo trong tờ báo cáo */
+          header:not(.sim-report-header),
+          footer,
+          [data-print-hide],
+          .print\\:hidden { display: none !important; }
+          .sim-report-header { display: block !important; }
           main { padding: 0 !important; margin: 0 !important; background: #fff !important; }
           .sim-report-wrap { max-width: none !important; padding: 0 !important; margin: 0 !important; }
           .sim-report {
@@ -224,17 +228,17 @@ export default async function SimReportPage({ params, searchParams }: Props) {
             className="sim-report-inner m-1.5 min-w-0 overflow-x-hidden border px-3.5 py-6 sm:px-6 md:px-9 md:py-7 print:m-0 print:border-0 print:px-0 print:py-0"
             style={{ borderColor: GOLD }}
           >
-            {/* Banner header */}
-            <header className="text-center print:break-inside-avoid">
+            {/* Banner header — class sim-report-header để CSS @media print không ẩn nhầm */}
+            <header className="sim-report-header text-center print:break-inside-avoid">
               <div className="mx-auto mb-2.5 flex justify-center">
-                <Image
+                {/* img thuần: một số trình duyệt in PDF bỏ qua next/image */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={LY_GIA.logoOrb}
                   alt={LY_GIA.name}
                   width={72}
                   height={72}
                   className="size-[72px] object-contain"
-                  unoptimized
-                  priority
                 />
               </div>
               <p className="text-[0.62rem] uppercase tracking-[0.4em]" style={{ color: GOLD }}>
