@@ -160,7 +160,7 @@ export default async function SimReportPage({ params, searchParams }: Props) {
       <style>{`
         .sim-report { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
         @media print {
-          @page { size: A4; margin: 16mm 14mm; }
+          @page { size: A4; margin: 12mm 12mm; }
           html, body {
             background: #fff !important;
             margin: 0 !important;
@@ -173,33 +173,80 @@ export default async function SimReportPage({ params, searchParams }: Props) {
           .print\\:hidden { display: none !important; }
           .sim-report-header { display: block !important; }
           main { padding: 0 !important; margin: 0 !important; background: #fff !important; }
-          .sim-report-wrap { max-width: none !important; padding: 0 !important; margin: 0 !important; }
+          .sim-report-wrap {
+            max-width: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+          }
           .sim-report {
             border: none !important;
             box-shadow: none !important;
             margin: 0 !important;
             max-width: none !important;
             background: #fff !important;
+            overflow: visible !important;
           }
           .sim-report-inner {
             border: none !important;
             margin: 0 !important;
             padding: 0 !important;
+            overflow: visible !important;
           }
-          /* Chỉ tránh cắt các khối nhỏ — section dài (phần 1) không avoid
-             kẻo bị đẩy cả khối sang trang sau, để trống nửa trang. */
+
+          /* Tiêu đề luôn dính với khối ngay dưới — không để trơ trên cuối trang */
           .sim-report .section-heading {
-            break-after: avoid;
-            page-break-after: avoid;
+            break-after: avoid !important;
+            page-break-after: avoid !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
           }
+
+          /* Khối nguyên tử: không cắt giữa trang */
           .sim-report .print-keep {
             break-inside: avoid !important;
             page-break-inside: avoid !important;
             -webkit-column-break-inside: avoid;
           }
-          /* Grid 3 quẻ: giữ hàng liền, không cắt giữa hình và tên */
+
+          /* Hình / SVG không bị cắt đôi */
+          .sim-report img,
+          .sim-report svg {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            max-width: 100% !important;
+            height: auto !important;
+          }
+
+          /* Phần 1: xếp dọc khi in cho dễ giữ tiêu đề + radar liền khối */
+          .sim-report .print-stack {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+          }
+          .sim-report .print-radar {
+            max-width: 210px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          .sim-report .print-radar svg {
+            max-width: 210px !important;
+          }
+
+          /* Thu hẹp khoảng cách dọc để vừa trang hơn, giảm cắt */
+          .sim-report .mt-7 { margin-top: 0.9rem !important; }
+          .sim-report .mt-6 { margin-top: 0.75rem !important; }
+          .sim-report .mt-5 { margin-top: 0.65rem !important; }
+          .sim-report .mt-4 { margin-top: 0.55rem !important; }
+          .sim-report .mt-3\\.5 { margin-top: 0.45rem !important; }
+
+          /* Bảng: cho phép cắt theo hàng, không cắt giữa ô */
+          .sim-report table { break-inside: auto; }
+          .sim-report tr { break-inside: avoid; page-break-inside: avoid; }
+          .sim-report thead { display: table-header-group; }
+
           .sim-report .print-keep.grid {
-            display: grid;
+            display: grid !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
           }
@@ -228,85 +275,87 @@ export default async function SimReportPage({ params, searchParams }: Props) {
             className="sim-report-inner m-1.5 min-w-0 overflow-x-hidden border px-3.5 py-6 sm:px-6 md:px-9 md:py-7 print:m-0 print:border-0 print:px-0 print:py-0"
             style={{ borderColor: GOLD }}
           >
-            {/* Banner header — class sim-report-header để CSS @media print không ẩn nhầm */}
-            <header className="sim-report-header text-center print:break-inside-avoid">
-              <div className="mx-auto mb-2.5 flex justify-center">
-                {/* img thuần: một số trình duyệt in PDF bỏ qua next/image */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={LY_GIA.logoOrb}
-                  alt={LY_GIA.name}
-                  width={72}
-                  height={72}
-                  className="size-[72px] object-contain"
-                />
-              </div>
-              <p className="text-[0.62rem] uppercase tracking-[0.4em]" style={{ color: GOLD }}>
-                Lý Gia Phúc An · Kiến tạo vận mệnh
-              </p>
-              <h1 className="mt-1.5 font-display text-2xl leading-tight text-ink md:text-[1.7rem]">
-                BÁO CÁO LUẬN GIẢI PHONG THỦY SIM
-              </h1>
-              <p className="mt-1 text-[0.7rem] text-muted">
-                Văn phòng tư vấn phong thủy — {LY_GIA.address} · {LY_GIA.phoneDisplay} · {LY_GIA.website}
-              </p>
-              <div
-                className="mt-3.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 border-y py-2 text-[0.72rem]"
-                style={{ borderColor: `${GOLD}66` }}
-              >
-                <span className="text-muted">
-                  Hồ sơ: <span className="font-semibold text-ink">{code}</span>
-                </span>
-                <span className="text-muted">
-                  Ngày lập: <span className="font-semibold text-ink">{dateLabel}</span>
-                </span>
-                <span className="text-muted">
-                  Nhà mạng:{' '}
-                  <span className="font-semibold text-ink">
-                    {NETWORK_LABELS[sim.network] ?? sim.network}
-                  </span>
-                </span>
-                <span className="text-muted">
-                  Ngũ hành: <span className="font-semibold" style={{ color: el.color }}>{el.label}</span>
-                </span>
-              </div>
-            </header>
-
-            {/* Tổng quan sim */}
-            <section className="print-keep mt-5 flex flex-wrap items-center justify-between gap-4 border border-fog bg-mist/40 px-5 py-4">
-              <div>
-                <p className="text-[0.65rem] uppercase tracking-[0.25em] text-muted">Số thẩm định</p>
-                <p className="mt-0.5 font-display text-3xl tracking-wide text-ink md:text-4xl">
-                  {sim.phone_display}
-                </p>
-                <p className="mt-1 text-[0.72rem] text-muted">
-                  Giá niêm yết {formatVnd(sim.price_vnd)} · chỉ ≈{' '}
-                  <span className="font-semibold text-ink">{perDay.toLocaleString('vi-VN')}đ/ngày</span>{' '}
-                  khi dùng 10 năm
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <SimScoreRing score={sim.overall_score} size={72} />
-                <div>
-                  <p className="font-display text-xl" style={{ color: VERDICT_COLORS[sim.verdict] }}>
-                    {verdictLabel(sim.verdict)}
-                  </p>
-                  <p className="text-[0.7rem] text-muted">{sim.overall_score}/100 điểm tổng hợp</p>
-                  {rank && kd ? (
-                    <p className="mt-0.5 text-[0.7rem] font-medium" style={{ color: rank.color }}>
-                      Quẻ {kd.primary.nameVi} · {rank.label}
-                    </p>
-                  ) : null}
+            {/* Trang đầu: logo + tiêu đề + số thẩm định — giữ liền khi in */}
+            <div className="print-keep">
+              <header className="sim-report-header text-center">
+                <div className="mx-auto mb-2.5 flex justify-center">
+                  {/* img thuần: một số trình duyệt in PDF bỏ qua next/image */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={LY_GIA.logoOrb}
+                    alt={LY_GIA.name}
+                    width={72}
+                    height={72}
+                    className="size-[72px] object-contain"
+                  />
                 </div>
-              </div>
-            </section>
+                <p className="text-[0.62rem] uppercase tracking-[0.4em]" style={{ color: GOLD }}>
+                  Lý Gia Phúc An · Kiến tạo vận mệnh
+                </p>
+                <h1 className="mt-1.5 font-display text-2xl leading-tight text-ink md:text-[1.7rem]">
+                  BÁO CÁO LUẬN GIẢI PHONG THỦY SIM
+                </h1>
+                <p className="mt-1 text-[0.7rem] text-muted">
+                  Văn phòng tư vấn phong thủy — {LY_GIA.address} · {LY_GIA.phoneDisplay} · {LY_GIA.website}
+                </p>
+                <div
+                  className="mt-3.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 border-y py-2 text-[0.72rem]"
+                  style={{ borderColor: `${GOLD}66` }}
+                >
+                  <span className="text-muted">
+                    Hồ sơ: <span className="font-semibold text-ink">{code}</span>
+                  </span>
+                  <span className="text-muted">
+                    Ngày lập: <span className="font-semibold text-ink">{dateLabel}</span>
+                  </span>
+                  <span className="text-muted">
+                    Nhà mạng:{' '}
+                    <span className="font-semibold text-ink">
+                      {NETWORK_LABELS[sim.network] ?? sim.network}
+                    </span>
+                  </span>
+                  <span className="text-muted">
+                    Ngũ hành: <span className="font-semibold" style={{ color: el.color }}>{el.label}</span>
+                  </span>
+                </div>
+              </header>
 
-            {/* ===== Phần 1: Bát Tự + phổ điểm ===== */}
+              <section className="mt-5 flex flex-wrap items-center justify-between gap-4 border border-fog bg-mist/40 px-5 py-4">
+                <div>
+                  <p className="text-[0.65rem] uppercase tracking-[0.25em] text-muted">Số thẩm định</p>
+                  <p className="mt-0.5 font-display text-3xl tracking-wide text-ink md:text-4xl">
+                    {sim.phone_display}
+                  </p>
+                  <p className="mt-1 text-[0.72rem] text-muted">
+                    Giá niêm yết {formatVnd(sim.price_vnd)} · chỉ ≈{' '}
+                    <span className="font-semibold text-ink">{perDay.toLocaleString('vi-VN')}đ/ngày</span>{' '}
+                    khi dùng 10 năm
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <SimScoreRing score={sim.overall_score} size={72} />
+                  <div>
+                    <p className="font-display text-xl" style={{ color: VERDICT_COLORS[sim.verdict] }}>
+                      {verdictLabel(sim.verdict)}
+                    </p>
+                    <p className="text-[0.7rem] text-muted">{sim.overall_score}/100 điểm tổng hợp</p>
+                    {rank && kd ? (
+                      <p className="mt-0.5 text-[0.7rem] font-medium" style={{ color: rank.color }}>
+                        Quẻ {kd.primary.nameVi} · {rank.label}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* ===== Phần 1: Bát Tự + phổ điểm — tiêu đề + radar + luận giữ liền ===== */}
             <section className="mt-6">
+              <div className="print-keep">
               <SectionHeading no="1" title="Bát Tự Dụng Thần & Phổ Điểm 5 Phương Diện" primary={primary} />
-              <div className="mt-4 grid gap-5 md:grid-cols-[1fr_1.1fr]">
-                <div className="flex items-center justify-center">
-                  <SimRadarChart axes={radarAxes} color={primary} size={280} />
+              <div className="print-stack mt-4 grid gap-5 md:grid-cols-[1fr_1.1fr]">
+                <div className="print-radar flex items-center justify-center">
+                  <SimRadarChart axes={radarAxes} color={primary} size={240} />
                 </div>
                 <div className="space-y-3 text-sm leading-relaxed">
                   {dungThan && personal && birth ? (
@@ -395,6 +444,7 @@ export default async function SimReportPage({ params, searchParams }: Props) {
                   </div>
                 </div>
               </div>
+              </div>
 
               {/* Hợp mục đích sâu — giống trang chi tiết sim */}
               <div className="print-keep mt-5 border border-fog bg-mist/30 px-4 py-4">
@@ -449,9 +499,11 @@ export default async function SimReportPage({ params, searchParams }: Props) {
 
             {/* ===== Phần 2: Du Niên + mật mã tài phú ===== */}
             <section className="mt-7">
-              <SectionHeading no="2" title="Bảng Bát Cực Du Niên & Dòng Chảy Từ Trường" primary={primary} />
-              <div className="mt-4">
-                <SimEnergyFlow pairs={analysis.pairs} compact />
+              <div className="print-keep">
+                <SectionHeading no="2" title="Bảng Bát Cực Du Niên & Dòng Chảy Từ Trường" primary={primary} />
+                <div className="mt-4">
+                  <SimEnergyFlow pairs={analysis.pairs} compact />
+                </div>
               </div>
               <div className="mt-4 w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain border border-fog [-webkit-overflow-scrolling:touch]">
                 <table className="w-full min-w-[28rem] text-left text-[0.72rem]">
@@ -554,43 +606,44 @@ export default async function SimReportPage({ params, searchParams }: Props) {
             ) : null}
 
             {/* ===== Phần 4: Hóa giải hung tinh ===== */}
-            <section className="mt-7">
+            <section className="print-keep mt-7">
               <SectionHeading no="4" title="Mẹo Hóa Giải Hung Tinh & Ép Hung Phát Cát" primary={primary} />
               <SimHoaGiaiSection hoaGiai={hoaGiai} primaryColor={primary} compact />
             </section>
 
             {/* ===== Phần 5: Khai sim + chứng nhận ===== */}
             <section className="mt-7">
-              <SectionHeading no="5" title="Quy Trình 3 Bước Khai Sim & Chứng Nhận Thẩm Định" primary={primary} />
+              <div className="print-keep">
+                <SectionHeading no="5" title="Quy Trình 3 Bước Khai Sim & Chứng Nhận Thẩm Định" primary={primary} />
+                <ol className="mt-4 space-y-2.5 text-[0.8rem] leading-relaxed text-ink/85">
+                  <li className="flex gap-2.5">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>1</span>
+                    <span>
+                      <span className="font-semibold text-ink">Dẫn khí {elementLabel(sim.element)}:</span>{' '}
+                      {ELEMENT_ACTIVATION[sim.element]}
+                    </span>
+                  </li>
+                  <li className="flex gap-2.5">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>2</span>
+                    <span>
+                      <span className="font-semibold text-ink">Khai sim giờ hoàng đạo:</span>{' '}
+                      thực hiện cuộc gọi đầu tiên vào khung giờ hoàng đạo bên dưới (thầy chọn lại đích danh
+                      theo Bát Tự khi giao sim — miễn phí).
+                    </span>
+                  </li>
+                  <li className="flex gap-2.5">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>3</span>
+                    <span>
+                      <span className="font-semibold text-ink">Luân chuyển trường khí:</span>{' '}
+                      đuôi sim ({analysis.tail.last3}) đóng{' '}
+                      {analysis.tail.star ? `${analysis.tail.star.nameVi} — ${analysis.tail.star.chuVe.toLowerCase()}` : 'phần khí quyết định'}
+                      ; ưu tiên dùng số này cho các cuộc gọi giao dịch lớn, đối tác quan trọng để nhận trợ lực tốt nhất.
+                    </span>
+                  </li>
+                </ol>
+              </div>
 
-              <ol className="mt-4 space-y-2.5 text-[0.8rem] leading-relaxed text-ink/85">
-                <li className="flex gap-2.5">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>1</span>
-                  <span>
-                    <span className="font-semibold text-ink">Dẫn khí {elementLabel(sim.element)}:</span>{' '}
-                    {ELEMENT_ACTIVATION[sim.element]}
-                  </span>
-                </li>
-                <li className="flex gap-2.5">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>2</span>
-                  <span>
-                    <span className="font-semibold text-ink">Khai sim giờ hoàng đạo:</span>{' '}
-                    thực hiện cuộc gọi đầu tiên vào khung giờ hoàng đạo bên dưới (thầy chọn lại đích danh
-                    theo Bát Tự khi giao sim — miễn phí).
-                  </span>
-                </li>
-                <li className="flex gap-2.5">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>3</span>
-                  <span>
-                    <span className="font-semibold text-ink">Luân chuyển trường khí:</span>{' '}
-                    đuôi sim ({analysis.tail.last3}) đóng{' '}
-                    {analysis.tail.star ? `${analysis.tail.star.nameVi} — ${analysis.tail.star.chuVe.toLowerCase()}` : 'phần khí quyết định'}
-                    ; ưu tiên dùng số này cho các cuộc gọi giao dịch lớn, đối tác quan trọng để nhận trợ lực tốt nhất.
-                  </span>
-                </li>
-              </ol>
-
-              <div className="mt-4">
+              <div className="print-keep mt-4">
                 <SimActivationHours birthYear={birthYear} primaryColor={primary} compact />
               </div>
 
