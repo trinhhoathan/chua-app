@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { after } from 'next/server';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
 import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
 import {
@@ -64,7 +65,10 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
   const sim = await getSimByPhone(temple.id, phone);
   if (!sim) notFound();
 
-  await recordSimView(temple.id, sim.phone);
+  // Đếm view không chặn TTFB — chạy sau khi response đã gửi
+  after(() => {
+    void recordSimView(temple.id, sim.phone);
+  });
 
   const birth = parseBirthParams(sp);
   const goal = parseGoal(sp.mt);

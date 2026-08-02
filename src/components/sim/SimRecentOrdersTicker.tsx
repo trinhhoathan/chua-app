@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { getRecentSimOrders } from '@/lib/sim/recent-orders';
 
 function maskName(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -25,28 +25,7 @@ function timeAgo(iso: string): string {
  * Server component; im lặng nếu thiếu service role hoặc chưa có đơn.
  */
 export async function SimRecentOrdersTicker({ templeId }: { templeId: string }) {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
-
-  let rows: Array<{
-    customer_name: string;
-    customer_phone: string;
-    phone_display: string;
-    created_at: string;
-  }> = [];
-  try {
-    const admin = getSupabaseAdmin();
-    const { data } = await admin
-      .from('sim_orders')
-      .select('customer_name, customer_phone, phone_display, created_at')
-      .eq('temple_id', templeId)
-      .neq('status', 'cancelled')
-      .order('created_at', { ascending: false })
-      .limit(8);
-    rows = data ?? [];
-  } catch {
-    return null;
-  }
-
+  const rows = await getRecentSimOrders(templeId);
   if (rows.length === 0) return null;
 
   return (

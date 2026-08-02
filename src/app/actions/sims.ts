@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { supabase } from '@/lib/supabase';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
@@ -130,6 +130,7 @@ export async function createSimOrder(
 
   revalidatePath('/sim');
   revalidatePath('/quan-tri/sim');
+  revalidateTag('sims', 'max');
   return { ok: true, orderCode };
 }
 

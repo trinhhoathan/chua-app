@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { assertTempleAccess, getAdminDb } from '@/lib/auth';
 import {
   buildSimScorePayload,
@@ -28,6 +28,7 @@ function revalidateSimPaths() {
   revalidatePath('/quan-tri/sim/don-hang');
   revalidatePath('/sim');
   revalidatePath('/');
+  revalidateTag('sims', 'max');
 }
 
 /* ------------------------------------------------------------------ */

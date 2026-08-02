@@ -3,8 +3,13 @@
  * parse cú pháp tìm kiếm 090*8888 và truy vấn danh sách sim.
  */
 
+import { unstable_cache } from 'next/cache';
 import { supabase } from '@/lib/supabase';
 import type { SimElement, SimListing } from '@/types/database';
+
+/** Cột đủ cho card kho + cá nhân hóa Bát Tự — bỏ description/star_summary nặng. */
+const SIM_LIST_COLUMNS =
+  'id,temple_id,phone,phone_display,network,tags,element,price_vnd,original_price_vnd,overall_score,verdict,nut,status,sale_ends_at,aspects,featured,que_number,created_at';
 
 /* ------------------------------------------------------------------ */
 /* Nhà mạng                                                            */
@@ -410,16 +415,17 @@ export interface SimQueryResult {
   pageSize: number;
 }
 
-export async function querySims(
+async function querySimsUncached(
   templeId: string,
-  filters: SimQueryFilters = {},
+  filters: SimQueryFilters,
 ): Promise<SimQueryResult> {
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = Math.min(60, Math.max(6, filters.pageSize ?? 24));
 
+  // count: 'estimated' — tránh COUNT(*) exact trên ~124k dòng mỗi request
   let query = supabase
     .from('sim_listings')
-    .select('*', { count: 'exact' })
+    .select(SIM_LIST_COLUMNS, { count: 'estimated' })
     .eq('temple_id', templeId);
 
   if (filters.onlyAvailable !== false) {
@@ -517,6 +523,28 @@ export async function querySims(
   };
 }
 
+/** Cache kết quả kho 90s — view mặc định / filter phổ biến không đập DB mỗi click. */
+export async function querySims(
+  templeId: string,
+  filters: SimQueryFilters = {},
+): Promise<SimQueryResult> {
+  const page = Math.max(1, filters.page ?? 1);
+  const pageSize = Math.min(60, Math.max(6, filters.pageSize ?? 24));
+  const normalized: SimQueryFilters = {
+    ...filters,
+    page,
+    pageSize,
+    elements: filters.elements ? [...filters.elements].sort() : undefined,
+  };
+  const cacheKey = JSON.stringify(normalized);
+
+  return unstable_cache(
+    () => querySimsUncached(templeId, normalized),
+    ['query-sims', templeId, cacheKey],
+    { revalidate: 90, tags: ['sims', `sims-${templeId}`] },
+  )();
+}
+
 /** Sim nổi bật cho trang chủ / khối đề xuất. */
 export async function getFeaturedSims(
   templeId: string,
@@ -524,7 +552,7 @@ export async function getFeaturedSims(
 ): Promise<SimListing[]> {
   const { data } = await supabase
     .from('sim_listings')
-    .select('*')
+    .select(SIM_LIST_COLUMNS)
     .eq('temple_id', templeId)
     .eq('status', 'available')
     .order('featured', { ascending: false })
@@ -571,7 +599,7 @@ export async function getSimilarSims(
 ): Promise<SimListing[]> {
   const { data } = await supabase
     .from('sim_listings')
-    .select('*')
+    .select(SIM_LIST_COLUMNS)
     .eq('temple_id', sim.temple_id)
     .eq('status', 'available')
     .neq('id', sim.id)
