@@ -152,7 +152,7 @@ export default async function SimReportPage({ params, searchParams }: Props) {
   const rank = kd ? QUE_RANK_META[kd.interpretation.rank] : null;
 
   return (
-    <main className="bg-mist/60 pt-20 pb-20 print:bg-white print:p-0 print:pt-0 print:pb-0">
+    <main className="overflow-x-hidden bg-mist/60 pt-20 pb-20 print:bg-white print:p-0 print:pt-0 print:pb-0">
       {/*
         In ấn: KHÔNG dùng khung viền bao cả báo cáo dài nhiều trang —
         Chrome cắt khung giữa trang → mất lề, trông xấu.
@@ -202,10 +202,10 @@ export default async function SimReportPage({ params, searchParams }: Props) {
         }
       `}</style>
 
-      <div className="sim-report-wrap mx-auto max-w-[820px] px-3 md:px-0">
+      <div className="sim-report-wrap mx-auto min-w-0 max-w-[820px] overflow-x-hidden px-3 md:px-0">
         {/* Thanh thao tác — không in */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
-          <nav className="text-xs text-muted">
+        <div className="mb-4 flex min-w-0 flex-wrap items-center justify-between gap-3 print:hidden">
+          <nav className="min-w-0 text-xs text-muted">
             <Link href="/sim" className="hover:text-ink">Kho sim</Link>
             <span className="mx-1.5">/</span>
             <Link href={`/sim/${sim.phone}`} className="hover:text-ink">{sim.phone_display}</Link>
@@ -217,11 +217,11 @@ export default async function SimReportPage({ params, searchParams }: Props) {
 
         {/* ====== TỜ BÁO CÁO ====== */}
         <div
-          className="sim-report border-4 bg-paper shadow-[0_24px_60px_-24px_rgba(0,0,0,0.35)] print:border-0 print:shadow-none"
+          className="sim-report min-w-0 overflow-x-hidden border-4 bg-paper shadow-[0_24px_60px_-24px_rgba(0,0,0,0.35)] print:border-0 print:shadow-none"
           style={{ borderColor: primary }}
         >
           <div
-            className="sim-report-inner m-1.5 border px-6 py-7 md:px-9 print:m-0 print:border-0 print:px-0 print:py-0"
+            className="sim-report-inner m-1.5 min-w-0 overflow-x-hidden border px-3.5 py-6 sm:px-6 md:px-9 md:py-7 print:m-0 print:border-0 print:px-0 print:py-0"
             style={{ borderColor: GOLD }}
           >
             {/* Banner header */}
@@ -449,8 +449,8 @@ export default async function SimReportPage({ params, searchParams }: Props) {
               <div className="mt-4">
                 <SimEnergyFlow pairs={analysis.pairs} compact />
               </div>
-              <div className="mt-4 overflow-x-auto border border-fog">
-                <table className="w-full text-left text-[0.72rem]">
+              <div className="mt-4 w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain border border-fog [-webkit-overflow-scrolling:touch]">
+                <table className="w-full min-w-[28rem] text-left text-[0.72rem]">
                   <thead className="bg-mist text-muted">
                     <tr>
                       <th className="p-2">Cặp số</th>

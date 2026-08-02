@@ -155,12 +155,12 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
   ];
 
   return (
-    <main className="pt-20 pb-24 md:pt-24">
+    <main className="overflow-x-hidden pt-20 pb-24 md:pt-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="mx-auto min-w-0 max-w-6xl px-4 md:px-6">
         {/* Breadcrumb */}
         <nav className="py-4 text-xs text-muted">
           <Link href="/" className="hover:text-ink">Trang chủ</Link>
@@ -521,8 +521,8 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
               <h3 className="mt-8 font-display text-xl text-ink">
                 Cấu trúc cặp quái số
               </h3>
-              <div className="mt-3 overflow-x-auto border border-fog">
-                <table className="w-full text-left text-xs">
+              <div className="mt-3 w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain border border-fog [-webkit-overflow-scrolling:touch]">
+                <table className="w-full min-w-[28rem] text-left text-xs">
                   <thead className="bg-mist text-muted">
                     <tr>
                       <th className="p-2.5">Cặp số</th>

@@ -73,7 +73,8 @@ export function SimRadarChart({
     <svg
       viewBox={`0 0 ${width} ${height}`}
       width="100%"
-      style={{ maxWidth: width, overflow: 'visible' }}
+      className="mx-auto block h-auto max-w-full"
+      style={{ maxWidth: width }}
       role="img"
       aria-label={`Phổ điểm: ${axes.map((a) => `${a.label} ${a.score}`).join(', ')}`}
     >
