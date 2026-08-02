@@ -117,7 +117,7 @@ export function SimCard({
 
       <Link
         href={href}
-        className="block pr-8 font-display text-[1.55rem] leading-tight tracking-wide text-ink tabular-nums hover:text-lacquer"
+        className="block pr-8 font-display text-[1.8rem] leading-tight tracking-wide text-ink tabular-nums hover:text-lacquer md:text-[1.65rem]"
       >
         {sim.phone_display}
       </Link>
