@@ -124,7 +124,7 @@ export default async function KhoSimPage({ searchParams }: Props) {
   }
 
   return (
-    <main className="pt-20 pb-24 md:pt-24">
+    <main className="overflow-x-hidden pt-20 pb-24 md:pt-24">
       {/* Hero */}
       <section className="bg-ink text-white">
         <div className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-12">

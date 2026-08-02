@@ -59,6 +59,39 @@ body {
   }
 }
 
+/*
+ * iOS Safari: input[type=date] có min-width native rất lớn (đặc biệt khi
+ * font-size bị ép ≥ 16px), dễ đẩy form/trang tràn ngang.
+ */
+input[type='date'],
+input[type='datetime-local'],
+input[type='month'],
+input[type='time'],
+input[type='week'] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@supports (-webkit-touch-callout: none) {
+  input[type='date'],
+  input[type='datetime-local'],
+  input[type='month'],
+  input[type='time'],
+  input[type='week'] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type='date']::-webkit-datetime-edit,
+  input[type='datetime-local']::-webkit-datetime-edit {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
 ::selection {
   background: color-mix(in srgb, var(--lacquer) 25%, white);
 }

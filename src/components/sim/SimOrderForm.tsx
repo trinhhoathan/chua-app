@@ -69,9 +69,9 @@ export function SimOrderForm({
     setSubmitting(false);
   }
 
-  // min-w-0 max-w-full: iOS Safari date/time có min-width native, dễ tràn/chồng ô
+  // min-w-0 max-w-full + appearance-none: iOS Safari date/time dễ tràn ngang
   const inputCls =
-    'box-border h-10 w-full min-w-0 max-w-full border border-fog bg-white px-3 text-sm text-ink outline-none placeholder:text-muted/70 focus:border-lacquer';
+    'box-border h-10 w-full min-w-0 max-w-full appearance-none border border-fog bg-white px-3 text-sm text-ink outline-none placeholder:text-muted/70 focus:border-lacquer';
 
   if (!open && !alwaysOpen) {
     return (

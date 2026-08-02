@@ -61,21 +61,21 @@ export function SimBirthPanel({
 
   return (
     <div
-      className="min-w-0 border bg-paper"
+      className="min-w-0 overflow-x-hidden border bg-paper"
       style={{ borderColor: `${primaryColor}55` }}
     >
       <div
-        className="flex items-center justify-between px-4 py-2.5"
+        className="flex min-w-0 items-center justify-between gap-2 px-4 py-2.5"
         style={{ backgroundColor: `${primaryColor}0d` }}
       >
-        <p className="text-[0.72rem] font-medium uppercase tracking-[0.2em]" style={{ color: primaryColor }}>
+        <p className="min-w-0 truncate text-[0.72rem] font-medium uppercase tracking-[0.2em]" style={{ color: primaryColor }}>
           Tìm sim hợp mệnh theo Bát Tự
         </p>
         {active ? (
           <button
             type="button"
             onClick={clear}
-            className="text-[0.65rem] text-muted underline underline-offset-2 hover:text-ink"
+            className="shrink-0 text-[0.65rem] text-muted underline underline-offset-2 hover:text-ink"
           >
             Bỏ cá nhân hóa
           </button>
@@ -84,9 +84,9 @@ export function SimBirthPanel({
 
       <form
         onSubmit={submit}
-        className="grid min-w-0 gap-2.5 p-4 md:grid-cols-[1.2fr_1fr_0.9fr_0.9fr_1.1fr_auto]"
+        className="grid min-w-0 gap-2.5 overflow-x-hidden p-4 md:grid-cols-[1.2fr_1fr_0.9fr_0.9fr_1.1fr_auto]"
       >
-        <label className="block min-w-0">
+        <label className="block min-w-0 overflow-hidden">
           <span className="mb-1 block text-[0.65rem] text-muted">Ngày sinh</span>
           <input
             type="date"
@@ -95,7 +95,8 @@ export function SimBirthPanel({
             min="1920-01-01"
             max="2026-12-31"
             onChange={(e) => setDate(e.target.value)}
-            className={inputCls}
+            className={`${inputCls} appearance-none`}
+            style={{ WebkitAppearance: 'none' }}
           />
         </label>
         <label className="block min-w-0">
