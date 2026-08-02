@@ -125,295 +125,194 @@ export function checkXungNam(
   };
 }
 
-// ----- Hoàng đạo / Hắc đạo (đơn giản theo chi ngày) -----
-// Simplified: 6 hoàng đạo + 6 hắc đạo cyclic per month.
-// This is a rule-of-thumb approximation; full calculation depends on lunar
-// month + chi day mapping. For Phase 1 we mark Tý/Sửu/Thìn/Tỵ/Mùi/Tuất as
-// hoàng đạo (rough).
-const HOANG_DAO_CHI: Chi[] = ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'];
-
-export function checkHoangDaoDay(
-  dd: number,
-  mm: number,
-  yy: number,
-): RuleResult {
-  const lunar = solarToLunar(dd, mm, yy);
-  const dcc = dayCanChi(lunar.jd);
-  const isHoangDao = HOANG_DAO_CHI.includes(dcc.chi);
-  return {
-    key: 'hoang_dao',
-    label: 'Ngày Hoàng đạo',
-    verdict: isHoangDao ? 'good' : 'caution',
-    detail: isHoangDao
-      ? `Ngày ${dd}/${mm}/${yy} (${dcc.can} ${dcc.chi}) là ngày Hoàng đạo.`
-      : `Ngày ${dd}/${mm}/${yy} (${dcc.can} ${dcc.chi}) không thuộc Hoàng đạo — nên xem xét.`,
-  };
-}
-
-// ----- Bát trạch: cung mệnh + hướng nhà -----
-// Nam: cung mệnh = (10 - (year_sum)) mod 9  (custom rule per luận giải)
-// Nữ: cung mệnh = (5 + year_sum) mod 9
-// Sử dụng bảng giản lược: tính cung mệnh theo năm sinh dương lịch.
-export const CUNG_MENH = [
-  'Khảm',
-  'Ly',
-  'Cấn',
-  'Đoài',
-  'Càn',
-  'Khôn',
-  'Tốn',
-  'Chấn',
-] as const;
-export type CungMenh = (typeof CUNG_MENH)[number];
-
-const DONG_TU = new Set<CungMenh>(['Khảm', 'Ly', 'Chấn', 'Tốn']);
-const TAY_TU = new Set<CungMenh>(['Càn', 'Khôn', 'Cấn', 'Đoài']);
-
-const HUONG_DONG_TU = ['Bắc', 'Nam', 'Đông', 'Đông Nam'];
-const HUONG_TAY_TU = ['Tây', 'Tây Nam', 'Đông Bắc', 'Tây Bắc'];
-
-function sumDigits(n: number): number {
-  let s = 0;
-  let x = Math.abs(n);
-  while (x > 0) {
-    s += x % 10;
-    x = Math.floor(x / 10);
-  }
-  return s > 9 ? sumDigits(s) : s;
-}
-
-export function calcCungMenh(
-  birthYear: number,
-  gender: 'nam' | 'nu',
-): CungMenh {
-  // Simplified: based on the sum-of-digits rule commonly used in Bát trạch.
-  const s = sumDigits(birthYear);
-  const idxMap: Record<'nam' | 'nu', CungMenh[]> = {
-    nam: ['Khảm', 'Ly', 'Cấn', 'Đoài', 'Càn', 'Khôn', 'Tốn', 'Chấn', 'Cấn'],
-    nu: ['Cấn', 'Càn', 'Đoài', 'Cấn', 'Ly', 'Khảm', 'Khôn', 'Chấn', 'Tốn'],
-  };
-  return idxMap[gender][s % 9];
-}
-
-export function goodDirections(
-  cung: CungMenh,
-): { group: 'Đông Tứ Mệnh' | 'Tây Tứ Mệnh'; directions: string[] } {
-  if (DONG_TU.has(cung)) {
-    return { group: 'Đông Tứ Mệnh', directions: HUONG_DONG_TU };
-  }
-  return { group: 'Tây Tứ Mệnh', directions: HUONG_TAY_TU };
-}
-
-export function checkHuongNha(
-  birthYear: number,
-  gender: 'nam' | 'nu',
-): RuleResult {
-  const cung = calcCungMenh(birthYear, gender);
-  const g = goodDirections(cung);
-  return {
-    key: 'huong_nha',
-    label: `Cung mệnh: ${cung} (${g.group})`,
-    verdict: 'good',
-    detail: `Nên chọn nhà hướng: ${g.directions.join(', ')}. Tránh 4 hướng còn lại.`,
-  };
-}
-
-// ----- Trùng tang / Nhập mộ / Thiên di -----
-// Bảng tra 12 địa chi theo chi ngày mất và tuổi thọ (tính theo chi).
-// Rule chuẩn dân gian:
-// - Nam bắt đầu từ Dần, Nữ bắt đầu từ Thân, đếm thuận theo tuổi mụ đến ngày mất.
-// - Vị trí ngày, tháng, năm mất rơi vào các cung:
-//   Tý=Trùng Tang, Sửu=Thiên Di, Dần=Nhập Mộ, Mão=Trùng Tang,
-//   Thìn=Thiên Di, Tỵ=Nhập Mộ, Ngọ=Trùng Tang, Mùi=Thiên Di,
-//   Thân=Nhập Mộ, Dậu=Trùng Tang, Tuất=Thiên Di, Hợi=Nhập Mộ
+// ----- Trùng tang / Nhập mộ / Thiên di — phương pháp 4 bàn đầy đủ -----
+// Khởi cung: nam từ Dần đếm THUẬN, nữ từ Thân đếm NGHỊCH.
+// Bàn tuổi: 10 tuổi tại cung khởi, mỗi cung tiếp 10 tuổi; hết chục đếm lẻ
+// mỗi cung 1 tuổi đến tuổi mụ. Bàn tháng: tháng 1 tại cung KẾ cung tuổi,
+// đếm tiếp đến tháng mất (âm). Bàn ngày: ngày 1 tại cung kế cung tháng.
+// Bàn giờ: giờ Tý tại cung kế cung ngày.
+// Cung rơi: Dần–Thân–Tỵ–Hợi = Trùng Tang; Tý–Ngọ–Mão–Dậu = Thiên Di;
+// Thìn–Tuất–Sửu–Mùi = Nhập Mộ. Một Nhập Mộ hóa giải được Trùng Tang
+// ("nhất mộ sát tam trùng").
 export type TrungTangKind = 'Trùng Tang' | 'Nhập Mộ' | 'Thiên Di';
 
 const CHI_TO_KIND: Record<Chi, TrungTangKind> = {
-  Tý: 'Trùng Tang',
-  Sửu: 'Thiên Di',
-  Dần: 'Nhập Mộ',
-  Mão: 'Trùng Tang',
-  Thìn: 'Thiên Di',
-  Tỵ: 'Nhập Mộ',
-  Ngọ: 'Trùng Tang',
-  Mùi: 'Thiên Di',
-  Thân: 'Nhập Mộ',
-  Dậu: 'Trùng Tang',
-  Tuất: 'Thiên Di',
-  Hợi: 'Nhập Mộ',
+  Dần: 'Trùng Tang',
+  Thân: 'Trùng Tang',
+  Tỵ: 'Trùng Tang',
+  Hợi: 'Trùng Tang',
+  Tý: 'Thiên Di',
+  Ngọ: 'Thiên Di',
+  Mão: 'Thiên Di',
+  Dậu: 'Thiên Di',
+  Thìn: 'Nhập Mộ',
+  Tuất: 'Nhập Mộ',
+  Sửu: 'Nhập Mộ',
+  Mùi: 'Nhập Mộ',
 };
 
 function chiIndex(c: Chi): number {
   return CHI.indexOf(c);
 }
 
+function chiAt(idx: number): Chi {
+  return CHI[((idx % 12) + 12) % 12];
+}
+
+export interface TrungTangBan {
+  key: 'tuoi' | 'thang' | 'ngay' | 'gio';
+  label: string;
+  /** VD "65 tuổi", "tháng 3 âm", "ngày 14 âm", "giờ Dần" */
+  value: string;
+  cungChi: Chi;
+  kind: TrungTangKind;
+}
+
 export interface TrungTangReport {
+  gender: 'nam' | 'nu';
+  /** Tuổi mụ tính theo năm ÂM LỊCH mất */
   ageAtDeath: number;
   dayLunar: string;
-  dayChi: Chi;
-  monthCung: TrungTangKind;
-  dayCung: TrungTangKind;
-  yearCung: TrungTangKind;
-  overall: TrungTangKind | 'Cần cẩn trọng';
+  deathDayCanChi: string;
+  bans: TrungTangBan[];
+  counts: Record<TrungTangKind, number>;
+  overall: 'Trùng Tang' | 'Nhập Mộ' | 'Thiên Di';
+  overallLabel: string;
   suggestion: string;
+  hourProvided: boolean;
 }
 
 /**
- * Bảng trùng tang / nhập mộ / thiên di.
- * Đầu vào là năm sinh + ngày giờ mất (dương lịch) + giới tính.
+ * Bảng trùng tang / nhập mộ / thiên di (4 bàn: tuổi → tháng → ngày → giờ).
+ * Đầu vào: năm sinh (âm lịch) + ngày mất dương lịch + giờ mất (0–23, tùy chọn).
  */
 export function checkTrungTang(input: {
   birthYear: number;
   deathDay: number;
   deathMonth: number;
   deathYear: number;
+  deathHour?: number | null;
   gender: 'nam' | 'nu';
 }): TrungTangReport {
-  const age = tuoiMu(input.birthYear, input.deathYear);
   const lunar = solarToLunar(input.deathDay, input.deathMonth, input.deathYear);
-  const dChi = dayCanChi(lunar.jd).chi;
-  const yChi = yearCanChi(lunar.year).chi;
-  const mChi = CHI[(lunar.month + 1) % 12] as Chi;
+  const age = tuoiMu(input.birthYear, lunar.year);
+  const dcc = dayCanChi(lunar.jd);
 
-  const startChi: Chi = input.gender === 'nam' ? 'Dần' : 'Thân';
-  const startIdx = chiIndex(startChi);
-  const cungMonthIdx = (startIdx + (age - 1)) % 12;
-  const cungMonthChi = CHI[cungMonthIdx] as Chi;
+  const dir = input.gender === 'nam' ? 1 : -1;
+  const startIdx = chiIndex(input.gender === 'nam' ? 'Dần' : 'Thân');
 
-  const kindsCount: Record<TrungTangKind, number> = {
+  // Bàn tuổi
+  const decades = Math.floor(age / 10);
+  const rem = age % 10;
+  let agePos: number;
+  if (decades > 0) {
+    agePos = startIdx + dir * (decades - 1);
+    if (rem > 0) agePos += dir * rem;
+  } else {
+    agePos = startIdx + dir * (Math.max(rem, 1) - 1);
+  }
+
+  // Bàn tháng: tháng 1 tại cung kế tiếp cung tuổi
+  const monthPos = agePos + dir * lunar.month;
+  // Bàn ngày: ngày 1 tại cung kế tiếp cung tháng
+  const dayPos = monthPos + dir * lunar.day;
+  // Bàn giờ: giờ Tý tại cung kế tiếp cung ngày
+  const hourProvided =
+    input.deathHour !== undefined && input.deathHour !== null;
+  const hourIdx = hourProvided
+    ? Math.floor((((input.deathHour as number) % 24) + 1) / 2) % 12
+    : 0;
+  const hourPos = dayPos + dir * (hourIdx + 1);
+
+  const bans: TrungTangBan[] = [
+    {
+      key: 'tuoi',
+      label: 'Bàn tuổi (năm)',
+      value: `${age} tuổi mụ`,
+      cungChi: chiAt(agePos),
+      kind: CHI_TO_KIND[chiAt(agePos)],
+    },
+    {
+      key: 'thang',
+      label: 'Bàn tháng',
+      value: `tháng ${lunar.month} âm`,
+      cungChi: chiAt(monthPos),
+      kind: CHI_TO_KIND[chiAt(monthPos)],
+    },
+    {
+      key: 'ngay',
+      label: 'Bàn ngày',
+      value: `ngày ${lunar.day} âm`,
+      cungChi: chiAt(dayPos),
+      kind: CHI_TO_KIND[chiAt(dayPos)],
+    },
+  ];
+  if (hourProvided) {
+    bans.push({
+      key: 'gio',
+      label: 'Bàn giờ',
+      value: `giờ ${CHI[hourIdx]}`,
+      cungChi: chiAt(hourPos),
+      kind: CHI_TO_KIND[chiAt(hourPos)],
+    });
+  }
+
+  const counts: Record<TrungTangKind, number> = {
     'Trùng Tang': 0,
     'Nhập Mộ': 0,
     'Thiên Di': 0,
   };
-  const monthKind = CHI_TO_KIND[cungMonthChi];
-  const dayKind = CHI_TO_KIND[dChi];
-  const yearKind = CHI_TO_KIND[yChi];
-  kindsCount[monthKind]++;
-  kindsCount[dayKind]++;
-  kindsCount[yearKind]++;
+  for (const b of bans) counts[b.kind]++;
 
   let overall: TrungTangReport['overall'];
-  if (kindsCount['Nhập Mộ'] >= 1) {
+  let overallLabel: string;
+  let suggestion: string;
+
+  if (counts['Trùng Tang'] === 0) {
+    if (counts['Nhập Mộ'] > 0) {
+      overall = 'Nhập Mộ';
+      overallLabel = 'Nhập Mộ — yên ổn';
+      suggestion =
+        'Không bàn nào rơi Trùng Tang, có cung Nhập Mộ — người mất được "yên mồ yên mả". Có thể tiến hành tang lễ theo nghi thức bình thường.';
+    } else {
+      overall = 'Thiên Di';
+      overallLabel = 'Thiên Di — bình hòa';
+      suggestion =
+        'Các bàn rơi cung Thiên Di — dân gian hiểu là sự ra đi do "trời định", con cháu có thể có thay đổi, di chuyển. Nên làm lễ cầu siêu chu đáo, không phạm Trùng Tang.';
+    }
+  } else if (counts['Nhập Mộ'] >= 1) {
     overall = 'Nhập Mộ';
-  } else if (kindsCount['Trùng Tang'] >= 2) {
-    overall = 'Trùng Tang';
-  } else if (kindsCount['Trùng Tang'] === 1) {
-    overall = 'Cần cẩn trọng';
+    overallLabel = 'Có Trùng Tang nhưng được Nhập Mộ hóa giải';
+    const ttBans = bans.filter((b) => b.kind === 'Trùng Tang');
+    suggestion = `Phạm Trùng Tang ở ${ttBans.map((b) => b.label.toLowerCase()).join(', ')} nhưng có ${counts['Nhập Mộ']} cung Nhập Mộ — theo lệ "nhất mộ sát tam trùng", một Nhập Mộ hóa giải được Trùng Tang. Gia đình vẫn nên làm lễ cầu siêu chu đáo cho an tâm.`;
   } else {
-    overall = 'Thiên Di';
+    overall = 'Trùng Tang';
+    const ttBans = bans.filter((b) => b.kind === 'Trùng Tang');
+    overallLabel = `Phạm Trùng Tang (${ttBans.map((b) => b.label.toLowerCase()).join(', ')})`;
+    const heavy =
+      ttBans.some((b) => b.key === 'gio') || ttBans.some((b) => b.key === 'ngay')
+        ? ' Trùng tang ở bàn giờ / bàn ngày theo quan niệm dân gian là nặng hơn bàn tháng, bàn năm.'
+        : '';
+    suggestion = `Phạm Trùng Tang, không có Nhập Mộ hóa giải.${heavy} Nên nhờ chùa làm lễ trấn Trùng Tang, tụng kinh cầu siêu 49 ngày, và tham vấn trụ trì trước khi định ngày an táng.`;
   }
 
-  const suggestion =
-    overall === 'Nhập Mộ'
-      ? 'Có Nhập Mộ hóa giải, gia đình yên ổn. Có thể tiến hành mai táng theo lễ nghi.'
-      : overall === 'Trùng Tang'
-        ? 'Cảnh báo Trùng Tang. Nên nhờ chùa làm lễ trấn Trùng Tang, dùng bùa, mời sư đọc kinh Đại Bi 49 ngày.'
-        : overall === 'Thiên Di'
-          ? 'Có Thiên Di — gia đạo có thể phải di chuyển, thay đổi. Nên làm lễ cầu siêu.'
-          : 'Cần cẩn trọng — nên tham vấn sư trụ trì trước khi định ngày.';
+  if (!hourProvided) {
+    suggestion +=
+      ' (Chưa nhập giờ mất — nếu biết giờ, nhập thêm để tính đủ bàn giờ, kết luận chính xác hơn.)';
+  }
 
   return {
+    gender: input.gender,
     ageAtDeath: age,
-    dayLunar: `${lunar.day}/${lunar.month}/${lunar.year} ÂL`,
-    dayChi: dChi,
-    monthCung: monthKind,
-    dayCung: dayKind,
-    yearCung: yearKind,
+    dayLunar: `${lunar.day}/${lunar.month}${lunar.leap ? ' nhuận' : ''}/${lunar.year} ÂL`,
+    deathDayCanChi: `${dcc.can} ${dcc.chi}`,
+    bans,
+    counts,
     overall,
+    overallLabel,
     suggestion,
+    hourProvided,
   };
-}
-
-// ----- Tuổi hợp cưới hỏi -----
-const TAM_HOP_GROUPS: Chi[][] = [
-  ['Thân', 'Tý', 'Thìn'],
-  ['Dần', 'Ngọ', 'Tuất'],
-  ['Tỵ', 'Dậu', 'Sửu'],
-  ['Hợi', 'Mão', 'Mùi'],
-];
-
-const LUC_HOP: Array<[Chi, Chi]> = [
-  ['Tý', 'Sửu'],
-  ['Dần', 'Hợi'],
-  ['Mão', 'Tuất'],
-  ['Thìn', 'Dậu'],
-  ['Tỵ', 'Thân'],
-  ['Ngọ', 'Mùi'],
-];
-
-export function checkTuoiCuoi(
-  brideYear: number,
-  groomYear: number,
-): RuleResult {
-  const b = yearCanChi(brideYear).chi;
-  const g = yearCanChi(groomYear).chi;
-
-  if (isXungChi(b, g)) {
-    return {
-      key: 'tuoi_cuoi',
-      label: 'Tuổi cô dâu chú rể',
-      verdict: 'bad',
-      detail: `Chi ${b} (cô dâu) xung với chi ${g} (chú rể) — Lục xung. Nên tham vấn kỹ trước khi định ngày cưới.`,
-    };
-  }
-  const tamHop = TAM_HOP_GROUPS.some(
-    (grp) => grp.includes(b) && grp.includes(g),
-  );
-  const lucHop = LUC_HOP.some(
-    ([x, y]) => (x === b && y === g) || (x === g && y === b),
-  );
-  if (tamHop) {
-    return {
-      key: 'tuoi_cuoi',
-      label: 'Tuổi cô dâu chú rể',
-      verdict: 'good',
-      detail: `Chi ${b} và ${g} thuộc Tam hợp — rất hợp cưới hỏi.`,
-    };
-  }
-  if (lucHop) {
-    return {
-      key: 'tuoi_cuoi',
-      label: 'Tuổi cô dâu chú rể',
-      verdict: 'good',
-      detail: `Chi ${b} và ${g} thuộc Lục hợp — hợp cưới hỏi.`,
-    };
-  }
-  return {
-    key: 'tuoi_cuoi',
-    label: 'Tuổi cô dâu chú rể',
-    verdict: 'caution',
-    detail: `Chi ${b} và ${g} bình thường — không xung, chưa được Tam/Lục hợp.`,
-  };
-}
-
-// ----- Nữ sinh con năm nào tốt -----
-export function goodYearsForChild(
-  motherYear: number,
-  fromYear: number,
-  count: number = 5,
-): Array<{ year: number; verdict: Verdict; note: string }> {
-  const results: Array<{ year: number; verdict: Verdict; note: string }> = [];
-  for (let i = 0; i < count; i++) {
-    const y = fromYear + i;
-    const kimLau = checkKimLau(motherYear, y);
-    const tamTai = checkTamTai(motherYear, y);
-    const xung = checkXungNam(motherYear, y);
-    let verdict: Verdict = 'good';
-    if (kimLau.verdict === 'bad') verdict = 'bad';
-    else if (tamTai.verdict === 'caution' || xung.verdict === 'caution')
-      verdict = 'caution';
-    results.push({
-      year: y,
-      verdict,
-      note:
-        verdict === 'good'
-          ? 'Năm thuận sinh con'
-          : verdict === 'caution'
-            ? 'Cần cẩn trọng, nên tham vấn sư/thầy'
-            : 'Không thuận — nên tránh',
-    });
-  }
-  return results;
 }
 
 // ----- Verdict tổng hợp -----

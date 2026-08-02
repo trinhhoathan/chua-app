@@ -16,6 +16,7 @@ import {
   type NavSection,
 } from '@/lib/fengshui/tools';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { hasWaterBottleBrand } from '@/lib/water-bottle-brand';
 
 interface Props {
   temple: Temple;
@@ -35,8 +36,6 @@ const MORE = [
   { href: '/#thu-vien-anh', label: 'Hình ảnh' },
   { href: '/#danh-gia', label: 'Đánh giá' },
 ] as const;
-
-const ALL_SIMPLE = [...PRIMARY, ...MORE] as const;
 
 type OpenMenu = 'more' | 'phongthuy' | 'phathoc' | null;
 type MobileSection = 'phongthuy' | 'phathoc' | null;
@@ -200,6 +199,17 @@ export function TopNav({ temple }: Props) {
   const phatHocGrouped = useMemo(
     () => groupToolsByNavSection(PHAT_HOC_NAV_ORDER),
     [],
+  );
+  const moreLinks = useMemo(() => {
+    const links: { href: string; label: string }[] = [...MORE];
+    if (hasWaterBottleBrand(temple)) {
+      links.push({ href: '/thu-nhan-nuoc', label: 'Chai nước mang nhãn' });
+    }
+    return links;
+  }, [temple]);
+  const allSimpleLinks = useMemo(
+    () => [...PRIMARY, ...moreLinks],
+    [moreLinks],
   );
 
   useEffect(() => {
@@ -463,7 +473,7 @@ export function TopNav({ temple }: Props) {
                     role="menu"
                     className="absolute right-0 top-full mt-2 min-w-[11.5rem] py-1.5 bg-ink/95 backdrop-blur-md border border-white/15 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.7)]"
                   >
-                    {MORE.map((l) => (
+                    {moreLinks.map((l) => (
                       <Link
                         key={l.href}
                         href={l.href}
@@ -554,7 +564,7 @@ export function TopNav({ temple }: Props) {
                 </Link>
               </div>
 
-              {ALL_SIMPLE.map((l) => (
+              {allSimpleLinks.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}

@@ -22,8 +22,7 @@ interface Props {
     address?: string | null;
     hotline?: string | null;
     phone?: string | null;
-    zalo?: string | null;
-    facebook?: string | null;
+    abbottName?: string | null;
   };
 }
 
@@ -220,14 +219,21 @@ export function TuViChartBoard({
                       {temple?.name ? (
                         <div className="mt-2 pt-1.5 border-t border-fog/70 space-y-0.5">
                           <p className="text-[0.6rem] text-muted leading-snug">
-                            Lá số được lập tại{' '}
+                            Lá số được trụ trì
+                            {temple.abbottName?.trim()
+                              ? ` ${temple.abbottName.trim()}`
+                              : ''}{' '}
+                            lập
+                          </p>
+                          <p className="text-[0.6rem] text-muted leading-snug">
+                            tại{' '}
                             {/^chùa\b/i.test(temple.name.trim())
                               ? temple.name.trim()
-                              : `chùa ${temple.name.trim()}`}
+                              : `Chùa ${temple.name.trim()}`}
                           </p>
                           {temple.address ? (
                             <p className="text-[0.55rem] text-muted/90 leading-snug">
-                              {temple.address}
+                              {temple.address.replace(/\s+/g, ' ').trim()}
                             </p>
                           ) : null}
                           {(temple.hotline || temple.phone) && (
@@ -241,36 +247,6 @@ export function TuViChartBoard({
                               </a>
                             </p>
                           )}
-                          {temple.zalo ? (
-                            <p className="text-[0.55rem] text-muted/90 leading-snug">
-                              Zalo:{' '}
-                              <a
-                                href={
-                                  temple.zalo.startsWith('http')
-                                    ? temple.zalo
-                                    : `https://zalo.me/${temple.zalo.replace(/\s/g, '')}`
-                                }
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-semibold text-ink hover:opacity-80"
-                              >
-                                {temple.zalo.replace(/^https?:\/\/(www\.)?zalo\.me\//i, '')}
-                              </a>
-                            </p>
-                          ) : null}
-                          {temple.facebook ? (
-                            <p className="text-[0.55rem] text-muted/90 leading-snug">
-                              Facebook:{' '}
-                              <a
-                                href={temple.facebook}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-semibold text-ink hover:opacity-80 break-all"
-                              >
-                                Fanpage
-                              </a>
-                            </p>
-                          ) : null}
                         </div>
                       ) : null}
                     </div>

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { Temple } from '@/types/database';
 import { formatVnd } from '@/lib/tenant';
+import { getWaterBottleBrand } from '@/lib/water-bottle-brand';
+import { WaterBottleShowcase } from '@/components/water/WaterBottleShowcase';
 
 interface Props {
   temple: Temple;
@@ -29,10 +31,12 @@ const TIERS = [
 export function WaterMeritsStory({ temple, compact = false }: Props) {
   const primary = temple.primary_color || '#7A1F1F';
   const pad = compact ? 'py-12 md:py-16' : 'py-20 md:py-28';
+  const bottleBrand = getWaterBottleBrand(temple);
+  const contentMax = bottleBrand ? 'max-w-4xl' : 'max-w-3xl';
 
   return (
     <section id="dong-nuoc" className={`bg-paper scroll-mt-8 ${pad}`}>
-      <div className="mx-auto max-w-3xl px-6 md:px-12">
+      <div className={`mx-auto ${contentMax} px-6 md:px-12`}>
         <div className="section-rule mb-6" />
         <p className="text-[0.72rem] tracking-[0.3em] uppercase text-lacquer mb-3">
           Gieo duyên nước mát
@@ -40,12 +44,19 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
         <h2 className="font-display text-3xl md:text-4xl text-ink leading-tight">
           Công đức nước tinh khiết
         </h2>
-        <p className="mt-4 text-muted leading-relaxed">
+        <p className="mt-4 text-muted leading-relaxed max-w-3xl">
           Câu chuyện về gáo nước sạch thời Đức Phật — và lời mời phát tâm thỉnh
           nước, cúng dường nước thanh tịnh cho {temple.name}.
         </p>
 
-        <div className="mt-10 space-y-8 text-muted leading-relaxed text-[1.05rem]">
+        {bottleBrand ? (
+          <WaterBottleShowcase
+            temple={temple}
+            variant={compact ? 'purchase' : 'home'}
+          />
+        ) : null}
+
+        <div className="mt-10 space-y-8 text-muted leading-relaxed text-[1.05rem] max-w-3xl">
           <div>
             <h3 className="font-display text-xl text-ink mb-3">
               Gáo nước sạch thời Đức Phật
@@ -118,6 +129,17 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
                 trải kinh phí duy trì nguồn nước sạch, thắp ngọn đèn chánh pháp
                 và thực hiện các hoạt động từ thiện, Phật sự tại địa phương.
               </li>
+              {bottleBrand ? (
+                <li>
+                  <span className="text-ink font-medium">
+                    Bùa chú · nguyện lành từ Sư phụ:{' '}
+                  </span>
+                  Nước mang nhãn {temple.name} được{' '}
+                  {bottleBrand.abbottHonorific} trì chú, phát tâm nguyện thiện
+                  lành — cầu bình an, cát tường cho gia đạo Quý Phật tử trước khi
+                  dâng lên / phát cho thập phương.
+                </li>
+              ) : null}
             </ul>
           </div>
 
@@ -138,7 +160,7 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
           </div>
         </div>
 
-        <div className="mt-14">
+        <div className="mt-14 max-w-3xl">
           <p className="text-[0.72rem] tracking-[0.3em] uppercase text-lacquer mb-3">
             Bảng phát tâm cúng dường
           </p>
@@ -147,10 +169,10 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
           </h3>
           <p className="mt-3 text-sm text-muted leading-relaxed">
             Mức phát tâm tùy hỷ:{' '}
-            {formatVnd(temple.water_price_vnd)}/thùng · tối thiểu 10 thùng mỗi
-            lần thỉnh để thuận tiện vận chuyển về chùa. Mỗi phát tâm được ghi
-            nhận vào Sổ Vàng Công Đức; nước được sắp xếp trang nghiêm tại sân
-            chùa / nhà bái đường.
+            {formatVnd(temple.water_price_vnd)}/thùng · tối thiểu 1 thùng (24
+            chai nước) mỗi lần thỉnh. Mỗi phát tâm được ghi nhận vào Sổ Vàng
+            Công Đức; nước được sắp xếp trang nghiêm tại sân chùa / nhà bái
+            đường.
           </p>
 
           <ul className="mt-8 space-y-3">
@@ -188,6 +210,14 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
                 màn hình để chọn số thùng và hoàn tất phát tâm.
               </p>
             )}
+            {bottleBrand ? (
+              <Link
+                href="/thu-nhan-nuoc"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium border border-fog text-ink hover:bg-mist"
+              >
+                Xem chai nước mang nhãn chùa
+              </Link>
+            ) : null}
             <Link
               href={compact ? '/#minh-bach' : '#minh-bach'}
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium border border-fog text-ink hover:bg-mist"

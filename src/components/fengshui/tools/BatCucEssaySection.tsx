@@ -10,9 +10,10 @@ import {
 import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { useSitePersona } from '@/components/SitePersonaContext';
 
 interface Props {
-  /** Khối dữ liệu Bát Cực đã tính sẵn (đã mask nếu chủ đề bảo mật). */
+  /** Khối dữ liệu Âm Dương Ngũ Hành đã tính sẵn (đã mask nếu chủ đề bảo mật). */
   analysisContext: string;
   topic: BatCucTopicId;
   templeName: string;
@@ -23,7 +24,7 @@ interface Props {
 }
 
 /**
- * Template dùng chung cho 14 trang Bát Cực Linh Số
+ * Template dùng chung cho 14 trang nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận
  * (cùng bố cục với «Luận cung Mệnh (mẫu)» trên trang tử vi):
  * — Luận giải mẫu (mệnh lệnh AI riêng từng chủ đề)
  * — Hộp CTA: Thỉnh nước (ưu tiên) · Gọi trụ trì · Hỏi trụ trì thêm
@@ -37,8 +38,9 @@ export function BatCucEssaySection({
   contactPhone,
   onAskMore,
 }: Props) {
+  const persona = useSitePersona();
   const cfg = BAT_CUC_TOPICS[topic];
-  const essaySubtitle = `Xem thử miễn phí ${cfg.dataLabel} theo Bát Cực Linh Số.`;
+  const essaySubtitle = `Xem thử miễn phí ${cfg.dataLabel} theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận.`;
   const ctaTitle = `Muốn luận ${cfg.dataLabel} chuyên sâu hơn?`;
 
   const [essay, setEssay] = useState('');
@@ -185,7 +187,7 @@ export function BatCucEssaySection({
         <div className="border border-fog bg-white p-3 md:p-4">
           {essayLoading && !essay ? (
             <p className="text-sm text-muted">
-              Trụ trì đang xem bảng sao của {cfg.dataLabel}…
+              {persona.thinkingLabel} bảng sao của {cfg.dataLabel}…
             </p>
           ) : (
             <>
@@ -206,6 +208,7 @@ export function BatCucEssaySection({
                   suggestions={teasers}
                   primaryColor={primaryColor}
                   notePrefix={cfg.donateNote}
+                  contactPhone={contactPhone}
                 />
               ) : null}
             </>
@@ -213,64 +216,109 @@ export function BatCucEssaySection({
         </div>
       ) : null}
 
-      <div className="border border-fog bg-white p-3 space-y-2 text-sm">
-        <p className="font-medium text-ink">{ctaTitle}</p>
-        <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
-          <li>Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ</li>
-          <li>
-            Liên hệ hỏi trụ trì trực tiếp
-            {contactPhone ? (
-              <>
-                {' '}
-                qua{' '}
-                <a
-                  href={phoneHref!}
-                  className="underline underline-offset-2"
-                  style={{ color: primaryColor }}
-                >
-                  {contactPhone}
-                </a>
-              </>
-            ) : (
-              ' qua số điện thoại nhà chùa'
-            )}
-          </li>
-          <li>
-            Hỏi trụ trì thêm trong chat — miễn phí 3 câu; từ câu thứ 4 cần
-            thỉnh nước để hỏi tiếp
-          </li>
-        </ul>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() =>
-              openWaterDonateForm({
-                note: cfg.donateNote.slice(0, 180),
-                qty: 10,
-              })
-            }
-            className="px-3 py-2 text-sm text-white"
-            style={{ background: primaryColor }}
-          >
-            Thỉnh nước
-          </button>
-          {phoneHref ? (
+      {persona.upsell === 'sim' ? (
+        <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+          <p className="font-medium text-ink">{ctaTitle}</p>
+          <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
+            <li>
+              Chọn số trong Kho Sim Phong Thủy — từng sim đã được chấm điểm
+              sẵn theo đúng thuật toán Âm Dương Ngũ Hành này
+            </li>
+            <li>
+              Gọi {persona.displayName} tư vấn trực tiếp
+              {contactPhone ? (
+                <>
+                  {' '}
+                  qua{' '}
+                  <a
+                    href={phoneHref!}
+                    className="underline underline-offset-2"
+                    style={{ color: primaryColor }}
+                  >
+                    {contactPhone}
+                  </a>
+                </>
+              ) : null}
+            </li>
+          </ul>
+          <div className="flex flex-wrap gap-2 pt-1">
             <a
-              href={phoneHref}
+              href="/sim"
+              className="px-3 py-2 text-sm text-white"
+              style={{ background: primaryColor }}
+            >
+              Xem kho sim hợp mệnh
+            </a>
+            {phoneHref ? (
+              <a
+                href={phoneHref}
+                className="px-3 py-2 text-sm border border-fog text-ink"
+              >
+                {persona.callLabel}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+          <p className="font-medium text-ink">{ctaTitle}</p>
+          <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
+            <li>Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ</li>
+            <li>
+              Liên hệ hỏi trụ trì trực tiếp
+              {contactPhone ? (
+                <>
+                  {' '}
+                  qua{' '}
+                  <a
+                    href={phoneHref!}
+                    className="underline underline-offset-2"
+                    style={{ color: primaryColor }}
+                  >
+                    {contactPhone}
+                  </a>
+                </>
+              ) : (
+                ' qua số điện thoại nhà chùa'
+              )}
+            </li>
+            <li>
+              Hỏi trụ trì thêm trong chat — miễn phí 3 câu; từ câu thứ 4 cần
+              thỉnh nước để hỏi tiếp
+            </li>
+          </ul>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() =>
+                openWaterDonateForm({
+                  note: cfg.donateNote.slice(0, 180),
+                  qty: 10,
+                })
+              }
+              className="px-3 py-2 text-sm text-white"
+              style={{ background: primaryColor }}
+            >
+              Thỉnh nước
+            </button>
+            {phoneHref ? (
+              <a
+                href={phoneHref}
+                className="px-3 py-2 text-sm border border-fog text-ink"
+              >
+                Gọi trụ trì
+              </a>
+            ) : null}
+            <button
+              type="button"
+              onClick={onAskMore}
               className="px-3 py-2 text-sm border border-fog text-ink"
             >
-              Gọi trụ trì
-            </a>
-          ) : null}
-          <button
-            type="button"
-            onClick={onAskMore}
-            className="px-3 py-2 text-sm border border-fog text-ink"
-          >
-            Hỏi trụ trì thêm
-          </button>
+              Hỏi trụ trì thêm
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

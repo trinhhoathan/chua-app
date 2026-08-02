@@ -5,6 +5,7 @@ import { formatVnd } from '@/lib/tenant';
 import { PLATFORM_HQ } from '@/lib/platform-hq';
 import { resolveTempleScope } from '@/lib/temple-scope';
 import { TempleRequiredNotice } from '@/components/admin/TempleRequiredNotice';
+import { isLyGiaDomain } from '@/lib/ly-gia-phuc-an';
 
 function currentMonth(): string {
   const d = new Date();
@@ -29,12 +30,172 @@ export default async function AdminHomePage({ searchParams }: Props) {
     return <TempleRequiredNotice feature="Tổng quan theo chùa" />;
   }
 
+  if (isLyGiaDomain(scope.temple?.domain)) {
+    return (
+      <SimSiteDashboard
+        templeId={templeId}
+        templeName={scope.temple?.name ?? ''}
+        isSuperAdmin={ctx.isSuperAdmin}
+      />
+    );
+  }
+
   return (
     <TempleDashboard
       templeId={templeId}
       templeName={scope.temple?.name ?? ''}
       isSuperAdmin={ctx.isSuperAdmin}
     />
+  );
+}
+
+/** Tổng quan cho site sim (Lý Gia Phúc An) — không có mảng thỉnh nước. */
+async function SimSiteDashboard({
+  templeId,
+  templeName,
+  isSuperAdmin,
+}: {
+  templeId: string;
+  templeName: string;
+  isSuperAdmin: boolean;
+}) {
+  const supabase = await createClient();
+  const month = currentMonth();
+  const monthStart = `${month}-01T00:00:00Z`;
+  const [y, m] = month.split('-').map(Number);
+  const nextMonth =
+    m === 12
+      ? `${y + 1}-01-01T00:00:00Z`
+      : `${y}-${String(m + 1).padStart(2, '0')}-01T00:00:00Z`;
+
+  const [pendingOrders, paidOrders, available, sold, templeRowRes] =
+    await Promise.all([
+      supabase
+        .from('sim_orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId)
+        .eq('status', 'pending_payment'),
+      supabase
+        .from('sim_orders')
+        .select('price_vnd')
+        .eq('temple_id', templeId)
+        .in('status', ['paid', 'delivering', 'completed'])
+        .gte('paid_at', monthStart)
+        .lt('paid_at', nextMonth),
+      supabase
+        .from('sim_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId)
+        .eq('status', 'available'),
+      supabase
+        .from('sim_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('temple_id', templeId)
+        .eq('status', 'sold'),
+      supabase
+        .from('temples')
+        .select('hotline, contact_links')
+        .eq('id', templeId)
+        .maybeSingle(),
+    ]);
+
+  const paidCount = (paidOrders.data ?? []).length;
+  const revenue = (paidOrders.data ?? []).reduce(
+    (s, o) => s + Number(o.price_vnd),
+    0,
+  );
+  const links = templeRowRes.data?.contact_links as { phone?: string } | null;
+  const hotline =
+    (templeRowRes.data?.hotline as string)?.trim() ||
+    links?.phone?.trim() ||
+    '';
+
+  const cards = [
+    {
+      label: 'Đơn sim chờ duyệt / thanh toán',
+      value: String(pendingOrders.count ?? 0),
+      href: '/quan-tri/sim/don-hang',
+    },
+    {
+      label: 'Sim bán được tháng này',
+      value: String(paidCount),
+      href: '/quan-tri/sim/don-hang',
+    },
+    {
+      label: 'Doanh thu sim tháng này',
+      value: formatVnd(revenue),
+      href: '/quan-tri/sim/don-hang',
+    },
+    {
+      label: 'Sim đang bán',
+      value: String(available.count ?? 0),
+      href: '/quan-tri/sim',
+    },
+    {
+      label: 'Sim đã bán (tổng)',
+      value: String(sold.count ?? 0),
+      href: '/quan-tri/sim',
+    },
+  ];
+
+  return (
+    <div>
+      <h1 className="font-display text-3xl text-ink">Tổng quan</h1>
+      <p className="mt-2 text-muted text-sm">
+        Tháng {month} · {templeName} · Thầy Phong Thủy Phúc An
+        {isSuperAdmin ? ' · ngữ cảnh SuperAdmin' : ''}
+      </p>
+
+      <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {cards.map((c) => (
+          <Link
+            key={c.label}
+            href={c.href}
+            className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
+          >
+            <p className="text-[10px] uppercase tracking-widest text-muted">
+              {c.label}
+            </p>
+            <p className="font-display text-2xl text-ink mt-2">{c.value}</p>
+          </Link>
+        ))}
+        <Link
+          href="/quan-tri/lien-he"
+          className="border border-fog bg-paper p-5 hover:border-ink/20 transition-colors"
+        >
+          <p className="text-[10px] uppercase tracking-widest text-muted">
+            Điện thoại liên hệ
+          </p>
+          <p className="font-display text-2xl text-ink mt-2 tabular-nums">
+            {hotline || 'Chưa có'}
+          </p>
+        </Link>
+      </div>
+
+      <div className="mt-10 flex flex-wrap gap-3 text-sm">
+        <Link href="/quan-tri/sim" className="px-4 py-2 bg-ink text-white">
+          Kho Sim Phong Thủy
+        </Link>
+        <Link
+          href="/quan-tri/sim/don-hang"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Đơn hàng sim
+        </Link>
+        <Link
+          href="/quan-tri/hinh-anh"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Hình ảnh
+        </Link>
+        <Link
+          href="/quan-tri/lien-he"
+          className="px-4 py-2 border border-ink/20 hover:bg-paper"
+        >
+          Liên hệ
+        </Link>
+      </div>
+    </div>
   );
 }
 

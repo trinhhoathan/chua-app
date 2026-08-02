@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getOrderByCode } from '@/app/actions/orders';
 import {
+  applyPromptPersona,
   buildPalaceSystemPrompt,
   parseTuViSchool,
 } from '@/lib/fengshui/tuvi-prompt';
 import { assertAiRateLimit } from '@/lib/rate-limit';
+import { getCurrentTemple } from '@/lib/tenant';
+import { getSitePersona } from '@/lib/site-persona';
+import {
+  aiDeviceSetCookie,
+  consumeAiCredit,
+  refundAiCredit,
+  type ConsumeResult,
+} from '@/lib/ai-quota';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -127,8 +136,24 @@ export async function POST(req: Request) {
     );
   }
 
-  // Gate: teaser miễn phí chỉ cho cung Mệnh; còn lại cần mã đơn paid.
-  if (!(freeTeaser && isMenh)) {
+  // Gate: teaser cung Mệnh trừ ví lượt AI; 11 cung còn lại cần mã đơn paid
+  // (giữ nguyên gate cũ — mã đơn hợp lệ thì không trừ ví).
+  let quota: ConsumeResult | null = null;
+  if (freeTeaser && isMenh) {
+    quota = await consumeAiCredit(req);
+    if (!quota.allowed) {
+      const res = NextResponse.json(
+        {
+          code: 'quota_exhausted',
+          remaining: 0,
+          error: 'Quý vị đã dùng hết lượt luận giải miễn phí.',
+        },
+        { status: 402 },
+      );
+      res.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+      return res;
+    }
+  } else {
     if (!orderCode) {
       return NextResponse.json(
         {
@@ -151,9 +176,25 @@ export async function POST(req: Request) {
     }
   }
 
-  const system = buildPalaceSystemPrompt(templeName, palaceName, school, {
-    noVanHan,
-  });
+  // Persona theo tenant: site Lý Gia dùng giọng "Thầy Phong Thủy Phúc An"
+  const temple = await getCurrentTemple().catch(() => null);
+  const sitePersona = temple ? getSitePersona(temple) : null;
+  const promptPersona =
+    sitePersona && sitePersona.upsell === 'sim'
+      ? {
+          aiRoleIntro: sitePersona.aiRoleIntro,
+          role: sitePersona.role,
+          aiOutro: sitePersona.aiOutro,
+        }
+      : null;
+
+  const system = applyPromptPersona(
+    buildPalaceSystemPrompt(templeName, palaceName, school, {
+      noVanHan,
+    }),
+    templeName,
+    promptPersona,
+  );
   const userContent = [
     chartContext,
     '',
@@ -161,7 +202,9 @@ export async function POST(req: Request) {
       body.palaceIndex != null ? ` (index ${body.palaceIndex})` : ''
     }.`,
     freeTeaser && isMenh
-      ? 'Đây là phần xem thử miễn phí cung Mệnh — luận đầy đủ, chất lượng cao để Phật tử cảm nhận.'
+      ? promptPersona
+        ? 'Đây là phần xem thử miễn phí cung Mệnh — luận đầy đủ, chất lượng cao để khách cảm nhận.'
+        : 'Đây là phần xem thử miễn phí cung Mệnh — luận đầy đủ, chất lượng cao để Phật tử cảm nhận.'
       : '',
   ]
     .filter(Boolean)
@@ -192,20 +235,26 @@ export async function POST(req: Request) {
       if (!upstream.ok || !upstream.body) {
         const errText = await upstream.text().catch(() => '');
         console.error('[luan-giai-cung] deepseek stream error', upstream.status, errText);
+        if (quota) await refundAiCredit(quota.identity);
         return NextResponse.json(
           { error: 'Không luận giải được cung này. Vui lòng thử lại.' },
           { status: 502 },
         );
       }
 
-      return new Response(sseTextStream(upstream), {
+      const streamRes = new Response(sseTextStream(upstream), {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
           'Cache-Control': 'no-cache, no-transform',
           'X-Accel-Buffering': 'no',
           Connection: 'keep-alive',
+          'X-Ai-Remaining': String(quota ? quota.remaining : -1),
         },
       });
+      if (quota) {
+        streamRes.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+      }
+      return streamRes;
     }
 
     const res = await fetch(DEEPSEEK_URL, {
@@ -225,6 +274,7 @@ export async function POST(req: Request) {
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
       console.error('[luan-giai-cung] deepseek error', res.status, errText);
+      if (quota) await refundAiCredit(quota.identity);
       return NextResponse.json(
         { error: 'Không luận giải được cung này. Vui lòng thử lại.' },
         { status: 502 },
@@ -236,20 +286,29 @@ export async function POST(req: Request) {
     };
     const content = data.choices?.[0]?.message?.content?.trim() || '';
     if (!content) {
+      if (quota) await refundAiCredit(quota.identity);
       return NextResponse.json(
         { error: 'Phản hồi luận giải trống.' },
         { status: 502 },
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      palaceName,
-      palaceIndex: body.palaceIndex ?? null,
-      content,
-    });
+    const jsonRes = NextResponse.json(
+      {
+        ok: true,
+        palaceName,
+        palaceIndex: body.palaceIndex ?? null,
+        content,
+      },
+      { headers: { 'X-Ai-Remaining': String(quota ? quota.remaining : -1) } },
+    );
+    if (quota) {
+      jsonRes.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+    }
+    return jsonRes;
   } catch (e) {
     console.error('[luan-giai-cung]', e);
+    if (quota) await refundAiCredit(quota.identity);
     return NextResponse.json(
       { error: 'Lỗi kết nối dịch vụ luận giải.' },
       { status: 502 },

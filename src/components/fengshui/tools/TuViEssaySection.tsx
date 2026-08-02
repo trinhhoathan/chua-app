@@ -9,6 +9,7 @@ import {
 import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { useSitePersona } from '@/components/SitePersonaContext';
 
 export type EssayFocusFlag =
   | 'hopTuoiFocus'
@@ -68,6 +69,7 @@ export function TuViEssaySection({
   notePrefix,
   onAskMore,
 }: Props) {
+  const persona = useSitePersona();
   const [essay, setEssay] = useState('');
   const [essayLoading, setEssayLoading] = useState(false);
   const [essayError, setEssayError] = useState<string | null>(null);
@@ -178,6 +180,12 @@ export function TuViEssaySection({
     ? `tel:${contactPhone.replace(/\s+/g, '')}`
     : null;
 
+  // Site Lý Gia: các trang gọi truyền "Trụ trì … đang luận…" — thay danh xưng
+  const displayLoadingLabel =
+    persona.upsell === 'sim'
+      ? loadingLabel.replace(/^Trụ trì.*?đang/u, `${persona.displayName} đang`)
+      : loadingLabel;
+
   return (
     <div className="border border-fog bg-paper p-4 md:p-5 space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -210,7 +218,7 @@ export function TuViEssaySection({
       {essay || essayLoading ? (
         <div className="border border-fog bg-white p-3 md:p-4">
           {essayLoading && !essay ? (
-            <p className="text-sm text-muted">{loadingLabel}</p>
+            <p className="text-sm text-muted">{displayLoadingLabel}</p>
           ) : (
             <>
               <TuViMarkdown
@@ -230,6 +238,7 @@ export function TuViEssaySection({
                   suggestions={teasers}
                   primaryColor={primaryColor}
                   notePrefix={notePrefix}
+                  contactPhone={contactPhone}
                 />
               ) : null}
             </>
@@ -237,64 +246,109 @@ export function TuViEssaySection({
         </div>
       ) : null}
 
-      <div className="border border-fog bg-white p-3 space-y-2 text-sm">
-        <p className="font-medium text-ink">{ctaTitle}</p>
-        <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
-          <li>Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ</li>
-          <li>
-            Liên hệ hỏi trụ trì trực tiếp
-            {contactPhone ? (
-              <>
-                {' '}
-                qua{' '}
-                <a
-                  href={phoneHref!}
-                  className="underline underline-offset-2"
-                  style={{ color: primaryColor }}
-                >
-                  {contactPhone}
-                </a>
-              </>
-            ) : (
-              ' qua số điện thoại nhà chùa'
-            )}
-          </li>
-          <li>
-            Hỏi trụ trì thêm trong chat — miễn phí 3 câu; từ câu thứ 4 cần
-            thỉnh nước để hỏi tiếp
-          </li>
-        </ul>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() =>
-              openWaterDonateForm({
-                note: notePrefix.slice(0, 180),
-                qty: 10,
-              })
-            }
-            className="px-3 py-2 text-sm text-white"
-            style={{ background: primaryColor }}
-          >
-            Thỉnh nước
-          </button>
-          {phoneHref ? (
+      {persona.upsell === 'sim' ? (
+        <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+          <p className="font-medium text-ink">{ctaTitle}</p>
+          <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
+            <li>
+              Chọn số trong Kho Sim Phong Thủy — từng sim đã được chấm điểm
+              hợp mệnh sẵn
+            </li>
+            <li>
+              Gọi {persona.displayName} tư vấn trực tiếp
+              {contactPhone ? (
+                <>
+                  {' '}
+                  qua{' '}
+                  <a
+                    href={phoneHref!}
+                    className="underline underline-offset-2"
+                    style={{ color: primaryColor }}
+                  >
+                    {contactPhone}
+                  </a>
+                </>
+              ) : null}
+            </li>
+          </ul>
+          <div className="flex flex-wrap gap-2 pt-1">
             <a
-              href={phoneHref}
+              href="/sim"
+              className="px-3 py-2 text-sm text-white"
+              style={{ background: primaryColor }}
+            >
+              Xem kho sim hợp mệnh
+            </a>
+            {phoneHref ? (
+              <a
+                href={phoneHref}
+                className="px-3 py-2 text-sm border border-fog text-ink"
+              >
+                {persona.callLabel}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+          <p className="font-medium text-ink">{ctaTitle}</p>
+          <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
+            <li>Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ</li>
+            <li>
+              Liên hệ hỏi trụ trì trực tiếp
+              {contactPhone ? (
+                <>
+                  {' '}
+                  qua{' '}
+                  <a
+                    href={phoneHref!}
+                    className="underline underline-offset-2"
+                    style={{ color: primaryColor }}
+                  >
+                    {contactPhone}
+                  </a>
+                </>
+              ) : (
+                ' qua số điện thoại nhà chùa'
+              )}
+            </li>
+            <li>
+              Hỏi trụ trì thêm trong chat — miễn phí 3 câu; từ câu thứ 4 cần
+              thỉnh nước để hỏi tiếp
+            </li>
+          </ul>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() =>
+                openWaterDonateForm({
+                  note: notePrefix.slice(0, 180),
+                  qty: 10,
+                })
+              }
+              className="px-3 py-2 text-sm text-white"
+              style={{ background: primaryColor }}
+            >
+              Thỉnh nước
+            </button>
+            {phoneHref ? (
+              <a
+                href={phoneHref}
+                className="px-3 py-2 text-sm border border-fog text-ink"
+              >
+                Gọi trụ trì
+              </a>
+            ) : null}
+            <button
+              type="button"
+              onClick={onAskMore}
               className="px-3 py-2 text-sm border border-fog text-ink"
             >
-              Gọi trụ trì
-            </a>
-          ) : null}
-          <button
-            type="button"
-            onClick={onAskMore}
-            className="px-3 py-2 text-sm border border-fog text-ink"
-          >
-            Hỏi trụ trì thêm
-          </button>
+              Hỏi trụ trì thêm
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

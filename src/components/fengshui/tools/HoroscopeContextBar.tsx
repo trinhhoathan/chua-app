@@ -7,6 +7,7 @@ import {
   shiftTimeIndex,
   todayDateInputValue,
 } from '@/lib/fengshui/iztro-chart';
+import { useSitePersona } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -56,6 +57,11 @@ export function HoroscopeContextBar({
   onOpenChat,
   onShare,
 }: Props) {
+  const persona = useSitePersona();
+  const chatLabel =
+    persona.upsell === 'sim'
+      ? `Luận giải với ${persona.displayName}`
+      : 'Luận giải với trụ trì';
   const slot =
     IZTRO_TIME_SLOTS.find((s) => s.index === timeIndex) ?? IZTRO_TIME_SLOTS[0];
 
@@ -124,8 +130,8 @@ export function HoroscopeContextBar({
               type="button"
               onClick={onOpenChat}
               className="shrink-0 p-1 text-muted hover:text-ink border border-transparent hover:border-fog"
-              title="Luận giải với trụ trì"
-              aria-label="Luận giải với trụ trì"
+              title={chatLabel}
+              aria-label={chatLabel}
             >
               <svg
                 viewBox="0 0 24 24"

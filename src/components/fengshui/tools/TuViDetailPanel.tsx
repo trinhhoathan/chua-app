@@ -11,6 +11,7 @@ import {
   type TuViSchool,
 } from '@/lib/fengshui/tuvi-prompt';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { useSitePersona } from '@/components/SitePersonaContext';
 import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import {
   chartSessionKey,
@@ -24,6 +25,7 @@ interface Props {
   primaryColor: string;
   templeName: string;
   templeId: string;
+  contactPhone?: string | null;
   chart: IztroChartView;
   horoscope: IztroHoroscopeView | null;
   school?: TuViSchool;
@@ -47,6 +49,13 @@ const WAIT_TIPS = [
   'Có thể đọc lại phần xem thử cung Mệnh trong lúc chờ.',
   'Khi xong, quý vị tải file HTML để lưu hoặc chia sẻ dễ dàng.',
   'Công đức thỉnh nước giúp duy trì đèn nước công quả tại chùa.',
+];
+
+const WAIT_TIPS_SIM = [
+  'Thầy Phong Thủy Phúc An đang xem từng cung thật kỹ — khoảng 2–4 phút là thường.',
+  'Mỗi cung cần luận riêng nên xin quý vị giữ tab này mở đến khi xong.',
+  'Có thể đọc lại phần xem thử cung Mệnh trong lúc chờ.',
+  'Khi xong, quý vị tải file HTML để lưu hoặc chia sẻ dễ dàng.',
 ];
 
 function storageKeyForEssays(sessionKey: string) {
@@ -180,7 +189,7 @@ function RunningPanel({
             Đang luận giải 12 cung…
           </p>
           <p className="mt-1 text-[0.7rem] text-muted leading-relaxed">
-            Trụ trì luận từng cung chuyên sâu — xin quý vị{' '}
+            Từng cung được luận chuyên sâu — xin quý vị{' '}
             <strong className="text-ink font-medium">không đóng tab</strong>,
             khoảng 2–4 phút.
           </p>
@@ -265,6 +274,7 @@ export function TuViDetailPanel({
   primaryColor,
   templeName,
   templeId,
+  contactPhone,
   chart,
   horoscope,
   school = 'bac_phai',
@@ -272,6 +282,7 @@ export function TuViDetailPanel({
   onPalaceEssaysChange,
   onRequestFullShare,
 }: Props) {
+  const persona = useSitePersona();
   const [orderCode, setOrderCode] = useState('');
   const [phase, setPhase] = useState<Phase>('locked');
   const [verifying, setVerifying] = useState(false);
@@ -363,7 +374,7 @@ export function TuViDetailPanel({
       }
     }, 1000);
     const tip = window.setInterval(() => {
-      setTipIndex((i) => (i + 1) % WAIT_TIPS.length);
+      setTipIndex((i) => i + 1);
     }, 8000);
     return () => {
       window.clearInterval(tick);
@@ -383,7 +394,7 @@ export function TuViDetailPanel({
 
   const unlockWithCode = useCallback(
     async (code: string) => {
-      const trimmed = code.trim().toUpperCase();
+      const trimmed = code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (!trimmed) {
         setError('Vui lòng nhập mã đơn.');
         return false;
@@ -444,7 +455,10 @@ export function TuViDetailPanel({
 
   async function runAll12(forcedCode?: string) {
     if (runningRef.current) return;
-    let code = (forcedCode || orderCode).trim().toUpperCase();
+    let code = (forcedCode || orderCode)
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '');
     if (!code) {
       setError('Nhập mã đơn đã thanh toán trước khi chạy 12 cung.');
       return;
@@ -508,7 +522,7 @@ export function TuViDetailPanel({
   }
 
   async function unlockAndRun() {
-    const code = orderCode.trim().toUpperCase();
+    const code = orderCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (!code) {
       setError('Vui lòng nhập mã đơn.');
       return;
@@ -620,9 +634,53 @@ export function TuViDetailPanel({
             doneCount={doneCount}
             total={palaceList.length}
             elapsedSec={elapsedSec}
-            tip={WAIT_TIPS[tipIndex]}
+            tip={
+              (persona.upsell === 'sim' ? WAIT_TIPS_SIM : WAIT_TIPS)[
+                tipIndex %
+                  (persona.upsell === 'sim' ? WAIT_TIPS_SIM : WAIT_TIPS).length
+              ]
+            }
           />
         ) : locked ? (
+          persona.upsell === 'sim' ? (
+            <div className="space-y-3">
+              <ul className="space-y-1.5">
+                {BENEFITS.slice(0, 3).map((b) => (
+                  <li
+                    key={b}
+                    className="text-xs text-muted leading-snug flex gap-2"
+                  >
+                    <span style={{ color: primaryColor }} aria-hidden>
+                      ✓
+                    </span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[0.7rem] text-muted leading-relaxed">
+                Phần luận 12 cung chuyên sâu do {persona.displayName} xem trực
+                tiếp — gọi thầy để đặt lịch, hoặc vào kho sim chọn dãy số hợp
+                mệnh đã chấm điểm sẵn.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {contactPhone ? (
+                  <a
+                    href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                    className="text-sm px-3 py-2 text-white font-medium"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    {persona.callLabel} · {contactPhone}
+                  </a>
+                ) : null}
+                <a
+                  href="/sim"
+                  className="text-sm px-3 py-2 border border-fog text-ink"
+                >
+                  Xem kho sim hợp mệnh
+                </a>
+              </div>
+            </div>
+          ) : (
           <div className="space-y-3">
             <ul className="space-y-1.5">
               {BENEFITS.map((b) => (
@@ -674,6 +732,7 @@ export function TuViDetailPanel({
             </p>
             {error ? <p className="text-xs text-red-700">{error}</p> : null}
           </div>
+          )
         ) : (
           <div className="space-y-3">
             <p className="text-xs text-muted">
@@ -691,8 +750,8 @@ export function TuViDetailPanel({
                   Bắt đầu luận giải 12 cung
                 </button>
                 <p className="text-[0.65rem] text-muted leading-relaxed">
-                  Quá trình thường mất 2–4 phút — trụ trì luận lần lượt từng
-                  cung. Vui lòng không đóng tab khi đang chạy.
+                  Quá trình thường mất 2–4 phút — {persona.role} luận lần lượt
+                  từng cung. Vui lòng không đóng tab khi đang chạy.
                 </p>
               </div>
             ) : null}

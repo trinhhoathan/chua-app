@@ -12,8 +12,7 @@ export type TuViShareTemple = {
   address?: string | null;
   hotline?: string | null;
   phone?: string | null;
-  zalo?: string | null;
-  facebook?: string | null;
+  abbottName?: string | null;
 };
 
 export type PalaceEssay = { name: string; content: string };
@@ -34,11 +33,17 @@ export const TUVI_UNLOCK_ORDER_KEY = (templeId: string) =>
 
 export const TUVI_LAST_PAID_ORDER_KEY = 'tuvi-last-paid-order';
 
+function normalizeStoredOrderCode(code: string): string {
+  return (code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
 export function savePaidOrderCode(orderCode: string, templeId?: string) {
+  const code = normalizeStoredOrderCode(orderCode);
+  if (!code) return;
   try {
-    localStorage.setItem(TUVI_LAST_PAID_ORDER_KEY, orderCode);
+    localStorage.setItem(TUVI_LAST_PAID_ORDER_KEY, code);
     if (templeId) {
-      localStorage.setItem(TUVI_UNLOCK_ORDER_KEY(templeId), orderCode);
+      localStorage.setItem(TUVI_UNLOCK_ORDER_KEY(templeId), code);
     }
   } catch {
     /* ignore */
@@ -47,11 +52,11 @@ export function savePaidOrderCode(orderCode: string, templeId?: string) {
 
 export function getSavedUnlockOrderCode(templeId: string): string {
   try {
-    return (
+    const raw =
       localStorage.getItem(TUVI_UNLOCK_ORDER_KEY(templeId)) ||
       localStorage.getItem(TUVI_LAST_PAID_ORDER_KEY) ||
-      ''
-    );
+      '';
+    return normalizeStoredOrderCode(raw);
   } catch {
     return '';
   }
@@ -83,7 +88,7 @@ function esc(s: string): string {
 
 function templePlace(name: string) {
   const t = name.trim();
-  return /^chùa\b/i.test(t) ? t : `chùa ${t}`;
+  return /^chùa\b/i.test(t) ? t : `Chùa ${t}`;
 }
 
 function mutagenColor(mutagen: string): string {
@@ -189,15 +194,13 @@ function centerHtml(
       ? `<p class="meta">Tuổi hư ${horoscope.nominalAge} · thời gian xem ${esc(horoscope.solarDate)} · ${esc(horoscope.timeLabel)}</p>`
       : '';
 
+  const abbott = temple.abbottName?.trim();
+  const address = temple.address?.replace(/\s+/g, ' ').trim();
   const contact = [
-    temple.address ? `<p class="meta">${esc(temple.address)}</p>` : '',
+    `<p class="meta">Lá số được trụ trì${abbott ? ` ${esc(abbott)}` : ''} lập</p>`,
+    `<p class="meta">tại ${esc(templePlace(temple.name))}</p>`,
+    address ? `<p class="meta">${esc(address)}</p>` : '',
     phone ? `<p class="meta">Điện thoại: <strong>${esc(phone)}</strong></p>` : '',
-    temple.zalo
-      ? `<p class="meta">Zalo: <strong>${esc(temple.zalo.replace(/^https?:\/\/(www\.)?zalo\.me\//i, ''))}</strong></p>`
-      : '',
-    temple.facebook
-      ? `<p class="meta">Facebook: <strong>Fanpage</strong></p>`
-      : '',
   ]
     .filter(Boolean)
     .join('');
@@ -212,7 +215,6 @@ function centerHtml(
   <p class="meta">DL ${esc(chart.solarDate)} · ÂL ${esc(chart.lunarDate)} · ${esc(chart.time)}</p>
   ${ageLine}
   <div class="temple-box">
-    <p class="meta">Lá số được lập tại ${esc(templePlace(temple.name))}</p>
     ${contact}
   </div>
 </div>`;
@@ -705,16 +707,13 @@ function coverHtml(opts: BuildTuViHtmlOptions): string {
 
 function footerHtml(temple: TuViShareTemple): string {
   const phone = temple.hotline || temple.phone;
-  const bits = [
-    phone ? `ĐT: ${phone}` : '',
-    temple.zalo ? `Zalo: ${temple.zalo}` : '',
-    temple.facebook ? 'Facebook: Fanpage' : '',
-  ].filter(Boolean);
+  const abbott = temple.abbottName?.trim();
+  const address = temple.address?.replace(/\s+/g, ' ').trim();
   return `<footer class="footer">
-  <p>Lá số được lập tại ${esc(templePlace(temple.name))}${
-    temple.address ? ` · ${esc(temple.address)}` : ''
+  <p>Lá số được trụ trì${abbott ? ` ${esc(abbott)}` : ''} lập tại ${esc(templePlace(temple.name))}${
+    address ? ` · ${esc(address)}` : ''
   }</p>
-  ${bits.length ? `<p>${esc(bits.join(' · '))}</p>` : ''}
+  ${phone ? `<p>Điện thoại: ${esc(phone)}</p>` : ''}
 </footer>`;
 }
 

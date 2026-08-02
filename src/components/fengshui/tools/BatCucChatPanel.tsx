@@ -12,6 +12,8 @@ import {
   savePaidOrderCode,
 } from '@/lib/fengshui/tuvi-html';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { useSitePersona } from '@/components/SitePersonaContext';
+import { useStickToBottom } from '@/components/fengshui/useStickToBottom';
 
 type Message = {
   id: string;
@@ -27,7 +29,7 @@ interface Props {
   templeId?: string;
   contactPhone?: string | null;
   topic: BatCucTopicId;
-  /** Khối dữ liệu Bát Cực đã tính sẵn (đã mask nếu chủ đề bảo mật). */
+  /** Khối dữ liệu Âm Dương Ngũ Hành đã tính sẵn (đã mask nếu chủ đề bảo mật). */
   analysisContext: string;
   /** Số câu hỏi miễn phí; hết thì thỉnh nước / nhập mã đơn để mở khóa. */
   freeQuestionLimit?: number;
@@ -95,7 +97,7 @@ async function verifyOrderPaid(code: string): Promise<boolean> {
   }
 }
 
-/** Khung chat hỏi trụ trì về dãy số — dùng chung cho 14 trang Bát Cực Linh Số. */
+/** Khung chat hỏi trụ trì về dãy số — dùng chung cho 14 trang nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận. */
 export function BatCucChatPanel({
   open,
   onClose,
@@ -116,11 +118,18 @@ export function BatCucChatPanel({
   const [unlocked, setUnlocked] = useState(false);
   const [orderCode, setOrderCode] = useState('');
   const [unlocking, setUnlocking] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  /** Lượt luận giải còn lại theo ví server (X-Ai-Remaining); null = chưa biết, -1 = không giới hạn */
+  const [serverRemaining, setServerRemaining] = useState<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const streamAccRef = useRef('');
+  const { containerRef, bottomRef, onScroll, onWheel, stickToBottom } =
+    useStickToBottom([messages, streaming]);
 
-  const abbottLabel = `trụ trì ${templeName.trim() || 'chùa'}`;
+  const persona = useSitePersona();
+  const abbottLabel =
+    persona.upsell === 'sim'
+      ? persona.displayName
+      : `trụ trì ${templeName.trim() || 'chùa'}`;
   const limit =
     typeof freeQuestionLimit === 'number' && freeQuestionLimit > 0
       ? freeQuestionLimit
@@ -131,8 +140,9 @@ export function BatCucChatPanel({
     [messages],
   );
 
+  // Nguồn sự thật là ví server: chỉ khóa khi server báo hết lượt (402 / X-Ai-Remaining = 0)
   const lockedForChat =
-    limit != null && !unlocked && userQuestionCount >= limit;
+    !unlocked && serverRemaining != null && serverRemaining === 0;
 
   useEffect(() => {
     if (!templeId || limit == null) return;
@@ -159,10 +169,6 @@ export function BatCucChatPanel({
   }, [open, onClose, streaming]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streaming]);
-
-  useEffect(() => {
     return () => abortRef.current?.abort();
   }, []);
 
@@ -184,6 +190,7 @@ export function BatCucChatPanel({
       }
       setOrderCode(code);
       setUnlocked(true);
+      setServerRemaining(null);
       if (templeId) savePaidOrderCode(code, templeId);
     } finally {
       setUnlocking(false);
@@ -194,15 +201,18 @@ export function BatCucChatPanel({
     const question = raw.trim();
     if (!question || streaming) return;
 
-    if (limit != null && !unlocked && userQuestionCount >= limit) {
+    if (lockedForChat) {
       setError(
-        `Đã dùng hết ${limit} câu hỏi miễn phí. Thỉnh nước ủng hộ chùa để hỏi tiếp.`,
+        persona.upsell === 'sim'
+          ? 'Đã dùng hết lượt luận giải miễn phí. Gọi thầy hoặc chọn sim hợp mệnh trong kho để được tư vấn tiếp.'
+          : 'Đã dùng hết lượt luận giải miễn phí. Thỉnh nước ủng hộ chùa để hỏi tiếp.',
       );
       return;
     }
 
     setError(null);
     setInput('');
+    stickToBottom();
     const userMsg: Message = {
       id: `u-${Date.now()}`,
       role: 'user',
@@ -238,13 +248,18 @@ export function BatCucChatPanel({
           history,
           templeName,
           topic,
+          orderCode: unlocked ? orderCode : undefined,
         }),
       });
+
+      const remainHeader = res.headers.get('X-Ai-Remaining');
+      if (remainHeader !== null) setServerRemaining(Number(remainHeader));
 
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
+        if (res.status === 402) setServerRemaining(0);
         throw new Error(
           data?.error ||
             (res.status === 429
@@ -356,7 +371,7 @@ export function BatCucChatPanel({
               className="text-[0.65rem] uppercase tracking-[0.2em]"
               style={{ color: primaryColor }}
             >
-              Bát Cực Linh Số · {cfg.title}
+              nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận · {cfg.title}
             </p>
             <p className="text-sm font-medium text-ink truncate">
               {abbottLabel}
@@ -375,15 +390,21 @@ export function BatCucChatPanel({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 bg-paper/60">
+        <div
+          ref={containerRef}
+          onScroll={onScroll}
+          onWheel={onWheel}
+          className="flex-1 overflow-y-auto px-3 py-3 space-y-3 bg-paper/60"
+        >
           {messages.length === 0 ? (
             <div className="space-y-3">
               <p className="text-sm text-muted leading-relaxed">
                 {cfg.chatIntro}
                 {limit != null ? (
                   <span className="block mt-1 text-[0.75rem]">
-                    Miễn phí {limit} câu hỏi; từ câu {limit + 1} cần thỉnh nước
-                    ủng hộ chùa.
+                    {persona.upsell === 'sim'
+                      ? `Miễn phí ${limit} câu hỏi; muốn luận sâu hơn hãy gọi thầy hoặc chọn sim hợp mệnh trong kho.`
+                      : `Miễn phí ${limit} câu hỏi; từ câu ${limit + 1} cần thỉnh nước ủng hộ chùa.`}
                   </span>
                 ) : null}
               </p>
@@ -483,55 +504,70 @@ export function BatCucChatPanel({
           {lockedForChat && !streaming ? (
             <div className="border border-fog bg-white p-3 space-y-2">
               <p className="text-xs font-medium text-ink">
-                Đã hết {limit} câu hỏi miễn phí
+                Đã hết lượt luận giải miễn phí
               </p>
               <p className="text-[0.7rem] text-muted leading-relaxed">
-                Thỉnh nước ủng hộ chùa để hỏi tiếp, hoặc liên hệ trụ trì trực
-                tiếp.
+                {persona.upsell === 'sim'
+                  ? `Gọi ${persona.displayName} để được luận tiếp, hoặc vào kho sim chọn số hợp mệnh.`
+                  : 'Thỉnh nước ủng hộ chùa để hỏi tiếp, hoặc liên hệ trụ trì trực tiếp.'}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  onClick={() =>
-                    openWaterDonateForm({
-                      note: cfg.donateNote.slice(0, 180),
-                      qty: 10,
-                    })
-                  }
-                  className="text-xs px-2.5 py-1.5 text-white"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  Thỉnh nước
-                </button>
+                {persona.upsell === 'sim' ? (
+                  <a
+                    href="/sim"
+                    className="text-xs px-2.5 py-1.5 text-white"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    Xem kho sim hợp mệnh
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openWaterDonateForm({
+                        note: cfg.donateNote.slice(0, 180),
+                        qty: 10,
+                      })
+                    }
+                    className="text-xs px-2.5 py-1.5 text-white"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    Thỉnh nước
+                  </button>
+                )}
                 {phoneHref ? (
                   <a
                     href={phoneHref}
                     className="text-xs px-2.5 py-1.5 border border-fog text-ink"
                   >
-                    Gọi trụ trì
+                    {persona.callLabel}
                     {contactPhone ? ` · ${contactPhone}` : ''}
                   </a>
                 ) : null}
               </div>
-              <div className="flex flex-wrap gap-1.5 items-end pt-1">
-                <label className="flex-1 min-w-[8rem] text-[0.65rem] text-muted">
-                  Mã đơn đã thanh toán
-                  <input
-                    value={orderCode}
-                    onChange={(e) => setOrderCode(e.target.value.toUpperCase())}
-                    placeholder="VD: BH…"
-                    className="mt-0.5 w-full border border-fog px-2 py-1.5 text-sm text-ink bg-white"
-                  />
-                </label>
-                <button
-                  type="button"
-                  disabled={unlocking}
-                  onClick={() => void unlockWithCode()}
-                  className="text-xs px-2.5 py-1.5 border border-fog text-ink disabled:opacity-50"
-                >
-                  {unlocking ? 'Đang kiểm…' : 'Mở khóa'}
-                </button>
-              </div>
+              {persona.upsell === 'sim' ? null : (
+                <div className="flex flex-wrap gap-1.5 items-end pt-1">
+                  <label className="flex-1 min-w-[8rem] text-[0.65rem] text-muted">
+                    Mã đơn đã thanh toán
+                    <input
+                      value={orderCode}
+                      onChange={(e) =>
+                        setOrderCode(e.target.value.toUpperCase())
+                      }
+                      placeholder="VD: BH…"
+                      className="mt-0.5 w-full border border-fog px-2 py-1.5 text-sm text-ink bg-white"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    disabled={unlocking}
+                    onClick={() => void unlockWithCode()}
+                    className="text-xs px-2.5 py-1.5 border border-fog text-ink disabled:opacity-50"
+                  >
+                    {unlocking ? 'Đang kiểm…' : 'Mở khóa'}
+                  </button>
+                </div>
+              )}
             </div>
           ) : null}
 

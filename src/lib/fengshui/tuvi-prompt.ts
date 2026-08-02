@@ -467,6 +467,41 @@ Câu hỏi gợi ý 5
 
 Trong khối chỉ có đúng 5 dòng câu hỏi thuần túy: không đánh số, không gạch đầu dòng, không lời dẫn — ngắn gọn, cụ thể, bám nội dung vừa luận, gợi tò mò và KHÁC câu vừa hỏi.`;
 
+/** Persona ghi đè cho site không phải chùa (VD: Lý Gia Phúc An). */
+export interface TuViPromptPersona {
+  /** VD: "với vai trò Thầy Phong Thủy Phúc An, thầy phong thủy trực tiếp luận giải…" */
+  aiRoleIntro: string;
+  /** Danh xưng ngắn: "thầy" */
+  role: string;
+  /** Hướng dẫn kết bài (mời xem sim / gọi thầy…) */
+  aiOutro?: string;
+}
+
+/** Áp persona lên prompt gốc (viết cho giọng trụ trì chùa). */
+export function applyPromptPersona(
+  prompt: string,
+  place: string,
+  persona?: TuViPromptPersona | null,
+): string {
+  if (!persona) return prompt;
+  const transformed = prompt
+    .replaceAll(`với vai trò trụ trì ${place}`, persona.aiRoleIntro)
+    .replaceAll('Phật tử / người hỏi', 'khách')
+    .replaceAll('Phật tử', 'khách')
+    .replaceAll(
+      'theo phương pháp và kinh nghiệm cá nhân gắn với ngôi chùa',
+      'theo phương pháp và kinh nghiệm cá nhân',
+    )
+    .replaceAll(
+      'theo tinh thần chùa (chúc an lành / tinh tấn)',
+      'bằng lời chúc thuận lợi, bình an',
+    )
+    .replaceAll('trụ trì', persona.role);
+  return persona.aiOutro
+    ? `${transformed}\n\nLưu ý thêm: ${persona.aiOutro}`
+    : transformed;
+}
+
 export function buildTuViSystemPrompt(
   templeName: string,
   school: TuViSchool = 'bac_phai',

@@ -65,7 +65,7 @@ export const NAV_SECTION_LABELS: Record<NavSection, string> = {
   hang_ngay: 'Dùng mỗi ngày',
   viec_he_trong: 'Việc hệ trọng',
   tu_vi_bat_tu: 'Tử vi · Bát tự',
-  bat_cuc: 'Bát Cực Linh Số',
+  bat_cuc: 'Linh số',
   tham_khao: 'Tham khảo thêm',
   lich_le: 'Lịch lễ · Vía',
   kinh_khan: 'Kinh · Văn khấn',
@@ -79,7 +79,7 @@ export const NAV_SECTION_MENU_LABELS: Record<NavSection, string> = {
   hang_ngay: 'Mỗi ngày',
   viec_he_trong: 'Hệ trọng',
   tu_vi_bat_tu: 'Tử vi',
-  bat_cuc: 'Bát Cực Linh Số',
+  bat_cuc: 'Linh số',
   tham_khao: 'Tham khảo',
   lich_le: 'Lịch lễ',
   kinh_khan: 'Kinh · khấn',
@@ -104,6 +104,20 @@ export const PHAT_HOC_NAV_ORDER: NavSection[] = [
   'tu_hoc',
   'tham_gia',
 ];
+
+/**
+ * Site Lý Gia Phúc An: không hiện nhóm «Tham gia» (lịch chùa, quy y, sớ, nước)
+ * — không phải website chùa vận hành sổ / công quả.
+ */
+export const PHAT_HOC_NAV_ORDER_LY_GIA: NavSection[] = [
+  'lich_le',
+  'kinh_khan',
+  'tu_hoc',
+];
+
+export function isThamGiaTool(tool: Pick<FengShuiToolMeta, 'navSection'>): boolean {
+  return tool.navSection === 'tham_gia';
+}
 
 export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
   // —— Dùng mỗi ngày ——
@@ -407,7 +421,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'tham_khao',
     status: 'ready',
     description:
-      'Tra cứu 64 quẻ, reo quẻ 6 hào và luận giải AI — hỗ trợ Phật tử tham khảo cổ học.',
+      'Tra cứu 64 quẻ, reo quẻ 6 hào và luận giải chuyên sâu — hỗ trợ Phật tử tham khảo cổ học.',
   },
   {
     slug: 'luc-hao',
@@ -454,6 +468,17 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
       'Xin xăm Quan Âm Linh Xăm — rút ngẫu nhiên 1 trong 100 quẻ. Cũng có icon nhanh trên cột liên hệ.',
   },
   {
+    slug: 'tran-trieu-than-ung',
+    title: 'Trần Triều 100 Quẻ Thần Ứng',
+    subtitle: 'Linh xăm Đức Thánh Trần · 50 quẻ',
+    category: 'Kinh Dịch',
+    domain: 'co_hoc',
+    navSection: 'tham_khao',
+    status: 'ready',
+    description:
+      'Linh Xăm Đức Thánh Trần Hưng Đạo (Cửu Thiên Vũ Đế) — bốc quẻ thần ứng và tra cứu 50 quẻ phổ biến (tên sách hay gọi 100 quẻ). Có giải nghĩa, ứng nghiệm từng việc và chú thích chỗ cần đối chiếu nguyên bản.',
+  },
+  {
     slug: 'than-so-hoc',
     title: 'Thần số học',
     subtitle: 'Số chủ đạo',
@@ -478,24 +503,26 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
   {
     slug: 'nhan-tuong',
     title: 'Nhân tướng',
-    subtitle: 'Tướng mặt · hình',
+    subtitle: 'Tam đình · Ngũ quan · thần thái',
     category: 'Tướng số',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung nhân tướng học sơ lược.',
+    status: 'ready',
+    description:
+      'Tự quan sát khuôn mặt theo khung tướng pháp cổ truyền: Ngũ hành hình tướng, Tam đình (ba đoạn vận đời), Ngũ quan và thần thái — luận chi tiết từng bộ vị, chấm 5 phương diện, kèm luận giải chuyên sâu. Có thể tải ảnh chân dung để máy đo tỷ lệ và điền gợi ý (ảnh phân tích ngay trên thiết bị, không tải lên máy chủ).',
   },
   {
     slug: 'chi-tuong',
     title: 'Chỉ tướng',
-    subtitle: 'Tướng bàn tay',
+    subtitle: 'Ba đường chính · gò · thủ hình',
     category: 'Tướng số',
     domain: 'co_hoc',
     navSection: 'tham_khao',
-    status: 'coming_soon',
-    description: 'Khung chỉ tướng (bàn tay).',
+    status: 'ready',
+    description:
+      'Tự quan sát bàn tay theo khung thủ tướng cổ truyền: thủ hình ngũ hành, ba đường chính Tâm đạo · Trí đạo · Sinh đạo, đường Định Mệnh, đường Hôn Nhân, các gò và ngón cái — luận chi tiết từng bộ vị, chấm 5 phương diện, kèm luận giải chuyên sâu.',
   },
-  // —— Bát Cực Linh Số (14 trang · 4 nhóm con) ——
+  // —— nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận (14 trang · 4 nhóm con) ——
   // Nhóm Định danh & giấy tờ
   {
     slug: 'boi-sim',
@@ -506,7 +533,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Luận giải sim theo sách Bát Cực Linh Số: 8 từ trường Du Niên, biến số 0·5, tổ hợp chế hóa, 3 số cuối, 5 phương diện + 81 Số Lý, Âm Dương, hợp mệnh Nạp Âm — kèm AI luận sâu và trò chuyện.',
+      'Luận giải sim theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận: 8 từ trường Du Niên, biến số 0·5, tổ hợp chế hóa, 3 số cuối, 5 phương diện + 81 Số Lý, Âm Dương, hợp mệnh Nạp Âm.',
   },
   {
     slug: 'so-tai-khoan',
@@ -517,7 +544,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Luận cấu trúc sao của số tài khoản: tiền vào có thuận, có giữ được không — phân tích trên máy, số được che khi hỏi AI.',
+      'Luận cấu trúc sao của số tài khoản: tiền vào có thuận, có giữ được không — phân tích trên máy, số được che khi hỏi luận sâu.',
   },
   {
     slug: 'so-nha',
@@ -528,7 +555,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Luận số nhà / căn hộ theo quái số từng chữ số, cặp sao Bát Cực và tổng nút — kèm cách bài trí bù trừ.',
+      'Luận số nhà / căn hộ theo quái số từng chữ số, cặp sao và tổng nút — kèm cách bài trí bù trừ.',
   },
   {
     slug: 'bien-so-xe',
@@ -539,7 +566,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Bóc mã tỉnh, seri chữ và dãy số chính của biển số VN — luận Bát Cực trọng tâm an toàn di chuyển và tài lộc.',
+      'Bóc mã tỉnh, seri chữ và dãy số chính của biển số VN — luận theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận — trọng tâm an toàn di chuyển và tài lộc.',
   },
   {
     slug: 'so-can-cuoc',
@@ -550,7 +577,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Giải mã cấu trúc CCCD 12 số (mã tỉnh, giới tính, năm sinh theo TT 07/2016/TT-BCA) và luận trường khí gốc — số được che khi hỏi AI.',
+      'Giải mã cấu trúc CCCD 12 số (mã tỉnh, giới tính, năm sinh theo TT 07/2016/TT-BCA) và luận trường khí gốc — số được che khi hỏi luận sâu.',
   },
   {
     slug: 'so-the-atm',
@@ -561,7 +588,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Kiểm tra Luhn, tách mã BIN ngân hàng và luận cấu trúc sao phần số chính của thẻ — số được che khi hỏi AI.',
+      'Kiểm tra Luhn, tách mã BIN ngân hàng và luận cấu trúc sao phần số chính của thẻ — số được che khi hỏi luận sâu.',
   },
   // Nhóm Kinh doanh & doanh nghiệp
   {
@@ -641,7 +668,7 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     navSection: 'bat_cuc',
     status: 'ready',
     description:
-      'Luận cấu trúc sao của dãy số gõ hằng ngày — phân tích hoàn toàn trên máy, khi hỏi AI che kín số gốc, luôn nhắc bảo mật.',
+      'Luận cấu trúc sao của dãy số gõ hằng ngày — phân tích hoàn toàn trên máy, khi hỏi luận sâu thì che kín số gốc, luôn nhắc bảo mật.',
   },
   {
     slug: 'so-thu-tu-ghe',
@@ -722,8 +749,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tu học',
     domain: 'phat_hoc',
     navSection: 'tu_hoc',
-    status: 'coming_soon',
-    description: 'Khung giáo lý căn bản giới thiệu Phật pháp cho Phật tử.',
+    status: 'ready',
+    description:
+      'Khung giáo lý căn bản cho Phật tử: Tam Bảo, Tứ Đế, Bát Chánh Đạo, giới luật, nghiệp quả, niệm Phật… — đọc theo bài, có điểm cần nhớ và gợi ý thực hành.',
   },
   {
     slug: 'niem-phat',
@@ -756,8 +784,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tu học',
     domain: 'phat_hoc',
     navSection: 'tu_hoc',
-    status: 'coming_soon',
-    description: 'Khung chia sẻ pháp thoại do nhà chùa đăng.',
+    status: 'ready',
+    description:
+      'Cách nghe pháp, oai nghi, kho chủ đề giảng thường gặp — kèm video và lịch khóa tu · vía nhà chùa đã đăng.',
   },
   {
     slug: 'hoi-dap-phat-hoc',
@@ -766,8 +795,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tu học',
     domain: 'phat_hoc',
     navSection: 'tu_hoc',
-    status: 'coming_soon',
-    description: 'Khung hỏi đáp Phật học cho Phật tử.',
+    status: 'ready',
+    description:
+      'Kho câu hỏi thường gặp: quy y, giới luật, niệm Phật, nghiệp quả, nghi lễ, lễ vía — có tìm kiếm, điểm cần nhớ và hướng dẫn hỏi thầy.',
   },
 
   // —— Tham gia cùng chùa (link hệ thống sẵn có) ——
@@ -824,8 +854,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tư liệu',
     domain: 'phat_hoc',
     navSection: 'tu_hoc',
-    status: 'coming_soon',
-    description: 'Giới thiệu các hệ phái và tông môn Phật giáo Việt Nam.',
+    status: 'ready',
+    description:
+      'Tổng quan Nam truyền · Bắc truyền, Thiền Trúc Lâm, Tịnh Độ, Khất sĩ… — giúp chọn đạo tràng và kính trọng sự khác biệt.',
   },
   {
     slug: 'danh-tang-cao-tang',
@@ -834,8 +865,9 @@ export const FENGSHUI_TOOLS: FengShuiToolMeta[] = [
     category: 'Tư liệu',
     domain: 'phat_hoc',
     navSection: 'tu_hoc',
-    status: 'coming_soon',
-    description: 'Khung tư liệu danh tăng — gắn nội dung theo chùa.',
+    status: 'ready',
+    description:
+      'Gương tổ sư và danh tăng Việt Nam — kèm tiểu sử trụ trì nhà chùa khi đã đăng trên website.',
   },
 ];
 

@@ -9,6 +9,8 @@ import {
 } from '@/lib/fengshui/sao-chieu-menh';
 import { VerdictBadge } from '../VerdictBadge';
 import { inputCls, labelCls } from '../FieldStyles';
+import { AdvisorName, AdvisorText } from '@/components/SitePersonaContext';
+import { HeTrongAiPanel } from './HeTrongAiPanel';
 
 interface Props {
   primaryColor: string;
@@ -121,7 +123,7 @@ export function SaoChieuMenh({ primaryColor }: Props) {
                 {result.overallLabel}
               </p>
               <p className="text-xs text-muted mt-1 leading-relaxed">
-                {result.overallDetail}
+                <AdvisorText text={result.overallDetail} />
               </p>
             </div>
           </section>
@@ -157,7 +159,7 @@ export function SaoChieuMenh({ primaryColor }: Props) {
               {result.star.advice}
             </p>
             <p className="mt-2 text-xs text-muted leading-relaxed">
-              {result.star.ritualHint}
+              <AdvisorText text={result.star.ritualHint} />
             </p>
           </section>
 
@@ -242,6 +244,12 @@ export function SaoChieuMenh({ primaryColor }: Props) {
             </ul>
           </section>
 
+          <HeTrongAiPanel
+            primaryColor={primaryColor}
+            resetKey={`${birthYear}-${viewYear}-${gender}`}
+            payload={{ topic: 'sao_chieu_menh', birthYear, viewYear, gender }}
+          />
+
           <section>
             <p className="text-xs tracking-wide uppercase text-muted mb-2">
               Cửu Diệu — tham khảo
@@ -265,8 +273,8 @@ export function SaoChieuMenh({ primaryColor }: Props) {
 
       <p className="mt-6 text-xs text-muted leading-relaxed">
         Bảng Cửu Diệu dân gian (nam đếm thuận từ La Hầu, nữ đếm nghịch từ Kế
-        Đô) theo tuổi mụ. Chỉ mang tính tham khảo; khoa lễ dâng sao do trụ trì
-        hướng dẫn.
+        Đô) theo tuổi mụ. Chỉ mang tính tham khảo; khoa lễ dâng sao do{' '}
+        <AdvisorName /> hướng dẫn.
       </p>
     </div>
   );

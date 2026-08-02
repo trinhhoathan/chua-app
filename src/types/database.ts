@@ -80,6 +80,8 @@ export interface Temple {
   bank_name: string | null;
   bank_account_number: string | null;
   bank_account_holder: string | null;
+  /** Mã BIN NAPAS của ngân hàng (sinh VietQR về TK riêng của chùa/tenant). */
+  bank_bin: string | null;
   /** Mã ngắn định danh chùa trên nội dung CK, ví dụ CV, BH. */
   payment_code: string | null;
   water_price_vnd: number;
@@ -102,6 +104,10 @@ export interface WaterOrder {
   temple_id: string;
   customer_name: string;
   customer_phone: string;
+  /** Địa chỉ Phật tử — thu thập sau TT, không dùng giao hàng. */
+  customer_address: string | null;
+  /** Phường / xã / khu vực — thu thập sau TT. */
+  customer_ward: string | null;
   note: string | null;
   quantity: number;
   unit_price: number;
@@ -434,6 +440,112 @@ export interface SoHouseholdMember {
   created_at: string;
   updated_at: string;
 }
+
+/* ------------------------------------------------------------------ */
+/* Kho Sim Phong Thủy (Lý Gia Phúc An)                                  */
+/* ------------------------------------------------------------------ */
+
+export type SimStatus = 'available' | 'reserved' | 'sold' | 'hidden';
+export type SimVerdict = 'tot' | 'kha' | 'trung_binh' | 'yeu';
+export type SimElement = 'kim' | 'moc' | 'thuy' | 'hoa' | 'tho';
+
+/** Nhà cung cấp / kho sim nguồn (hoa hồng khi bán) */
+export interface SimSource {
+  id: string;
+  temple_id: string;
+  name: string;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_note: string | null;
+  /** % hoa hồng khi bán thành công */
+  commission_percent: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SimListing {
+  id: string;
+  temple_id: string;
+  /** 10 chữ số chuẩn hóa 0xxxxxxxxx */
+  phone: string;
+  phone_display: string;
+  network: string;
+  price_vnd: number;
+  original_price_vnd: number | null;
+  /** Thời điểm kết thúc flash sale (đếm ngược); null = không có sale */
+  sale_ends_at: string | null;
+  status: SimStatus;
+  featured: boolean;
+  tags: string[];
+  overall_score: number;
+  du_nien_score: number;
+  verdict: SimVerdict;
+  nut: number;
+  element: SimElement;
+  so_ly_81: number;
+  /** { tai_loc, su_nghiep, tinh_cam, suc_khoe, quy_nhan } 0-100 */
+  aspects: Record<string, number>;
+  /** { catPairs, hungPairs, starCounts } */
+  star_summary: Record<string, unknown>;
+  careers: string[];
+  /** Quẻ Kinh Dịch chủ 1–64 theo Mai Hoa Dịch Số (null với dữ liệu cũ chưa backfill) */
+  que_number: number | null;
+  description: string | null;
+  /** Lượt xem trang chi tiết */
+  view_count: number;
+  /** Nguồn / kho sim (nullable) */
+  source_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SimOrderStatus =
+  | 'pending_payment'
+  | 'paid'
+  | 'delivering'
+  | 'completed'
+  | 'cancelled';
+
+export interface SimOrder {
+  id: string;
+  order_code: string;
+  temple_id: string;
+  sim_id: string | null;
+  phone: string;
+  phone_display: string;
+  price_vnd: number;
+  customer_name: string;
+  customer_phone: string;
+  note: string | null;
+  birth_date: string | null;
+  birth_time: string | null;
+  gender: 'nam' | 'nu' | null;
+  status: SimOrderStatus;
+  payment_ref: string | null;
+  paid_at: string | null;
+  /** Snapshot nguồn sim lúc đặt đơn */
+  source_id: string | null;
+  source_name: string | null;
+  commission_percent: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const SIM_ORDER_STATUS_LABELS: Record<SimOrderStatus, string> = {
+  pending_payment: 'Chờ thanh toán',
+  paid: 'Đã thanh toán',
+  delivering: 'Đang giao sim',
+  completed: 'Hoàn tất',
+  cancelled: 'Đã hủy',
+};
+
+export const SIM_STATUS_LABELS: Record<SimStatus, string> = {
+  available: 'Đang bán',
+  reserved: 'Đang giữ chỗ',
+  sold: 'Đã bán',
+  hidden: 'Ẩn',
+};
 
 /** Gia tiên / chính tiến */
 export interface SoAncestor {

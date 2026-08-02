@@ -8,7 +8,7 @@ import {
   type LunarTime,
   type NineStar,
 } from 'lunar-typescript';
-import { viGanZhi, viList, viTerm } from './lunar-zh-vi';
+import { viGanZhi, viList, viTerm, viZhi } from './lunar-zh-vi';
 
 export type DayLuck = 'good' | 'bad' | 'neutral';
 
@@ -259,7 +259,7 @@ function mapHour(t: LunarTime): AlmanacHour {
   const nine = mapNineStar(t.getNineStar());
   return {
     ganZhi: viGanZhi(t.getGanZhi()),
-    chi: viTerm(t.getZhi()),
+    chi: viZhi(t.getZhi()),
     animal: viTerm(t.getShengXiao()),
     range: `${t.getMinHm()}–${t.getMaxHm()}`,
     tianShen: viTerm(t.getTianShen()),

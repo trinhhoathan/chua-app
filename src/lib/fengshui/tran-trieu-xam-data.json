@@ -1,0 +1,2422 @@
+[
+  {
+    "id": 1,
+    "rank": "đại_cát",
+    "titleHan": "Hòa thần đương xuân",
+    "titleVi": "Mùa xuân thần thái ôn hòa",
+    "poemHan": "Nhất điểm xuân tình mạt phấn hoa\nTầm phương khách diệc phỏng Đông A\nThế nhân mạc thức dư tâm lạc\nTiếu chỉ sơn đầu lạc bút (1) kha.",
+    "poemVi": "Một điểm tình xuân rải phấn hoa\nKhách tìm thơm lại hỏi nơi ta\nNgười đời không biết, ta vui bảo :\nKìa “bút đầu non” được trổ (1) ra.",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "Triệu «hòa thần đương xuân»: thời vận như mùa xuân ấm áp — việc cầu xin dễ thuận nếu lấy ôn hòa, nhu thuận làm gốc. Cây non gặp xuân thì nảy nở; nóng nảy hay tranh chấp sẽ làm mất khí xuân của quẻ.\n\nThời vận: Vượng nhất mùa xuân (tháng 1–3 âm); hạ·thu bình; đông kém hơn.\n\nLời khuyên: Giữ hòa khí trong nhà và nơi làm việc; làm lành, tránh nóng vội.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “mùa xuân thần thái ôn hòa” các việc mưu vọng đều tốt, khác nào cây non gặp thời trổ mạnh, nhựa xuân ăm ắp mạch sống chứa chan. Tuy nhiên, triệu đứng chữ “hòa” nên các việc phải lấy ôn-hòa làm căn bản thì mới hay. Thời vận : Mùa xuân (các tháng 1,2,3) vượng ; Mùa hạ (các tháng 4,5,6) và mùa thu các tháng (7,8,9) bình ; Mùa đông (các tháng 10,11,12) kém hơn 3 mùa kia. Chú thích : (1) “Búp đầu non” là chỉ chữ “triệt” giống chữ “sơn” Mà nét sổ giữa kéo dài ra.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 2,
+    "rank": "đại_cát",
+    "titleHan": "Tích thụ sinh hoa",
+    "titleVi": "Cây ngày trước ngày nay lại trổ bông",
+    "poemHan": "Hoa viên qui khứ cập tân xuân\nGiáp mã đương đồ xách cố nhân\nNam hướng ly minh phùng thử nhật\nQuan sơn vô dạng hạ hồng ân.",
+    "poemVi": "Xuân mới vườn xuân dạo bước chơi\nGiữa đường gặp bạn ngựa xe vời\nNam phương hướng ấy sang hồi tốt\nNon nước bình yên hưởng phúc trời.",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Tích thụ sinh hoa» — cây đức tổ tiên / công khó ngày trước nay đã trổ hoa. Cầu quan·cầu tài dễ được như hoa gặp xuân; nhắc người hưởng phúc phải tiếp tục tu nhân tích đức kẻo cây phúc héo.\n\nThời vận: Xuân rất vượng; hạ tốt; thu khá; đông kém.\n\nLời khuyên: Biết ơn nguồn gốc; khi toại nguyện đừng kiêu, hãy bồi đắp phúc đức.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu : “Xưa trồng cây đức, nay đã nở hoa” là có ý nói tổ tiên tu nhân tích đức để phúc lại cho con cháu hưởng nên ngày nay được mọi sự tốt lành. Thời vận mùa xuân (tháng 1,2,3) rất vượng ; mùa hạ (tháng 4,5,6) tốt ; mùa thu (tháng 7,8,9) cũng khá ; mùa đông (tháng 10,11,12) kém hơn 3 mùa kia. Quẻ này có quý nhân phù trợ nhưng khi toại nguyện nên luôn luôn giữ lòng tử tế và ăn ở tu nhân tích đức để bồi đắp cho cây phúc của tổ tiên đã trồng thì mới mong hưởng thụ lâu dài. Hiện có ngôi mộ để hướng Nam đang kết, chớ nên bốc đi nơi khác, hoặc ngôi nhà 3 gian hay 3 tầng hướng Nam đang rất vượng, chớ nên thay đổi hoặc chuyển hướng nhà .",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 3,
+    "rank": "trung_bình",
+    "titleHan": "Vong dương bổ lao",
+    "titleVi": "Mất dê mới lo rào chuồng",
+    "poemHan": "Trấp tải công phu ẩn kỷ đa\nNhất triệu lao lạc mạn phân hoa\nNhư kim nhược đắc quí công tử\nLan xú đồng tâm khởi vọng xa.",
+    "poemVi": "Bao độ dùi mài chí thú thay\nNào ngờ một sớm quá vun tay ! Ví bằng gặp được trang hiền\nđức\nLan sa ngày thêm ảnh hưởng hay.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Đại nhân hữu bỉ",
+        "meaning": "Tự thân và gia đình gặp lúc lủng củng không yên"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Tái ông đắc mã",
+        "meaning": "Cầu quan cầu tài gặp may nhưng phúc, họa điên đảo"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Đương diện thác quá",
+        "meaning": "Việc hôn nhân có sự bỏ qua đáng tiếc"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Đông môn giải vi",
+        "meaning": "Sự sinh nở gặp khó khăn, nhưng sau rồi cũng cứu"
+      },
+      "PHONG THỦY": {
+        "phrase": "Bất như nhân hòa",
+        "meaning": "Nên cư xử đẹp đẽ với mọi người để tránh sự phá hoại"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Tất hữu ngã sư",
+        "meaning": "Kiện tụng nên tìm người biết luật làm cố vấn thì"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Cửu chuyển đan thành",
+        "meaning": "Gặp thầy gặp thuốc, tuy nhiên, cũng tốn nhiều thuốc"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Ngã tổ đông sơn",
+        "meaning": "Người đi, của mất nên sang nẻo đông mà tìm"
+      },
+      "LỤC SÚC ĐIỀM TẦM": {
+        "phrase": "Tiểu hữu đắc dã",
+        "meaning": "Có làm có ăn mà lợi lộc cũng chỉ nho nhỏ"
+      }
+    },
+    "judgment": "«Vong dương bổ lao» (thành ngữ): mất dê mới rào chuồng — việc đã sơ hở, nay mới lo phòng. Chưa phải đại hung nhưng báo hiệu cần sửa sai, siết kỷ luật; nếu kịp bổ cứu thì tránh họa lớn.\n\nThời vận: Cần chủ động phòng hơn là chờ vận tự tới.\n\nLời khuyên: Rà soát hợp đồng, tài chính, cửa nhà; đừng để cùng một lỗi tái phạm.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “mất dê mới rào chuồng” là nói nên tu tỉnh tâm chí lại, nên nghe lời khuyên răn của bạn bè mới có cơ cứu vãn tình thế. Nghĩa là dù thời vận kém, nhưng biết hướng thiện cũng có thể chuyển xấu sang tốt, khác nào như kẻ để chuồng hư, dê mất thì nên rào lại chuồng là tự khắc không mất thêm dê nữa. Thời vận trong quẻ này có chữ “vong dương” là mất dê ; dê là tháng mùi (tức tháng 6). Vậy tháng 6 hạn xấu phải đề phòng. Ngoài ra, cũng nên lo miệng tiếng, vì dương (dê) thuộc (đoài) là khẩu thiệt (miệng tiếng). Lại nên đề phòng sông nước cho con gái thứ, vì đoài là “thứ nữ” lại là “chẵm lạch” cho nên phải lưu ý .",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 4,
+    "rank": "trung_bình",
+    "titleHan": "Hàn thiền ẩm lộ",
+    "titleVi": "Ve lạnh uống sương",
+    "poemHan": "Nhân sự vô đa bất thị tiên\nThử nhân, thử thế đạm như thiền\nLai sinh ưng học kim-đơn dược\nÝ ngã càn khôn xuất tục duyên.",
+    "poemVi": "Trần tục nào ai đã hóa tiên ? Thân nầy, thế ấy nhạt mùi\nthiền\nKiếp sau học luyện lò tiên dược\nĐể chữa đời ta khỏi tục duyên.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Ngã sinh chi hậu",
+        "meaning": "Thân thế và gia đình lủng củng, chẳng được như lòng"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Mật vân bất vũ",
+        "meaning": "Cầu quan cầu tài, nhiều tin tức hay mà sau không có"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Bất vĩnh sở sự",
+        "meaning": "Việc hôn nhân không vĩnh viễn"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Hà khả trưởng dã",
+        "meaning": "Việc con cái có điều vất vả"
+      },
+      "PHONG THỦY": {
+        "phrase": "Ốc dã thiên lỷ",
+        "meaning": "Mộ phần yên"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Hệ vu bào tang",
+        "meaning": "Việc quan tụng có thể bị câu lưu"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Nhan Hồi yểu tử",
+        "meaning": "Bệnh trọng khó qua khỏi"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Kỳ vong kỳ vong",
+        "meaning": "Người đi xa và của mất không hy vọng trở về"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Táng ngưu vu dịch",
+        "meaning": "Việc nuôi súc vật và việc canh nông đều thất"
+      }
+    },
+    "judgment": "«Hàn thiền ẩm lộ» — ve lạnh chỉ uống sương: cảnh thanh cao nhưng kham khổ, nuôi dưỡng bằng ít ỏi. Quẻ trung bình: giữ được phẩm hạnh, song lợi lộc mỏng; đừng ham việc lớn khi lực còn mỏng.\n\nThời vận: Thu·đông ứng khí lạnh — càng cần kiên nhẫn.\n\nLời khuyên: Sống giản dị, tích lũy dần; tránh vay nợ hoặc đánh lớn.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Ve lạnh uống sương” là quẻ không có tài lộc, không có quý nhân phù trợ ; các mưu vọng ít thành, ví như con ve xác đã gầy mòn, lại gặp tiết trời lạnh lẻo, chỉ có uống sương mà sống qua ngày. Tuy nhiên, dù gặp vận bĩ, nhưng vẫn còn đường sống thì chưa nên chán nản vội, hãy gắng chờ thời .",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 5,
+    "rank": "thượng_thượng",
+    "titleHan": "Thừa phong phá lãng",
+    "titleVi": "Nhân gió để lướt sóng",
+    "poemHan": "Bằng hướng đông quân lực khá hồi\nÂm thư nhân sự lưỡng tương thôi\nÔ Giang vị tử nhân giang đỉnh\nThiên hạ anh hùng kỷ tự cai ?",
+    "poemVi": "Nhờ sức trời xanh khéo chuyển xoay\nViệc hay, dồn dập tiếp tin hay\nÔ Giang chưa mất tài nâng đỉnh\nThiên hạ nào ai đã sánh tầy ?",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Thừa phong phá lãng» — thuận gió phá sóng: thời cơ tốt, có thể tiến mạnh. Thuộc thượng thượng — việc lớn có duyên thành nếu biết nắm gió, đừng chần chừ.\n\nThời vận: Khi có «gió» (quý nhân, chính sách, xu hướng) thì xuống tay.\n\nLời khuyên: Dám quyết nhưng vẫn giữ đạo nghĩa; đừng ỷ thế ức người.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Con thuyền được gió lướt sóng ra khơi” nên mỗi việc đều có sức người ngoài phù trợ không cần vất vả mà được thành công. Tuy nhiên, trong thơ tổng luận có nhắc đến sự nghiệp anh hùng của Hạng Võ, lúc đắc thời, lên ngôi bá vương, coi thường nhân tài hào kiệt trong thiên hạ, rồi sau bị thất bại ở Ô-Giang. Vậy ai xin được quẻ này, công việc làm ăn, mưu vọng tuy có thắng lợi nhưng luôn luôn phải giữ đức tính khiêm nhường thì mới tránh khỏi sự thất bại về sau .",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 6,
+    "rank": "trung_bình",
+    "titleHan": "Thu giang vọng nguyệt",
+    "titleVi": "Ngắm bóng trăng dưới dòng sông mùa thu",
+    "poemHan": "Đàn cầm kỷ khúc tố tri âm\nMao xá thinh lai bất khả tầm ! Nam-phố tống quân thôi hứng tứ\nTrường thiên nhạn độ quá bình lâm.",
+    "poemVi": "Thánh thót đàn ai mấy tiếng hòa\nTri âm xóm vắng chẳng tìm ra\nChén đưa nam phố tuôn nguồn hứng\nRừng thẳm lưng trời bóng nhạn xa.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Gia dụng bình khang",
+        "meaning": "Tự thân mạnh khỏe, nhà cửa bình an. Mọi việc"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Cung tường ngoại vọng",
+        "meaning": "Việc cầu quan và cầu tài hiện chưa có lối bước vào"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Thu trung hữu nữ",
+        "meaning": "Sinh con gái, sau này tài mạo song toàn"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tri nhân tắc triết",
+        "meaning": "Nên đón thầy địa lý giỏi tìm giúp đất mới có"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Do dư vị định",
+        "meaning": "Việc kiện tụng, cả đôi bên chưa bên nào quả quyết"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Thần chi thính chi",
+        "meaning": "Nên cầu Thần Phật phù hộ cho sẽ có cơ chóng khỏi"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Vị ngã hà cầu",
+        "meaning": "Không nên tìm kiếm chi cả. Người đi xa vẫn chưa về,"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Bạch bích vi hà",
+        "meaning": "Việc cầy cấy chăn nuôi, đều thất 1 phần"
+      }
+    },
+    "judgment": "«Thu giang vọng nguyệt» — trăng đẹp trên sông thu: cảnh thanh nhã, tâm an, nhưng ánh trăng không cầm được. Quẻ trung: đẹp về hình thức, thực lợi vừa phải; hợp thưởng ngoạn, tu dưỡng hơn là tranh đoạt.\n\nThời vận: Thu (tháng 7–9) đẹp nhất.\n\nLời khuyên: Giữ tâm thanh; đừng vì vẻ đẹp bề ngoài mà lao vào việc rủi ro.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “ngắm bóng trăng dưới dòng sông mùa thu” nên mọi việc trông như có thực, mà kết quả thành mơ hồ, khác nào như ngắm bóng gương nga long lánh dưới dòng sông, đẹp thì đẹp lắm, nhưng đấy chỉ là ảo ảnh mà thôi. Trong thơ tổng đoán cũng có nói :Tiếng đàn văng vẳng từ xóm nhà tranh vang ra, nhưng tìm đến người đánh đàn cũng như người nghe đàn thì tuyệt không thấy ai cả. Trong triệu có chữ “thừa phong” là nhờ gió. Gió là quẻ Tốn thuộc hướng Đông Nam, vậy công việc mưu cầu nên tìm nẻo Đông Nam thì tốt nếu quý nhân là người nữ trán rộng, tóc thưa thì càng hay .",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 7,
+    "rank": "đại_cát",
+    "titleHan": "Bạt thập đắc ngũ",
+    "titleVi": "Làm mười được năm",
+    "poemHan": "Xuân quang ngâm vịnh bất thăng đề\nNhật chiếu Thần san ảnh vị đê\nThạc quả kỷ hồi lưu bất thực\nThái mao hạ sự xuất trường đê !",
+    "poemVi": "Trời xuân ngâm vịnh dạt dào thơ\nÁc ngả Thần sơn ánh chửa mờ\nQuả chín bấy lâu dành đợi đó\nThái mao lo phải chốn xa chừ !",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Công gia vô dạng",
+        "meaning": "Già trẻ mạnh khỏe, gia môn khang cát"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Yên sơn ngũ quế (Năm gốc quế nhà Đậu Yên-sơn)",
+        "meaning": "Sinh nhiều con trai, sau đều hiển đạt"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tất đắc kỳ trung",
+        "meaning": "Mộ để trúng huyệt, kiểu đất hình thổ"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Thừa thắng tràng khu",
+        "meaning": "Việc kiện đại thắng"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Tử tôn phùng cát",
+        "meaning": "Gặp thầy gặp thuốc, bệnh sẽ khỏi liền"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Kim ngã lai tư",
+        "meaning": "Người đi xa và của mất sẽ có tin đem về"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Thái bình hữu tượng",
+        "meaning": "Súc vật và hoa màu không bị phá hại, thảy đều hưng"
+      }
+    },
+    "judgment": "«Bạt thập đắc ngũ» — làm mười được năm: biết chọn đường hay nên có kết quả chắc. Không phải «được hết» nhưng phần đạt được là thực; âm đức tổ tiên còn để lại.\n\nThời vận: Tháng 5 và tháng 10 thường được nhắc là điểm ứng tốt trong bản chú giải phổ biến.\n\nLời khuyên: Chấp nhận «được một nửa chắc» hơn tham mười phần ảo.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “làm mười được năm” là triệu biết làm điều hiền, biết chọn đường hay, nên có kết quả tốt. Trong thơ tổng vịnh có câu : “Quả chín bấy lâu dành để đó” tức là âm công của ông bà tiên tổ còn để lại cho con cháu đời sau hưởng. Vậy ai xin trúng quẻ này mọi việc đều vững vàng, tài lộc cũng tiến đều. Trong quẻ có ghi chữ “đắc ngũ” ứng vào tháng 5 nhằm thời vận rất tốt. Lại có chữ “bạt thập” ứng vào tháng 10 cũng sẽ có việc thắng lợi đưa đến .",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 8,
+    "rank": "hạ_hạ",
+    "titleHan": "Ngạ hổ phùng dương",
+    "titleVi": "Hổ đói gặp dê",
+    "poemHan": "Tứ dã vô nhân, sự diệc nan\nThất thân khởi liệu đáo thâm san ! Kim triêu nhược đắc bồ-đề quả\nThác lạc phong tiền xuất cá quan.",
+    "poemVi": "Vắng tanh bốn mặt khốn nguy thay ! Lạc bước ngờ đâu tới núi này\nNếu được bồ-đề nhân quả tốt\nXác xơ họa thoát khỏi vòng dây.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Tam nguyệt hoàng hoàng",
+        "meaning": "Thân thế và gia đình đương gặp việc bối rối"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Vĩ sinh bão kiều",
+        "meaning": "Vĩ sinh xưa là người giữ chữ tín có hẹn một nữ nhân"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Thái không vô vân (thời quang không mây)",
+        "meaning": "Khó hy vọng có thai nghén"
+      },
+      "PHONG THỦY": {
+        "phrase": "Địa tích dân bần (đất xấu dân nghèo)",
+        "meaning": "Mộ để đất xấu, con cháu không mong gì phát phúc"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Anh hùng nhập cốc",
+        "meaning": "Người anh hùng gặp vận kiển, dù có giỏi cũng không"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Tử-Lộ thinh đảo",
+        "meaning": "Bệnh nầy nên cầu Thần Phật phù hộ, nhưng trước hết"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Vọng chi bất kiến.(Trông cũng chẳng thấy)",
+        "meaning": "Người đi xa không về, của mất không mong lấy lại"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Thang hạn nhất niên",
+        "meaning": "Công việc đồng ruộng, chăn nuôi, thảy đều thua lỗ"
+      }
+    },
+    "judgment": "«Ngạ hổ phùng dương» — hổ đói gặp dê: thế mạnh hiếp yếu, hoặc bản thân đang ở thế «dê» trước kẻ hung. Hạ hạ — nguy hại nếu tham tiến; nên tránh đối đầu với thế lực mạnh.\n\nThời vận: Mọi mùa đều cần phòng.\n\nLời khuyên: Tránh kiện tụng, tránh làm ăn với kẻ bá quyền; giữ mình là trên.\n\nChú giải cổ truyền (tóm): Quẻ nầy ứng triệu “Hổ đói gặp dê”, nên các sự đều xấu, khác gì người đi một mình trong chốn vắng vẻ hoang vu không biết đường ra. Giữa lúc kinh hoàng đó, may ra có phúc đức cứu thì cũng phải một phen hú vía rồi mới ra khỏi chốn hiểm nghèo. Về thời vận trong triệu có chữ “hổ” ứng vào tháng Dần là tháng Giêng ; có chữ “dương” ứng vào tháng Mùi là tháng 6 ; vậy hai tháng nầy nên đề phòng gấp, sợ có sự bị lừa hoặc bị tai nạn .",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 9,
+    "rank": "hạ_hạ",
+    "titleHan": "Khô mộc vô chi",
+    "titleVi": "Cây khô không cành",
+    "poemHan": "Vạn sự gian quan bất đẳng nhàn\nNhất tầng san thướng nhất tầng san ! Tiêu-liêu vô lộ qui lâm tẩu\nDao vọng xuân ôn cánh ngộ hàn.",
+    "poemVi": "Muôn việc gian nan há rảnh nào\nMột tầng non tiếp một tầng cao\nChim bay cách lối khôn về tổ\nCầu ấm chưa sang, lạnh đã vào !",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Bất hoàng an tức",
+        "meaning": "Thân thế và gia đình hoang mang chẳng được yên hàn"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Tương ngộ chi sơ (Gặp gỡ sơ tình)",
+        "meaning": "Cầu quan cầu tài không có quý nhân giúp sức"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Gia nhân cao cao",
+        "meaning": "Việc hôn nhân vấp phải mọi người trong gia đình bàn"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Dư nhật vọng chi",
+        "meaning": "Mong ngày đêm vì đường con cái vẫn còn hiếm hoi"
+      },
+      "PHONG THỦY": {
+        "phrase": "Dĩ vi băng sơn,",
+        "meaning": "Mộ để phải chỗ đất lỡ, hoặc là chỗ núi bị phá"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Bất bình tắt minh",
+        "meaning": "Có sự bất bình phải nhờ cửa công phân xử,"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Thần bất phụ thể",
+        "meaning": "Bệnh trọng người ốm mê sảng khó thoát, cần giữ cho"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Bất kiến kỳ thê",
+        "meaning": "Người đi xa không có tin tức, của mất chẳng"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Thập thất cửu không (mười nhà chín trống) ",
+        "meaning": "Việc chăn nuôi thua thiệt, việc làm ruộng mất"
+      }
+    },
+    "judgment": "«Khô mộc vô chi» — cây khô không cành: hết nhựa sống, khó nảy lộc. Việc cầu xin dễ tắc; đừng đổ thêm vốn vào chỗ đã kiệt.\n\nThời vận: Đông khí càng nặng.\n\nLời khuyên: Thủ hơn công; dưỡng sức, chờ xuân khác.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Cây khô trụi cành” nên mọi việc mưu vọng đã khó khăn lại khó khăn them, khác nào như leo núi, leo hết tầng này lại đến tầng khác, thật là gian nan vất vả mà rốt cuộc chưa leo tới đỉnh. Lại như con chim lạc đường về rừng, nẻo xa hy vọng mùa xuân ấm áp tới, nhưng ngờ đâu mùa rét đã sát đến chân. Ai xin được quẻ xăm này, nên an thân thủ cựu, không nên cựa quậy, chỉ nhọc công phu mà thôi. Thời vận phải đợi đến ngày Đông-chí, có khí dương chớm dậy, cây cối được dịp nẩy mầm, thì mới có thể chuyển sang thời vận mới.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 10,
+    "rank": "hạ_hạ",
+    "titleHan": "Thục đạo kỳ khu",
+    "titleVi": "Đường đi về đất Thục gập ghềnh quanh co",
+    "poemHan": "Thiềm cung vô địa thực tiên đào\nYên thụ thiền thanh hoán bá lao\nThiên nhược đa tình khan thử hội\nHảo tương thiện niệm luyện cương đao.",
+    "poemVi": "Cung trăng không đất cấy tiên đào\nRừng biếc ve ngâm giục cú kêu\nVí thử gian lao trời có thấu\nNguyện rèn niềm thiện dắn bằng dao.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Hoàng hoàng như dã",
+        "meaning": "Thân thế và gia trạch hoang mang, không được"
+      },
+      "CẦU TÀI CẦU QUAN": {
+        "phrase": "Phong nhập phá ốc",
+        "meaning": "Việc cầu quan cầu tài chưa tới thời vận, nên"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Duyên mộc cầu ngư (leo cây tìm cá)",
+        "meaning": "Việc hôn nhân khó thành"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Phụ dựng bất dục",
+        "meaning": "Có đẻ mà không nuôi được"
+      },
+      "PHONG THỦY": {
+        "phrase": "An năng cửu cư",
+        "meaning": "Mộ để phải chỗ đất xấu, nên tìm chỗ khác dời"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Nhân nhi vô lễ (người mà không biết lễ)",
+        "meaning": "Tránh kẻ tiểu nhân mới mong thoát việc kiện"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Trương Lương đa bệnh",
+        "meaning": "Đau ốm triền miên"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Mạc úy ngã tâm (chẳng thỏa tấm lòng)",
+        "meaning": "Của mất không tìm thấy; người đi xa không về"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Hà đông đi túc (Hà đông dời thóc)",
+        "meaning": "Mất hết mùa màng, chăn nuôi rất kém"
+      }
+    },
+    "judgment": "«Thục đạo kỳ khu» — đường vào Thục gập ghềnh (điển Lý Bạch): hành trình gian nan, nhiều khúc quanh. Xuất hành, chuyển hướng lớn dễ trắc trở.\n\nThời vận: Đường xa càng kỵ.\n\nLời khuyên: Hoãn đi xa / ký kết phức tạp; nếu buộc phải đi thì chuẩn bị kỹ và đi cùng người tin cậy.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “đường Thục gặp ghềnh” nên mọi việc đều trắc trở khó khăn chẳng được hanh thông khác nào như trên cung trăng không có đất để trồng đào tiên, mà nơi rừng thu sương khói mịt mờ này chỉ nghe văng vẳng có tiếng ve than cùng tiếng cú rúc thật là buồn tai. Để thoát khỏi cảnh đó chỉ còn cách trở về tu thân tích đức bằng một ý chí cứng rắn, thì may qua tuần tháng 7, 8, 9 có chuyển biến thời vận mới.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 11,
+    "rank": "thượng_quái",
+    "titleHan": "Tháo đao chế cẩm",
+    "titleVi": "Cầm kéo cắt gấm",
+    "poemHan": "Bách trĩ thành cao cấp độ châm\nCao san lưu thủy hữu tri âm\nPhùng thời an đụng luân cân pháp\nKhuê hạng quân thần lợi đoạn câm.",
+    "poemVi": "Trăm trĩ thành cao cách mấy tầm\nTình cờ duyên gặp khách tri âm\nGặp thời lọ mượn mưu Gia-Cát\nTôi, Chúa thành công tại nhất tâm.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Hồng tập trung thạch",
+        "meaning": "Thân thế và gia đình đều yên vui"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Cơ nguyệt nhi khả",
+        "meaning": "Cầu quan cầu tài rất tốt và rất mau lẹ"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Xuất ngôn hữu chương",
+        "meaning": "Việc hôn nhân nói ra là đẹp tai hợp ý được mọi"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Tái lộng chi chương",
+        "meaning": "Điềm sinh con trai"
+      },
+      "PHONG THỦY": {
+        "phrase": "Vô cữu vô dự",
+        "meaning": "Mộ được bình yên"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Lợi hữu du vãng",
+        "meaning": "Kiện tụng có cơ thắng"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Đại nhân báo biến",
+        "meaning": "Bệnh mỗi ngày một nhẹ đi"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Tái kiến vu Chu",
+        "meaning": "Người đi tất về, vật mất tất thấy"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Tam niên hữu thành",
+        "meaning": "Việc chăn nuôi và làm ruộng cũng có kết quả"
+      }
+    },
+    "judgment": "«Tháo đao chế cẩm» — cầm kéo cắt gấm: có tài cắt may đúng chỗ, biến nguyên liệu quý thành đồ đẹp. Thượng quái — quẻ đứng đầu hệ thống theo nhiều bản phân loại; rất tốt nếu biết «cắt» đúng (quyết đoán đúng lúc).\n\nThời vận: Vượng khi có việc cần quyết định dứt khoát.\n\nLời khuyên: Dùng tài đúng chỗ; đừng cắt nhầm — nghĩ kỹ rồi hạ thủ một lần cho gọn.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Cầm kéo cắt gấm” là triệu rất tốt. Tuy nhiên chính tay mình phải may cắt thì áo mới thành; như thế là mình đã tạo lấy đồ trang sức cho mình. Vậy ai rút được quẻ này, về mưu vọng nên nửa trông vào mình, nửa trông vào bạn tri âm (quý nhân), hai đằng hợp một mới mong hoàn toàn, cho nên trong thơ tổng đoán có câu “Tôi Chúa thành công tại nhất tâm”. Đây là quẻ phải nên luôn luôn đồng tâm hợp lực thì kết quả mới tốt.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 12,
+    "rank": "hạ_hạ",
+    "titleHan": "Họa xà thiêm túc",
+    "titleVi": "Vẽ rắn thêm chân",
+    "poemHan": "Ngư trảo hồ minh vị túc luân\nToàn bằng tạo hóa định ngô chân\nThỉnh khan tiêu sắt thu dung đạm\nThùy thị đăng cao kế hứng tần.",
+    "poemVi": "Cá quẫy hồ kêu chẳng kể mà\nToàn nhờ tạo hóa định cho ta\nKìa xem heo hắt màn thu nhạt\nAi kẻ lên cao hứng đậm đà ?",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Họa xà thiêm túc» — vẽ rắn thêm chân: làm thừa, vẽ vời khiến hỏng việc. Hạ hạ — đừng phức tạp hóa; càng thêm chi tiết càng sai.\n\nThời vận: Mọi mùa.\n\nLời khuyên: Giữ đơn giản; dừng khi đã đủ; tránh lời thừa và kẻ bày vẽ.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Vẽ rắn thêm chân” nên việc gì cũng bị rắc rối sinh ra lắm chuyện mà kết cục toàn là hão cả. Vậy ai rút được quẻ này, mọi việc đều theo định mệnh là hơn, đừng bới vẽ ra làm gì chỉ nhọc công tốn sức mà thôi. Thời vận : Tháng 4 là tháng Tỵ . Tỵ là rắn, vậy nên lưu ý đề phòng e có sự buồn xảy ra ứng câu “Tiêu sắt thu dung đạm” ; các tháng 7, 8, 9 cũng thế.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 13,
+    "rank": "đại_cát",
+    "titleHan": "Tích cốc phòng cơ",
+    "titleVi": "Trữ thóc phòng đói",
+    "poemHan": "Nhất thể nhân long khởi dị thường\nMão kim thiên tử khởi Mang-Dương\nHà ưu tam quốc phân tranh đỉnh\nCa vũ môn đình chỉ nhật vương.",
+    "poemVi": "Rồng giữa nhân gian há khác thường\nLưu Bang đột khởi tự Mang-Dương\nLo gì tam quốc phân tranh đỉnh\nCa vũ nơi này hẹn nghiệp vương.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Lai chương hữu khách",
+        "meaning": "Thân thế gia đình được hưởng phúc lành, có"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Gia huyền hộ sắt. (Nhà nhà đàn hát)",
+        "meaning": "Cầu quan đắc quan, cầu tài đắc tài, đến đâu cũng được mọi người vui vẻ"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Duy hùng duy bi",
+        "meaning": "Sinh con trai"
+      },
+      "PHONG THỦY": {
+        "phrase": "Nhân khí ngã thủ. (Người bỏ ta lấy)",
+        "meaning": "Ngôi đất tốt nhờ có âm-công dày nên trời để dành"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Xưng bỉ tỷ quanh",
+        "meaning": "Bệnh nên cữ rượu sẽ khỏi"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Văn vương vô ưu",
+        "meaning": "Việc chăn nuôi, việc trồng cấy đều tiến triển"
+      }
+    },
+    "judgment": "«Tích cốc phòng cơ» — trữ thóc phòng đói: biết lo xa thì sau này yên. Đại cát theo hướng phòng bị — của để dành, kế hoạch dài hơi mang lại an toàn.\n\nThời vận: Thu hoạch · cuối năm càng ứng.\n\nLời khuyên: Tiết kiệm, tích trữ, mua bảo hiểm / để dành; đừng ăn hết hạt giống.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Trữ thóc phòng đói” là điều nên dự trữ lo xa. Ai rút được quẻ này mọi việc đều vững vàng chắc chắn, khác nào như vua Hán Cao Tổ thưở hàn vi còn ẩn mình ở núi Mang-Dương mà cái khí thế đã lộ ra sau này làm nên sự nghiệp vương trong thiên hạ. Tuy nhiên, dù có báo trước sự thành công, nhưng quẻ ứng triệu “Trữ thóc phòng đói” nên khi thành công rồi vẫn phải giữ mực cần kiệm, siêng năng mới tốt. Thời vận : Tháng 2, 7, 8 , 9 ứng chữ Mão Kim trong tổng thơ rất tốt, có việc sinh cơ lập nghiệp và nên danh phận.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 14,
+    "rank": "trung_bình",
+    "titleHan": "Lạo tận đàm thanh",
+    "titleVi": "Lọc hết, nước đầm lại trong",
+    "poemHan": "Loan hoàng giao dã cửu trình tường\nVạn quốc hy du hóa nhật trường\nMạc đạo tích niên xuân vị ổn\nThái canh sơ phạn tống hành trang.",
+    "poemVi": "Rõ ràng loan phượng báo điềm hay\nMuôn nước ưu du thỏa tháng ngày\nChớ nhắc năm xưa thời lận đận\nRa đời : áo vải với canh đay.",
+    "aspects": {
+      "HÔN NHÂN": {
+        "phrase": "Nhan như thuấn hoa",
+        "meaning": "Lấy được người đẹp. (gái có sắc, trai có tài)"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Khô mộc sinh chi. (Cây khô mọc cành)",
+        "meaning": "Tuy muộn nhưng thế nào cũng sinh con tốt"
+      },
+      "PHONG THỦY": {
+        "phrase": "Vô binh bất bi",
+        "meaning": "Mộ phần yên ổn"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Như ngư hữu thủy. (Như cá gặp nước)",
+        "meaning": "Nhờ vào lý phải, lại được quan minh xét, nên việc kiện sẽ thắng"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Thái tân chi ưu",
+        "meaning": "Có ốm đau soàng nhưng không đáng lo ngại"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Đắc xích thủ xích",
+        "meaning": "Việc chăn nuôi, việc trồng cấy có làm có ăn, không"
+      }
+    },
+    "judgment": "«Lạo tận đàm thanh» — nước đục lắng hết thì đầm lại trong: sau loạn có trị, sau đục có trong. Trung bình nghiêng về hy vọng — cần thời gian lắng.\n\nThời vận: Càng về sau càng tỏ.\n\nLời khuyên: Kiên nhẫn để sự việc lắng; đừng khuấy thêm.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Lọc hết, nước đầm trở về trong trẻo như xưa” có nghĩa là qua cơn bĩ cực đến tuần thái lai, qua bước gập gềnh đến đoạn bằng phẳng, đúng như câu tổng thi “Muôn nước ưu du thỏa tháng ngày”. Tuy nhiên, đường lối sống trong lúc này là phải êm ả dịu dàng, đừng nòng nảy cáu kỉnh, vì trong triệu có câu “hết đục đến trong” nghĩa là nhờ có sự yên tĩnh làm cho bùn nhơ lắng xuống, nước đầm trở nên trong. Nay nếu nóng nảy, khác nào lấy que mà khuấy lên thì nước còn trong thế nào được.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 15,
+    "rank": "hạ_hạ",
+    "titleHan": "Tế vũ phi hoa",
+    "titleVi": "Mưa nhẹ mà vẫn làm rụng hoa",
+    "poemHan": "Yến tước vô thanh điếu mộ xuân\nLinh nhân trường đoạn khấp hồng trần\nVấn cừ giải đắc thanh tiêu mộng ? Hoàng-lạc lâu tiền đôi bạch vân !",
+    "poemVi": "Âm thầm chiếc én khóc xuân tàn\nSui khách hồng trần đứt ruột gan\nThử hỏi mộng đời ai giải được ? Kìa lầu Hoàng-lạc áng mây tan !",
+    "aspects": {
+      "HÔN NHÂN": {
+        "phrase": "Diệc bất nữ tòng",
+        "meaning": "Việc hôn nhân không xong, vì gia đình cô gái"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Chu dĩ Bao Tự",
+        "meaning": "Con cái hiếm hoi, cần sửa lại hành dộng phản"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tàng đầu lộ vĩ. (Kín đầu hở chân)",
+        "meaning": "Đất ở mộ bị lở, lộ cả áo quan (hòm)"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Cữu nhị bất khắc",
+        "meaning": "Việc kiện khó thắng"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Nhân nhi vô ưu",
+        "meaning": "Nên bớt lo nghĩ, cho tinh thần thư sảng"
+      }
+    },
+    "judgment": "«Tế vũ phi hoa» — mưa nhẹ cũng đủ làm rụng hoa: sơ suất nhỏ gây tổn thất lớn. Hạ hạ — việc mong manh dễ hỏng vì «mưa phùn» (lời ra tiếng vào, tiểu nhân, sơ ý).\n\nThời vận: Xuân hoa càng kỵ mưa phùn.\n\nLời khuyên: Bảo vệ thành quả mong manh; tránh thị phi và chỗ đông người xấu.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “mưa nhẹ rụng hoa” có nghĩa là các việc sui đem đến từ từ, tuy chẳng kịch liệt cho lắm mà rốt cuộc gia đạo ngày một suy dần. Ai rút được quẻ này phải nên lưu ý tu tỉnh tâm tính, cùng sửa lại hành động để cứu vãn dần dần họa may mới thoát khỏi vận hạn hiểm nghèo. Đồng thời cũng phải cố nén lòng chịu đựng đừng oán trời, trách người chi cả. Khi nào vận bĩ qua, vận thái khắc trở lại khác nào như cơn mưa (làm rụng hoa) đã tạnh, thì bầu trời phải trở lại quang quẻ, lúc đó tha hồ mà hóng gió mát, ngắm trăng trong. Thời vận về ba tháng xuân (Giêng, 2, 3) không tốt vì ứng chữ “tế vũ phi hoa” nhất là tháng 3, nên đề phòng hơn, vì có chữ “điếu mộ xuân”. Sang mùa thu thời vận khá hơn.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 16,
+    "rank": "thượng_thượng",
+    "titleHan": "Thừa dư tế nhân",
+    "titleVi": "Cưỡi xe giúp người",
+    "poemHan": "Phúc điền hảo bả thực linh cai\nTộc đại an tri tử bất tài\nVị vấn Cao-dương bát long thị\nNhãn tiền thu đắc kỷ phần lai.",
+    "poemVi": "Cây đức ươm trồng đã bấy nay\nHọ to mừng thấy cháu con hay\nBát long kìa đất Cao-dương nọ\nDanh vọng cao sang mấy kẻ tầy ?",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Ôn ôn như ngọc",
+        "meaning": "Tự than khang cường; gia đạo yên vui, mọi việc trong nhà đều ôn nhuần như ngọc"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Thiên kim chi tử",
+        "meaning": "Sinh trai quý tử"
+      },
+      "PHONG THỦY": {
+        "phrase": "Hữu hảo điền địa. (Có ruộng đất tốt)",
+        "meaning": "Nhà có phúc đức nên phần mộ được để vào đất tốt, con cháu hưng thịnh"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Khởi dư giả thương",
+        "meaning": "Bệnh soàng không đáng lo ngại, (có người học trò hoặc con bạn trông nom săn sóc thuốc thang)"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Tri tử lai chi",
+        "meaning": "Người đi xa sẽ về, vật mất lại thấy"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Sinh tài hữu đạo",
+        "meaning": "Nhờ có sự làm ra nhiều, tiêu xài ít nên việc sinh tài rất khả quan"
+      }
+    },
+    "judgment": "«Thừa dư tế nhân» — ngồi xe đi giúp người: có địa vị / phương tiện mà dùng để cứu giúp. Thượng thượng — vừa tốt cho mình vừa tạo phúc; quý nhân và nghĩa cử đi cùng nhau.\n\nThời vận: Khi có lực thì nên ra tay giúp.\n\nLời khuyên: Làm ơn đúng lúc; giúp người sẽ được người giúp lại.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Cưỡi xe giúp người” đi đôi với thơ tổng thi : “Cây đức ươm trồng đã bấy nay.Họ lo con cái hẳn càng hay”. Vậy ai xin được quẻ này, muốn hưởng phúc lâu dài, cần vun trồng cây đức, để ý thương người giúp đời, như thế là hợp lời Thánh dạy sẽ được phúc lộc song tuyền. Về thời vận, quẻ này đầy năm đều tốt, hễ giúp người nhiều bao nhiêu thì phúc lộc càng nhiều bấy nhiêu.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 17,
+    "rank": "trung_bình",
+    "titleHan": "Trưởng hạ vi kỳ",
+    "titleVi": "Giữa ngày hè ngồi đánh cờ",
+    "poemHan": "Trường thiên nhạn độ bất tu kinh Cửu mã phiên phiên dữ tử hành\nTúng hữu họa ông miêu cựu bản Bích gian hà tất điểm long tình !",
+    "poemVi": "Sá chi, cánh nhạn lướt lưng trời Tôi bạn phây phây thắng ngựa chơi\nVí có bút hoa vờn bản cũ Vẽ rồng lọ phải điểm con ngươi !",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Hòa khí trí tường",
+        "meaning": "Gia đình đầm ấm, thân thế an khang"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Tự hữu định toán",
+        "meaning": "Thiên công đã định không cần thắc mắc lắm"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Dục tốc bất đạt",
+        "meaning": "Việc hôn nhân không nên nóng nảy, e khó thành"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Kim kê hàm xác",
+        "meaning": "Khoảng tháng 8 sẽ có tin mừng"
+      },
+      "PHONG THỦY": {
+        "phrase": "Địa xấu khai hoa. (Đất xấu nở hoa)",
+        "meaning": "Âm công ít nên chỉ được ngôi đất nhỏ"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Hà lự hà tư. (Còn lo nghĩ gì)",
+        "meaning": "Không cần lo nghĩ về việc kiện"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Tử lai hà mộ",
+        "meaning": "Người đi xa, của mất, còn lâu mới tìm ra manh mối"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Vô tiểu vô đại",
+        "meaning": "Việc trồng trọt và chăn nuôi, không lợi nhiều cũng không thua lỗ"
+      }
+    },
+    "judgment": "«Trưởng hạ vi kỳ» — giữa hè ngồi đánh cờ: nhàn hạ, thư thái. Trung bình — ổn nhưng dễ trì trệ nếu chỉ «đánh cờ» mà quên việc chính.\n\nThời vận: Hạ.\n\nLời khuyên: Được nghỉ thì nghỉ; đừng biến nhàn thành bê trễ công việc hệ trọng.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Ngày hạ ngồi đánh cờ”. Tổng thi có câu “Tôi bạn phây phây thắng ngựa chơi” là quẻ có tính cách nhàn-nhã ưu du hơn là bôn tẩu hoạt động. Vậy ai xin được quẻ này, mọi việc mưu vọng hãy gắng đợi chờ thời vận đến sẽ thi thố, khác nào như bức tranh vẽ rồng của Trương-Tăng-Dao trên vách nọ không được giờ thiêng điểm nhãn thì rồng không vùng vẫy mà bay lên được. Về thời vận, trong triệu có chữ : “Hạ vi kỳ”. Vậy 3 tháng hè (các tháng 4, 5, 6) coi như an nhàn không thuận lợi cho sự hoạt động; phải đợi sang mùa thu trở đi mới khá; còn 3 tháng mùa xuân ăn vào vận trước.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 18,
+    "rank": "trung_bình",
+    "titleHan": "Tái ông thất mã",
+    "titleVi": "Tái ông mất ngựa",
+    "poemHan": "Kỷ độ kê đàm lạc bút kinh\nXuân hoa như mộng dạ trung sinh\nKhuyến quân tu tác hảo điền địa\nĐăng hạ nhiên hương tụng Phật kinh.",
+    "poemVi": "Mấy độ lăng xăng những trỗ tài\nHoa xuân như mộng nở đêm dài\nKhuyên nên gắng sửa lòng ta đã\nĐốt nến xem kinh lễ Phật đài.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Triêu can tịch dịch. (Sớm chiều rau ráu)",
+        "meaning": "Tự thân gia trạch, luôn luôn để tâm lo lắng"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Vô thành hữu chung",
+        "meaning": "Theo đuổi lâu, về sau cũng được"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Hợp phu hữu cung",
+        "meaning": "Việc hôn nhân tốt"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Khởi bất nhĩ tư",
+        "meaning": "Số muộn nhưng sau vẫn có con trai"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tiền bần hậu phú. (Trước nghèo sau giàu)",
+        "meaning": "Mộ phần phát phúc về hậu vận"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Phản phúc tự đạo",
+        "meaning": "Quan tụng gặp nhiều rắc rối, lật qua lật lại nhiều lần"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Tiển chuyển phản sí",
+        "meaning": "Nên đề phòng bệnh khỏi lại tái phát"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Cầu chi tất đắc",
+        "meaning": "Người đi xa và của bị mất nếu cố sức tìm thì có thể thấy"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Dân bất gia đa",
+        "meaning": "Việc chăn nuôi và việc làm ruộng không nảy nở được là mấy"
+      }
+    },
+    "judgment": "«Tái ông thất mã» — họa phúc khó lường: mất ngựa hóa ra là phúc. Trung bình — đừng vội mừng cũng đừng vội lo; chuyện xấu có thể thành tốt và ngược lại.\n\nThời vận: Biến động bất ngờ.\n\nLời khuyên: Giữ tâm bình; xem lại việc «mất» trước khi than van.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Tái ông mất ngựa”. Nguyên trước ngựa tái ông mất, sau lại rũ được ngựa khác cùng về. Con tái ông vì ham cưỡi ngựa mới, bị ngựa này vật ngã gãy xương nên được miễn đi đánh giặc v.v… nghĩa là họa phúc trong việc mất ngựa khó mà biết được kết câu ra sao. Ai xin được quẻ này, về thời vận hên sui cũng giống như thế, vậy nên gắng công tu nhân tích đức để Trời, Phật, Quỷ, Thần phù trợ cho là hơn. Còn như làm phi nghĩa mà mong được hưởng giàu sang thì cũng không khác câu thơ Tổng thi :”Hoa xuân như mộng nở đêm dài” đến lúc bừng mắt tỉnh dậy thì ôi thôi ! có còn gì nữa đâu ?",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 19,
+    "rank": "trung_bình",
+    "titleHan": "Chi ngưu vi mã",
+    "titleVi": "Chỉ trâu làm ngựa",
+    "poemHan": "Bất đồ thế thái bạc thu vân\nQuân hướng Nam quan, ngã hướng Tần\nMạc xử phiên vân thành để sự\nGiao tha cấp tảo lễ gia thần.",
+    "poemVi": "Trò đời mỏng mảnh tựa mây trôi\nKẻ ngược người xuôi khác nẻo rồi\nChớ để lòng kia thành tráo trở\nKhuyên ai thờ lấy đạo “Tâm” thôi.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Họa khởi tiêu tường. (Họa phát sinh trong nhà)",
+        "meaning": "Anh em bà con bất hòa gây nên mối họa, nên thân thế và gia đình bất an"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Dĩ vô vi hữu. (Cho không làm có)",
+        "meaning": "Việc cầu quan cùng cầu tài tự nhiên mọc ra rồi kết cục cùng là hảo huyền tất"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Huyền không hoán xuất",
+        "meaning": "Việc hôn nhân có sự sai lời hứa hẹn"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Khô dương sinh hoa. (Liễu khô sinh hoa)",
+        "meaning": "Sinh con gái"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tư giả phi chân",
+        "meaning": "Mộ phần táng vào kiểu đất đẹp, nhưng chỉ là giả huyệt không phải chân huyệt nên đẹp cũng là vô ích"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Chỉ lương vi cường",
+        "meaning": "Việc kiện tụng có sự lầm người lương thiện là cường gian"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Bất khả dĩ phúng",
+        "meaning": "Bệnh phải kiêng gió"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Mụ mị tư phục",
+        "meaning": "Người đi xa không về, của mất không tìm thấy, dù nhớ tiếc đêm ngày cũng vô ích"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Dân diệc lao chỉ",
+        "meaning": "Lao công tốn sức về việc chăn nuôi và làm ruộng mà chẳng thu hoạch được gì"
+      }
+    },
+    "judgment": "«Chi ngưu vi mã» — chỉ trâu bảo là ngựa: nhận nhầm, đánh giá sai, hoặc bị người khác đánh tráo khái niệm. Trung bình — cần minh bạch danh–thực.\n\nThời vận: Dễ nhầm khi hấp tấp.\n\nLời khuyên: Kiểm chứng kỹ hợp đồng, danh xưng, lời hứa; đừng tin miệng.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Chỉ trâu làm ngựa” là quẻ thị phi điên đảo, xấu hóa tốt, tốt hóa xấu, thực hóa giả, giả hóa thực. Ngày xưa Triệu Cao đem con hươu dâng vua Nhị Đế bảo rằng con ngựa, Nhị Đế nói “Thừa tướng có nhầm chăng” đây là con hươu; nói rồi liền hỏi tả hữu. Tả hữu, kẻ thì nín lặng, kẻ thì nói là ngựa, cũng có kẻ ấp úng bảo là hươu ! Ấy quẻ này đại khái cũng như thế. Vậy ai xin được nên phải tiên liệu đề phòng ngay từ chỗ thân cận đã có sự chia rẽ mỗi người một bụng như thế đó. Thời vận tháng 5 (ngựa) và tháng Chạp (trâu) gặp chuyện lừa dối vậy nên lưu ý .",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 20,
+    "rank": "thượng_thượng",
+    "titleHan": "Tàng châu đãi giá",
+    "titleVi": "Giữ ngọc báu đợi giá",
+    "poemHan": "Hạc lập kê trung tự bất quần\nĐông tây lịch biến chí hoa xuân\nĐẳng nhân hạnh ngộ lão tiên tử\nHuề ngã đăng đài thường bạch lân.",
+    "poemVi": "Hạc nọ, gà đâu dám sánh gần\nĐông tây nhàn dạo ngắm hoa xuân\nGắng chờ gặp gỡ người tiên tử\nCùng dắt lên đài thưởng bạch lân.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Nhất thất thái bình",
+        "meaning": "Cửa nhà yên ổn, thân thế ung dung"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Đắc thời tắc giả",
+        "meaning": "Việc cầu quan, cầu tài được dịp bay nhảy thỏa lòng ước mong"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Kỳ thực thất hề",
+        "meaning": "Hôn nhân có tin lành rất tốt"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Ngư hóa vi long. (Cá hóa rồng)",
+        "meaning": "Sinh trai quý tử"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tại thủy chí mi",
+        "meaning": "Mộ táng cục đất bình thủy hay ở ven sông là mộ đắc địa"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Sử vô tụng hồ",
+        "meaning": "Thông cảm nhau hơn là phải nhờ đến cửa công phân xử"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Nãi dĩ dân ninh",
+        "meaning": "Sức khỏe bình thường"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Diệc ký kiến chỉ",
+        "meaning": "Người đi xa sẽ tìm thấy, của mất lại tìm ra"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Ký thứ thả đa",
+        "meaning": "Việc trồng cấy chăn nuôi đều được phát đạt"
+      }
+    },
+    "judgment": "«Tàng châu đãi giá» — giữ ngọc đợi giá cao: có của quý, chưa vội bán. Thượng thượng — tiềm lực lớn; chờ đúng thời thì được giá.\n\nThời vận: Đợi thời hơn là xô đẩy.\n\nLời khuyên: Đừng bán rẻ tài năng / tài sản; kiên nhẫn đến khi thị trường / quý nhân tới.\n\nChú giải cổ truyền (tóm): Quẻ này ứng triệu “Giữ ngọc báu đợi giá” là quẻ có thái độ của người quân tử xử thế. Không tranh giành kèn cựa với ai thế mà đâu vẫn vào đấy khác nào như hạc đứng trong đàn gà, không khoe lông khoe mỏ mà hạc vẫn ra hạc, gà vẫn là gà, chẳng thể nào lẫn lộn được. Đây là quẻ ứng sự bình yên vui vẻ. Riêng về mưu vọng phải chờ cơ hội đến sẽ có quý nhân giúp sức thì kết quả xứng đáng hơn. Quẻ này rất tốt, tuy nhiên phải đợi, vì triệu quẻ này có nói “Ngọc báu đợi giá” thì ngọc mới quý.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 21,
+    "rank": "đại_cát",
+    "titleHan": "Thiên tướng cát nhân",
+    "titleVi": "Trời giúp người lành",
+    "poemHan": "Bất thức tài bồi dĩ kỷ niên\nHồng trần sái lạc địa trung tiên\nThái giai hỷ kiến Đường Ngu trị\nĐáo xứ giang sơn diệc hữu duyên.",
+    "poemVi": "Cây đức vun trồng trải mấy niên\nBụi trần rũ sạch thực là tiên\nMừng nay sống gặp đời Nghiêu, Thuấn\nĐất nước đâu là chẳng có duyên.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Thủy lục quân an",
+        "meaning": "Gia đình thân thế đều được bình yên, dù ở nhà, hay đi xa, trên bộ, hay trên thủy cũng không ngại chi"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Sở cầu như ý",
+        "meaning": "Việc cầu tài và cầu quan thảy đều như lòng mong muốn"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Sở nguyện tòng tâm",
+        "meaning": "Việc hôn nhân tốt lành theo như sở nguyện"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Chung tu sần sần",
+        "meaning": "Sinh con đông đúc, lại có hiếu nghĩa"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tại địa thành hình",
+        "meaning": "Kiểu đất để mộ rất đẹp, sinh được nhiều người tài"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Cữu ngũ nguyên cát",
+        "meaning": "Pháp luật minh chính, việc kiện tụng tất thắng"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Sinh thử vương quốc",
+        "meaning": "Gặp thầy gặp thuốc, lại đầy đủ phương tiện nên tật bệnh không quản ngại gì"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Ngã tâm tắc di",
+        "meaning": "Người đi xa sẽ về, của mất sẽ tìm thấy, không phải lo buồn"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Thứ vật hàm minh",
+        "meaning": "Súc vật và hoa màu đều không bị hư hại và trộm cắp"
+      }
+    },
+    "judgment": "«Thiên tướng cát nhân» — trời giúp người lành: làm điều thiện thì được phù hộ. Đại cát — nhân quảxuôi chiều; càng giữ tâm lành càng gặp quý nhân.\n\nThời vận: Mọi mùa nếu giữ thiện niệm.\n\nLời khuyên: Làm phúc, giữ chữ tín; đừng lợi dụng lúc thuận để hại người.\n\nChú giải cổ truyền (tóm): Quẻ nầy ứng triệu “Trời giúp người lành” nên mọi việc tiến triển một cách nhịp nhàng và đi đến đâu cũng được người yêu, kẻ vì; âu cũng là cây đức của ông bà vun trồng từ trước nên mới có ngày nay. Ai được quẻ nầy nên lấy lòng trung hậu mà xử thế để tỏ ra đúng tư cách một cát nhân (người tốt) như lời Thánh dạy thì tất được hưởng phúc lâu dài. Còn như giữ tà tâm phản đạo đức thì chắc kết quả sẽ ngược lại.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 22,
+    "rank": "trung_bình",
+    "titleHan": "Bạch bích vi hà",
+    "titleVi": "Ngọc trắng có vết",
+    "poemHan": "Tý ngọ tuần trung vi định bình\nMộng hồn thanh dạ thưởng bồng doanh\nGiao tha miễn tận sinh bình sự\nHồng thụ chi biên nhật nguyệt minh.",
+    "poemVi": "Đứng bóng, mà sao vẫn bấp bênh ? Đêm đêm mơ tưởng chuyện bồng-doanh\nKhuyên nên gắng sức bình sinh đã\nRồi mộng non tiên mới dệt thành.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Hửu bị vô hoạn",
+        "meaning": "Tự thân và gia trạch đã có phòng bị thì tránh khỏi lo âu"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Tất cư kỳ nhất",
+        "meaning": "Hai việc cầu quan cầu tài chỉ có thể thành được một việc"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Duyệt mục vi ngu",
+        "meaning": "Việc hôn nhân đành rằng nhan sắc vừa ý, nhưng cũng cần xem lại đức hạnh"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Đương như á tử",
+        "meaning": "Sinh con trai, nhưng nếu ăn ở thất đức thì con sẽ bị ngọng, câm, hay ái nam ái nữ"
+      },
+      "PHONG THỦY": {
+        "phrase": "Biệt hữu giai thú",
+        "meaning": "Mộ có kiểu đất sơn thủy hữu tình rất đẹp"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Ngu nhuế chất thành",
+        "meaning": "việc kiện sự, nên thành thật tường trình đúng sự thật thì sẽ thắng"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Thần kỳ hựu chi",
+        "meaning": "Bệnh tật đã có thần-linh phù hộ, chăm kêu cầu bệnh sẽ lui"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Trì trì ngô hành",
+        "meaning": "Người đi xa và của mất cứ từ từ mà tìm kiếm sẽ ra manh mối"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Bất hòa vô hại",
+        "meaning": "Chăn nuôi và làm ruộng kết quả bình thường"
+      }
+    },
+    "judgment": "«Bạch bích vi hà» — ngọc trắng có vết: tổng thể tốt nhưng còn khuyết điểm. Trung bình — đừng cầu toàn; sửa vết nhỏ thì giữ được viên ngọc.\n\nThời vận: Ổn định nếu biết che·sửa vết.\n\nLời khuyên: Nhìn nhận khuyết điểm của mình / đối tác; đừng vì một vết mà đập bỏ cả viên ngọc, cũng đừng giả bộ không có vết.\n\nChú giải cổ truyền (tóm): Quẻ nầy ứng triệu “Ngọc trắng có vết” nên tuy là của báu mà không được hoàn toàn, ai xin được quẻ nầy, mọi việc xảy ra, dù có thắng lợi cũng không được mười thành mỹ mãn thế nào cũng có chút ít điều bất như ý xen vào. Tuy nhiên ngọc có cắt giủa mới thành hình, cũng như con người có luyện tài mới trở nên hữu dụng, cho nên trong bài Tổng thi có câu “Khuyên ai gắng sức bình sinh đã” là có ý bảo đừng mơ mộng lên cung tiên vội, hãy trao dồi tài đức của mình, chính chỗ đó mới đem mình lên cao đấy.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 23,
+    "rank": "trung_bình",
+    "titleHan": "Ma chử thành châm",
+    "titleVi": "Mài sắt nên kim",
+    "poemHan": "Thu cúc đôi hoàng di kỷ thu\nVãn hương đa thiểu túy phù du\nHữu tâm tự cổ giai thành sự\nMạc quái trí-thù chức vọng du.",
+    "poemVi": "Thu về bao độ cức nên thơ\nHương muộn say sưa cái kiếp vờ\nTự cổ có công là có nghiệp\nĐừng cười con nhện nó vương tơ.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Cửu đạo hóa thành",
+        "meaning": "Tự thân và gia trạch đều được yên vui tỏ ra nhà có đạo lý"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Khoan tắc đắc chúng",
+        "meaning": "Cầu quan cầu tài vì được lòng mọi người nên công việc đều thành"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Ruật quan quyết thành",
+        "meaning": "Việc hôn nhân thế nào cũng thành"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Đồng tử bội huề",
+        "meaning": "Lục giáp sinh con trai sau này trở nên người quí"
+      },
+      "PHONG THỦY": {
+        "phrase": "Xả cận cầu viển",
+        "meaning": "Chỉ nhờ vào mộ tổ phát phúc mà thôi"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Hảo mưu nhi thành",
+        "meaning": "Việc quan tụng phải có mưu mới mong thắng đối phương"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Sở quí hồ tinh",
+        "meaning": "Bệnh tật nên đón thầy chuyên môn và dùng thuốc thật tốt; cũng nên viển phòng và bồi bổ chân “thận” nữa"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Hồng phi minh minh",
+        "meaning": "Người đi xa và của mất như cánh chim trời bay đi không hẹn ngày trở lại"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Bệnh vu hạ huề",
+        "meaning": "Làm ruộng, chăn nuôi rất vất vả cực nhọc mà số thu hoạch không bõ công phu"
+      }
+    },
+    "judgment": "«Ma chử thành châm» (mài sắt nên kim): kiên trì lâu ngày ắt thành. Trung bình nghiêng cát nếu chịu gian khó lâu dài.\n\nThời vận: Công dài hơi.\n\nLời khuyên: Kiên trì học·làm; đừng bỏ cuộc giữa chừng.\n\nChú giải cổ truyền (tóm): Quẻ nầy ứng triệu “Mài sắt nên kim” như vậy là phải kiên tâm trong thời gian lâu dài mới mong đạt được mục đích. Trong Tổng thi Thánh đã dạy “Tự cổ có công là có nghiệp, đừng cười con nhện nó vương tơ”. Con nhện vương tơ mà bắt được ruồi muỗi thì cái đích “mài sắt nên kim” của con người liệu có nên nản chí không ? Ai được quẻ nầy, muốn mưu vọng việc gì phải ngắm theo hướng đó mà hành động mới hòng có kết quả. Thời vận : Xuân, hạ đồng như nhau, duy mùa thu có sự gây nên rồi lại tan đi, ứng vào câu “Hương muộn say sưa cái kiếp vờ” tức là kiếp phù du không trường cửu.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 24,
+    "rank": "hạ_hạ",
+    "titleHan": "Tịch dương tại sơn",
+    "titleVi": "Ác xế sườn non",
+    "poemHan": "Nha tháo hàn chi dạ dục sương\nGiai nhân qui khứ lộ mang mang\nTúy tỉnh bất giác tòng đầu sổ\nLao lạc thần tinh khách đoạn trường.",
+    "poemVi": "Đêm xuống, rừng hoang, quạ réo sương\nĐường dài thân giá bước hoang mang\nTỉnh, mơ khôn tỏ, nơi nào tá ? Trời sáng, sao thưa khách đoạn trường !",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Bất hoang khải xứ",
+        "meaning": "Thân thế và gia đình chẳng được an vui"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Tái ông mất mã",
+        "meaning": "Cầu quan và cầu tài đều thất vọng"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Ngu cơ thú vũ",
+        "meaning": "Việc hôn nhân tài sắc đẹp đôi nhưng hậu vận kém"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Hàn thiền ẩm lộ",
+        "meaning": "Con cái hiếm hoi"
+      },
+      "PHONG THỦY": {
+        "phrase": "Bách thảo phồn sương",
+        "meaning": "Mộ táng nơi hoang vu e có rễ cây bò lan vào hài cốt"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Sự dung dỉ hồ",
+        "meaning": "Quan tụng nên tìm đường giảng hòa thì hơn"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Đắc tội ư thiên",
+        "meaning": "Nên thành tâm cầu trời và hối cải tội lỗi họa chăng mới thoát"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Bất tri kỳ kỳ",
+        "meaning": "Người đi xa không hẹn ngày về, của mất không mong tìm thấy"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Thập niên cửu lạo",
+        "meaning": "Việc trồng cấy và chăn nuôi, mười phần mất chín"
+      }
+    },
+    "judgment": "«Tịch dương tại sơn» — nắng chiều trên núi: sắp hết ngày, khí suy. Hạ hạ — việc đã muộn hoặc lực đã tàn; cố gắng lúc này dễ mệt mà ít thành.\n\nThời vận: Chiều tà · cuối chu kỳ.\n\nLời khuyên: Thu xếp, kết thúc gọn; đừng mở việc mới khi lực kiệt.\n\nChú giải cổ truyền (tóm): Quẻ nầy ứng triệu “Ác xế sườn non” là quẻ xấu, tuy nhiên ác mới về sườn non thì ánh sáng vẫn còn lòe lẹt tỏa ra chứ chưa đến nỗi mất hẳn nên các việc mưu vọng cũng vẫn chưa đến tuyệt vọng. Vậy ai xin được quẻ nầy nên bền gan chịu đựng cho qua vận hạn xấu vận sui, rồi sẽ tính chuyện trở lại hoạt động.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 25,
+    "rank": "trung_bình",
+    "titleHan": "Du ngư hý hà",
+    "titleVi": "Cá giỡn hồ sen",
+    "poemHan": "Khả ái dương-đài trợ khách du\nThi tình ngâm vịnh bất thăng thu\nNa tri hạng ngoại phân phiền sự\nChỉ giác nhàn trung túy tửu hồ.",
+    "poemVi": "Dương-đài Vân-mộng khách dong chơi\nThơ hứng ngâm nga thú tuyệt vời\nMặc kẻ bon chen đường thế lợi\nTa say vò rượu cảnh nhàn thôi.",
+    "aspects": {
+      "TỰ THÂN GIA TRẠCH": {
+        "phrase": "Quân tử du minh",
+        "meaning": "Tự thân nhàn nhã, gia đình yên ổn"
+      },
+      "CẦU QUAN CẦU TÀI": {
+        "phrase": "Tiểu ngôn chung cát",
+        "meaning": "Kết quả tốt tùy công việc chẳng lấy gì lớn lao"
+      },
+      "HÔN NHÂN": {
+        "phrase": "Đãi băng vị phán",
+        "meaning": "Nên gấp cưới gã"
+      },
+      "LỤC GIÁP": {
+        "phrase": "Hữu nữ như vân",
+        "meaning": "Sinh con gái đẹp"
+      },
+      "PHONG THỦY": {
+        "phrase": "Tiên mê hậu đắc",
+        "meaning": "Mộ mới phát phúc"
+      },
+      "QUAN TỤNG": {
+        "phrase": "Bất cầu thậm giải",
+        "meaning": "Kiện cũng không đi đến đâu, nên hòa là hơn"
+      },
+      "TẬT BỆNH": {
+        "phrase": "Thôn điệt dũ tật",
+        "meaning": "Ăn ở nhân đức có thể khỏi được bệnh hiểm nghèo"
+      },
+      "HÀNH NHÂN THẤT VẬT": {
+        "phrase": "Thất nhật lai phục",
+        "meaning": "Người đi xa cùng cưa bị mất trong 7 ngày có thể thấy tin tức"
+      },
+      "LỤC SÚC ĐIỀN TẦM": {
+        "phrase": "Lạc tắc hành chi",
+        "meaning": "Cầy cấy chăn nuôi kết quả tốt đẹp"
+      }
+    },
+    "judgment": "«Du ngư hý hà» — cá giỡn hồ sen: cảnh nhàn đẹp, lợi lộc vừa. Trung bình — hợp hưởng nhàn, không hợp tranh đoạt lớn; mùa hạ (sen nở) khá hơn.\n\nThời vận: Hạ (tháng 4–6) tốt hơn; đông sen tàn thì kém.\n\nLời khuyên: Tận hưởng điều vừa đủ; đừng vì cảnh đẹp mà quên thực tế.\n\nChú giải cổ truyền (tóm): Quẻ nầy ứng triệu “Cá giỡn hồ sen” là quẻ ưu du nhàn nhã, về hình thức thì đẹp nhưng về lợi lộc thì xem ra cũng thường, dù có cũng chẳng được là bao. Vì trong thơ tổng thi chỉ nhắc đến chuyện “Sở Tương-Vương chơi đầm Vân-mộng ở núi Dương-đài” gặp thần nữ ngâm thơ uống rượu để hưởng cảnh nhàn mà thôi. Quẻ nầy không tốt cũng chẳng xấu, đứng vào hạng trung bình, ai bốc được nên đợi đến mùa hạ (các tháng 4, 5, 6 là mùa sen), ứng vào triệu “Du ngư hý hà” thì mới tốt. Các tháng 1, 2, 3 (mùa xuân) sen đợi mọc, thời vận thường, các tháng 7, 8, 9, 10, 11, chạp sen tàn, vận kém đi.",
+    "needsVerify": false,
+    "verifyNotes": [],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 26,
+    "rank": "thượng_thượng",
+    "titleHan": "Long hổ đấu kỳ",
+    "titleVi": "Rồng cọp thi nhau trổ tài",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Long hổ đấu kỳ» — rồng cọp tranh tài: hai bên đều mạnh, cuộc đấu đáng kể. Thượng thượng — có thể thắng lớn nếu đủ thực lực; cũng là lúc «kỳ phùng địch thủ».\n\nThời vận: Khi đã sẵn sàng thì ra trận.\n\nLời khuyên: Chuẩn bị kỹ trước khi đối đầu; thắng cũng giữ lễ với đối thủ.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 27,
+    "rank": "hạ_hạ",
+    "titleHan": "Lậu tận chung minh",
+    "titleVi": "Chuông báo canh tàn",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Lậu tận chung minh» — canh tàn chuông điểm: một giai đoạn đã hết. Hạ hạ — kết thúc, tan rã hoặc hết duyên; cố níu dễ tổn.\n\nThời vận: Cuối đêm · cuối việc.\n\nLời khuyên: Buông việc đã hết duyên; lo phần kết thúc cho đàng hoàng.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 28,
+    "rank": "hạ_hạ",
+    "titleHan": "Lăng cốc biến thiên",
+    "titleVi": "Gò hang biến đổi",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Lăng cốc biến thiên» — gò hang đổi dời: cuộc đất / cục diện biến động lớn. Hạ hạ — bất ổn, khó đoán; phong thủy và chỗ ở cần thận trọng.\n\nThời vận: Biến động mạnh.\n\nLời khuyên: Hoãn dời nhà / cải tạo lớn nếu chưa buộc; giữ an toàn hơn mưu lợi.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 29,
+    "rank": "đại_cát",
+    "titleHan": "Đăng hoa báo hỷ",
+    "titleVi": "Đèn hoa báo tin vui",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Đăng hoa báo hỷ» — ngọn đèn hoa báo tin vui: tin tốt sắp tới (hôn sự, thai sản, thăng tiến tùy việc hỏi). Đại cát — vui nhưng vẫn giữ mực thước.\n\nThời vận: Đêm đèn hoa — tin tới bất ngờ.\n\nLời khuyên: Đón tin vui trong chừng mực; làm lễ tạ ơn, chia sẻ phúc.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 30,
+    "rank": "trung_bình",
+    "titleHan": "Ôn cố tri tân",
+    "titleVi": "Ôn cũ biết mới",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Bình thường",
+        "meaning": "Không đại lo cũng chưa đại cát — giữ nếp nhà."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Đãi thời",
+        "meaning": "Được một phần; tránh tham, chờ thời thì hơn."
+      },
+      "Hôn nhân": {
+        "phrase": "Cần thận",
+        "meaning": "Có duyên nhưng nên xem kỹ, đừng vội."
+      },
+      "Tật bệnh": {
+        "phrase": "Cầu an",
+        "meaning": "Chữa trị đều; kết hợp làm phúc cầu an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Trì chậm",
+        "meaning": "Tin tức có thể chậm — kiên nhẫn tìm."
+      },
+      "Quan tụng": {
+        "phrase": "Nên hòa",
+        "meaning": "Kiện dễ kéo dài — hòa giải thường lợi hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Trung bình",
+        "meaning": "Không đại cát cũng không đại hung — tránh động lớn."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tùy thời",
+        "meaning": "Được mùa nếu chăm; bỏ bê thì kém."
+      }
+    },
+    "judgment": "«Ôn cố tri tân» — ôn cũ biết mới: học hỏi từ chuyện cũ để hiểu chuyện mới. Trung bình — thích hợp ôn tập, nhìn xét lại, tìm cách từ kinh nghiệm.\n\nThời vận: Khi có tư liệu / người cũ để hỏi.\n\nLời khuyên: Xem lại hồ sơ cũ, hỏi cố nhân; đừng bỏ qua bài học đã trả giá.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 31,
+    "rank": "hạ_hạ",
+    "titleHan": "Phong vũ quy châu",
+    "titleVi": "Thuyền về trong mưa gió",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Phong vũ quy châu» — thuyền về trong mưa gió: đường về gian nan, sóng gió. Hạ hạ — xuất hành / về quê / chuyển động đều vất vả.\n\nThời vận: Mưa gió.\n\nLời khuyên: Hoãn lộ trình nếu được; nếu phải đi thì chọn cách an toàn nhất.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 32,
+    "rank": "đại_cát",
+    "titleHan": "Nhất lộ phúc tinh",
+    "titleVi": "Một đường sao phúc",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Nhất lộ phúc tinh» — một đường sao phúc: suốt hành trình có sao lành soi. Đại cát — đi đường, làm việc xuôi chèo mát mái nếu giữ chính đạo.\n\nThời vận: Thuận cho xuất hành chính đáng.\n\nLời khuyên: Cứ đi đường ngay; phúc tự theo — đừng rẽ vào đường tà để «nhanh».",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 33,
+    "rank": "trung_bình",
+    "titleHan": "Ngoan kim dược dã",
+    "titleVi": "Vàng cũng chảy ra ngoài lò đúc",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Bình thường",
+        "meaning": "Không đại lo cũng chưa đại cát — giữ nếp nhà."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Đãi thời",
+        "meaning": "Được một phần; tránh tham, chờ thời thì hơn."
+      },
+      "Hôn nhân": {
+        "phrase": "Cần thận",
+        "meaning": "Có duyên nhưng nên xem kỹ, đừng vội."
+      },
+      "Tật bệnh": {
+        "phrase": "Cầu an",
+        "meaning": "Chữa trị đều; kết hợp làm phúc cầu an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Trì chậm",
+        "meaning": "Tin tức có thể chậm — kiên nhẫn tìm."
+      },
+      "Quan tụng": {
+        "phrase": "Nên hòa",
+        "meaning": "Kiện dễ kéo dài — hòa giải thường lợi hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Trung bình",
+        "meaning": "Không đại cát cũng không đại hung — tránh động lớn."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tùy thời",
+        "meaning": "Được mùa nếu chăm; bỏ bê thì kém."
+      }
+    },
+    "judgment": "«Ngoan kim dược dã» — vàng chảy ra ngoài khuôn đúc: tài / chất quý bị phân tán, hao tán. Trung bình — có của nhưng dễ chảy mất nếu không giữ khuôn (kỷ luật).\n\nThời vận: Khi nóng chảy — càng dễ hao.\n\nLời khuyên: Siết chi tiêu, hợp đồng, quy trình; đừng để «vàng» chảy lung tung.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 34,
+    "rank": "đại_cát",
+    "titleHan": "Lão bạng sinh châu",
+    "titleVi": "Trai già sinh ngọc",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Lão bạng sinh châu» — trai già sinh ngọc: muộn nhưng quý. Đại cát — thành quả đến chậm mà giá trị cao (con cái muộn, sự nghiệp về già, hợp đồng lâu mới chốt).\n\nThời vận: Càng về sau càng sáng.\n\nLời khuyên: Kiên nhẫn; đừng khinh vật / người «già»; của quý nằm trong cái chậm.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 35,
+    "rank": "đại_cát",
+    "titleHan": "Khô trúc sinh duẩn",
+    "titleVi": "Tre khô mọc măng",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Khô trúc sinh duẩn» — tre khô lại mọc măng: chỗ tưởng hết lại nảy lộc. Đại cát — hồi sinh, cơ hội mới từ nền cũ.\n\nThời vận: Xuân măng.\n\nLời khuyên: Đừng bỏ đám tre già; chăm lại việc tưởng đã chết có thể ra măng.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 36,
+    "rank": "thượng_thượng",
+    "titleHan": "Long đông tùng bách",
+    "titleVi": "Tùng bách xanh tốt vào mùa đông",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Long đông tùng bách» — tùng bách xanh giữa mùa đông: khí tiết bền, không sợ rét. Thượng thượng — phẩm cách và sự nghiệp vững trong nghịch cảnh.\n\nThời vận: Đông mà vẫn vượng — khác thường.\n\nLời khuyên: Giữ tiết tháo; khó khăn chính là lúc tỏ bản lĩnh.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 37,
+    "rank": "hạ_hạ",
+    "titleHan": "Lưu thủy lạc hoa",
+    "titleVi": "Nước chảy hoa trôi",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Lưu thủy lạc hoa» — nước chảy hoa trôi: hết duyên, cảnh cũ không giữ được. Hạ hạ — chia ly, tan tác; níu kéo thêm đau.\n\nThời vận: Xuân tàn hoa rụng.\n\nLời khuyên: Buông đúng lúc; giữ lại những gì còn thực dụng, đừng ôm cánh hoa đã rời cành.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 38,
+    "rank": "trung_bình",
+    "titleHan": "Đông sơn điệu cầm",
+    "titleVi": "Non Đông dạo đàn",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Bình thường",
+        "meaning": "Không đại lo cũng chưa đại cát — giữ nếp nhà."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Đãi thời",
+        "meaning": "Được một phần; tránh tham, chờ thời thì hơn."
+      },
+      "Hôn nhân": {
+        "phrase": "Cần thận",
+        "meaning": "Có duyên nhưng nên xem kỹ, đừng vội."
+      },
+      "Tật bệnh": {
+        "phrase": "Cầu an",
+        "meaning": "Chữa trị đều; kết hợp làm phúc cầu an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Trì chậm",
+        "meaning": "Tin tức có thể chậm — kiên nhẫn tìm."
+      },
+      "Quan tụng": {
+        "phrase": "Nên hòa",
+        "meaning": "Kiện dễ kéo dài — hòa giải thường lợi hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Trung bình",
+        "meaning": "Không đại cát cũng không đại hung — tránh động lớn."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tùy thời",
+        "meaning": "Được mùa nếu chăm; bỏ bê thì kém."
+      }
+    },
+    "judgment": "«Đông sơn điệu cầm» — trên Đông Sơn gảy đàn (điển Tạ An): phong thái nhàn nhã của người có bản lĩnh, bên ngoài êm mà bên trong lo việc lớn. Trung bình — đẹp về khí chất; cần phân biệt «nhàn giả» và «nhàn thật».\n\nThời vận: Khi cần giữ bình tĩnh trước việc lớn.\n\nLời khuyên: Bình tĩnh xử lý; đừng chỉ khoe vẻ nhàn mà quên chuẩn bị.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 39,
+    "rank": "hạ_hạ",
+    "titleHan": "Khử thảo trừ căn",
+    "titleVi": "Nhổ cỏ đào rễ",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Khử thảo trừ căn» — nhổ cỏ phải nhổ rễ: làm thì phải triệt để, hoặc báo hiệu phải cắt đứt nguồn họa. Hạ hạ nếu hiểu là họa đã mọc rễ sâu — nửa vời sẽ mọc lại.\n\nThời vận: Càng để lâu càng khó nhổ.\n\nLời khuyên: Xử lý dứt điểm mối họa (nợ, tiểu nhân, tật xấu); đừng làm lấy lệ.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 40,
+    "rank": "hạ_quái",
+    "titleHan": "Khí kê tầm vụ",
+    "titleVi": "Bỏ gà tìm cò",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Khí kê tầm vụ» — bỏ gà đi tìm cò: bỏ cái chắc đuổi theo cái ảo. Hạ quái — kém nhất trong nhiều bảng phân loại; tham thì mất.\n\nThời vận: Mọi mùa đều kỵ.\n\nLời khuyên: Giữ lấy «con gà» đang có; đừng bỏ việc ổn để theo lời hứa xa xôi.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 41,
+    "rank": "đại_cát",
+    "titleHan": "Xuất cốc thiên kiều",
+    "titleVi": "Ra khỏi hang tối tới cây cao bóng cả",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Xuất cốc thiên kiều» — ra khỏi hang tối, thấy cây cao bóng cả: thoát cảnh tối tăm, gặp chỗ dựa lớn. Đại cát — đổi môi trường sẽ sáng.\n\nThời vận: Khi đã quyết ra khỏi chỗ tối.\n\nLời khuyên: Dám rời chỗ giam cầm (việc độc hại, nơi không đường); tìm minh sư / môi trường tốt.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 42,
+    "rank": "hạ_hạ",
+    "titleHan": "Đắc thố vong đề",
+    "titleVi": "Được thỏ quên thuổng",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Đắc thố vong đề» — được thỏ quên thuổng: được rồi quên ơn / quên công cụ đã giúp mình. Hạ hạ về đạo đức và hậu vận — hưởng mà quên nguồn thì sau khó bền.\n\nThời vận: Sau khi vừa được việc.\n\nLời khuyên: Nhớ ơn người giúp; giữ «cái thuổng» (phương tiện, quan hệ) cho lần sau.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 43,
+    "rank": "đại_cát",
+    "titleHan": "Khúc đột tỷ tân",
+    "titleVi": "Cong ống khói, dời chỗ củi",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Khúc đột tỷ tân» (điển «khúc đột tỉ tân»): uốn ống khói, dời đống củi — phòng cháy trước khi cháy. Đại cát theo hướng trí tuệ phòng bị; nghe lời can ngăn thì hóa hung thành cát.\n\nThời vận: Trước khi họa xảy ra.\n\nLời khuyên: Nghe người có kinh nghiệm; sửa chỗ nguy trước khi lửa bùng.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 44,
+    "rank": "đại_cát",
+    "titleHan": "Cận duyệt viễn lai",
+    "titleVi": "Gần vui vẻ, xa tìm đến",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Cận duyệt viễn lai» — người gần vui, người xa tìm đến: đức lan tỏa, uy tín hút người. Đại cát — nhân duyên và danh tiếng tốt.\n\nThời vận: Khi đã có thực đức.\n\nLời khuyên: Giữ chữ tín với người gần; xa sẽ tự tìm đến — đừng chạy quảng cáo rỗng.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 45,
+    "rank": "trung_hạ",
+    "titleHan": "Cô nhạn xuất quần",
+    "titleVi": "Chim nhạn lìa đàn",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Cô nhạn xuất quần» — nhạn lìa đàn: cô độc, lệch nhóm. Trung hạ — đường riêng vất vả; thiếu đồng đội.\n\nThời vận: Mùa nhạn bay — dễ lạc.\n\nLời khuyên: Tìm lại đàn (đồng nghiệp, gia đình, đạo hữu); đừng cố đi một mình việc lớn.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 46,
+    "rank": "trung_bình",
+    "titleHan": "Đăng cao tự ty",
+    "titleVi": "Lên cao khởi đầu từ thấp",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Bình thường",
+        "meaning": "Không đại lo cũng chưa đại cát — giữ nếp nhà."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Đãi thời",
+        "meaning": "Được một phần; tránh tham, chờ thời thì hơn."
+      },
+      "Hôn nhân": {
+        "phrase": "Cần thận",
+        "meaning": "Có duyên nhưng nên xem kỹ, đừng vội."
+      },
+      "Tật bệnh": {
+        "phrase": "Cầu an",
+        "meaning": "Chữa trị đều; kết hợp làm phúc cầu an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Trì chậm",
+        "meaning": "Tin tức có thể chậm — kiên nhẫn tìm."
+      },
+      "Quan tụng": {
+        "phrase": "Nên hòa",
+        "meaning": "Kiện dễ kéo dài — hòa giải thường lợi hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Trung bình",
+        "meaning": "Không đại cát cũng không đại hung — tránh động lớn."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tùy thời",
+        "meaning": "Được mùa nếu chăm; bỏ bê thì kém."
+      }
+    },
+    "judgment": "«Đăng cao tự ty» — muốn lên cao phải từ thấp: tuần tự mà tiến. Trung bình — không nhảy cóc; tích lũy từng bậc.\n\nThời vận: Đường dài.\n\nLời khuyên: Làm vững bậc thấp trước; đừng ham chức vụ / lợi nhuận vượt khả năng.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 47,
+    "rank": "thượng_thượng",
+    "titleHan": "Đắc Lũng vọng Thục",
+    "titleVi": "Được đất Lũng lại mong đất Thục",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Đắc Lũng vọng Thục» — được Lũng lại muốn Thục: đã được còn muốn thêm. Thượng thượng trong một số bản hiểu là chí lớn, có thể tiến xa; cũng là lời nhắc tham vọng cần có thực lực kẻo hóa tham.\n\nThời vận: Khi nền Lũng đã vững.\n\nLời khuyên: Có chí tiến tới thì được; nhưng phải giữ đất đã được trước khi mở đất mới.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 48,
+    "rank": "hạ_hạ",
+    "titleHan": "Trụy phấn phiêu hương",
+    "titleVi": "Phấn rã hương bay",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Giữ gìn",
+        "meaning": "Nên thủ, tránh xung đột; chậm tiến hơn tham tiến."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Bất lợi",
+        "meaning": "Cầu tài·danh dễ hao — tạm gác việc lớn."
+      },
+      "Hôn nhân": {
+        "phrase": "Trở ngại",
+        "meaning": "Duyên đôi nhiều trở; nên trì quyết định lớn."
+      },
+      "Tật bệnh": {
+        "phrase": "Cẩn trọng",
+        "meaning": "Chữa sớm, đừng chủ quan; thành tâm cầu nguyện."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Khó khăn",
+        "meaning": "Người đi / vật mất khó tin ngay — thận trọng đường xa."
+      },
+      "Quan tụng": {
+        "phrase": "Bất lợi",
+        "meaning": "Tranh chấp dễ thua thiệt — tránh kiện nếu được."
+      },
+      "Phong thủy": {
+        "phrase": "Bất an",
+        "meaning": "Tránh cải tạo / dời chỗ lúc này nếu chưa buộc."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tổn thất",
+        "meaning": "Canh tác · chăn nuôi dễ hao — phòng bệnh dịch."
+      }
+    },
+    "judgment": "«Trụy phấn phiêu hương» — phấn rã, hương bay: vẻ đẹp tàn, danh tiếng / nhan sắc / đài các không giữ được. Hạ hạ — suy giảm hình thức và khí thế.\n\nThời vận: Hoa rụng · hương tan.\n\nLời khuyên: Đừng dựa vào vẻ ngoài; quay về thực lực và đức độ.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 49,
+    "rank": "đại_cát",
+    "titleHan": "Tha hương ngộ cố",
+    "titleVi": "Đất khách gặp cố nhân",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "An thuận",
+        "meaning": "Thân tâm ổn, gia đạo êm nếu giữ hòa."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Thuận lợi",
+        "meaning": "Cầu danh·cầu tài có duyên; làm chính đáng thì tiến."
+      },
+      "Hôn nhân": {
+        "phrase": "Hợp duyên",
+        "meaning": "Duyên đôi khá thuận; thành tâm dễ thành."
+      },
+      "Tật bệnh": {
+        "phrase": "Dần an",
+        "meaning": "Bệnh có chiều hướng giảm nếu chữa trị và giữ tâm an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Có tin",
+        "meaning": "Người đi / vật mất thường có tin hoặc tìm lại."
+      },
+      "Quan tụng": {
+        "phrase": "Hữu lý",
+        "meaning": "Tranh chấp nghiêng về phía có lý; hòa vẫn hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Cát",
+        "meaning": "Chỗ ở / mộ phần nhìn chung ổn; giữ gìn thanh tịnh."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Được mùa",
+        "meaning": "Canh tác · chăn nuôi tương đối thuận."
+      }
+    },
+    "judgment": "«Tha hương ngộ cố» — đất khách gặp cố nhân: giữa chỗ lạ có người quen cứu giúp. Đại cát — quý nhân bất ngờ, duyên cũ tái hợp có ích.\n\nThời vận: Khi đi xa / làm ăn nơi khác.\n\nLời khuyên: Giữ quan hệ cũ; lúc khó đừng ngại liên lạc cố nhân.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  },
+  {
+    "id": 50,
+    "rank": "trung_bình",
+    "titleHan": "Tá trợ họa trù",
+    "titleVi": "Mượn đũa bày mưu",
+    "poemHan": "",
+    "poemVi": "",
+    "aspects": {
+      "Tự thân gia trạch": {
+        "phrase": "Bình thường",
+        "meaning": "Không đại lo cũng chưa đại cát — giữ nếp nhà."
+      },
+      "Cầu quan cầu tài": {
+        "phrase": "Đãi thời",
+        "meaning": "Được một phần; tránh tham, chờ thời thì hơn."
+      },
+      "Hôn nhân": {
+        "phrase": "Cần thận",
+        "meaning": "Có duyên nhưng nên xem kỹ, đừng vội."
+      },
+      "Tật bệnh": {
+        "phrase": "Cầu an",
+        "meaning": "Chữa trị đều; kết hợp làm phúc cầu an."
+      },
+      "Hành nhân thất vật": {
+        "phrase": "Trì chậm",
+        "meaning": "Tin tức có thể chậm — kiên nhẫn tìm."
+      },
+      "Quan tụng": {
+        "phrase": "Nên hòa",
+        "meaning": "Kiện dễ kéo dài — hòa giải thường lợi hơn."
+      },
+      "Phong thủy": {
+        "phrase": "Trung bình",
+        "meaning": "Không đại cát cũng không đại hung — tránh động lớn."
+      },
+      "Lục súc điền tầm": {
+        "phrase": "Tùy thời",
+        "meaning": "Được mùa nếu chăm; bỏ bê thì kém."
+      }
+    },
+    "judgment": "«Tá trợ họa trù» — mượn đũa để bày mưu (điển Trương Lương / cổ sử): nhờ bàn tay người khác để thành việc. Trung bình — cần minh quân / đối tác; một mình khó xong, mượn lực đúng người thì thành.\n\nThời vận: Khi tìm được người để «mượn đũa».\n\nLời khuyên: Tìm cố vấn / đối tác đáng tin; đừng tự quyết việc quá tầm.",
+    "needsVerify": true,
+    "verifyNotes": [
+      "Thơ tổng thi (Hán-Việt) chưa đối chiếu đủ bản in — đang để trống hoặc thiếu.",
+      "Chú giải từng phương diện đang dùng khung theo hạng quẻ (cát/trung/hung), cần đối chiếu nguyên bản Hội Bắc Việt Tương Tế / Trần Nguyên Cát.",
+      "Đoạn tổng đoán cổ truyền chi tiết chưa lấy đủ từ bản lưu hành."
+    ],
+    "sourceNote": "Danh mục 50 quẻ · phân hạng theo bản Linh Xăm Đức Thánh Trần (Hội Bắc Việt Tương Tế phụng tự) lưu hành phổ biến. Tên sách hay gọi «Trần Triều 100 Quẻ Thần Ứng» nhưng ống xăm / bản chú giải thông dụng hiện nay là 50 quẻ."
+  }
+]

@@ -7,7 +7,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { getTempleByDomain, getCurrentDomain, formatVnd } from '@/lib/tenant';
 import { getSessionUser, assertTempleAccess } from '@/lib/auth';
 import { sendDevoteeNotification } from '@/lib/notifications';
-import { generateOrderCode } from '@/lib/payment';
+import { generateOrderCode, normalizeOrderCode } from '@/lib/payment';
 import type { WaterOrder } from '@/types/database';
 
 export interface CreateOrderInput {
@@ -37,8 +37,8 @@ export async function createWaterOrder(
   const phone = (input.customerPhone ?? '').trim();
   const note = (input.note ?? '').trim() || null;
 
-  if (!quantity || quantity < 10 || quantity > 100000) {
-    return { ok: false, error: 'Số lượng tối thiểu là 10 thùng (để thuận tiện vận chuyển về chùa).' };
+  if (!quantity || quantity < 1 || quantity > 100000) {
+    return { ok: false, error: 'Số lượng tối thiểu là 1 thùng (24 chai nước).' };
   }
   if (name.length < 2) {
     return { ok: false, error: 'Vui lòng nhập họ tên Phật tử.' };
@@ -219,5 +219,69 @@ export async function markOrderPaid(
   revalidatePath('/quan-tri');
   revalidatePath('/quan-tri/doi-soat');
   revalidatePath('/quan-tri/don-hang');
+  return { ok: true };
+}
+
+export interface UpdateDevoteeInfoInput {
+  orderCode: string;
+  address?: string;
+  ward?: string;
+  note?: string;
+}
+
+/** Cập nhật địa chỉ / ghi chú sau khi đã thanh toán (tùy chọn). */
+export async function updateWaterOrderDevoteeInfo(
+  input: UpdateDevoteeInfoInput,
+): Promise<{ ok: boolean; error?: string }> {
+  const code = normalizeOrderCode(input.orderCode ?? '');
+  if (code.length < 3) {
+    return { ok: false, error: 'Mã đơn không hợp lệ.' };
+  }
+
+  const address = (input.address ?? '').trim();
+  const ward = (input.ward ?? '').trim();
+  const note = (input.note ?? '').trim();
+  if (!address && !ward && !note) {
+    return { ok: false, error: 'Vui lòng nhập ít nhất một thông tin.' };
+  }
+
+  const client = await createClient();
+  const { data, error } = await client.rpc('update_water_order_devotee_info', {
+    p_code: code,
+    p_address: address || null,
+    p_ward: ward || null,
+    p_note: note || null,
+  });
+
+  if (error) {
+    // Fallback service role nếu RPC chưa sẵn sàng trên client.
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      const admin = getSupabaseAdmin();
+      const { data: adminData, error: adminErr } = await admin.rpc(
+        'update_water_order_devotee_info',
+        {
+          p_code: code,
+          p_address: address || null,
+          p_ward: ward || null,
+          p_note: note || null,
+        },
+      );
+      if (adminErr) return { ok: false, error: adminErr.message };
+      const result = adminData as { ok?: boolean; error?: string };
+      if (!result?.ok) {
+        return { ok: false, error: result?.error ?? 'Không cập nhật được.' };
+      }
+    } else {
+      return { ok: false, error: error.message };
+    }
+  } else {
+    const result = data as { ok?: boolean; error?: string };
+    if (!result?.ok) {
+      return { ok: false, error: result?.error ?? 'Không cập nhật được.' };
+    }
+  }
+
+  revalidatePath('/quan-tri/don-hang');
+  revalidatePath(`/dat-nuoc/${encodeURIComponent(code)}/thanh-cong`);
   return { ok: true };
 }

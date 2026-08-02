@@ -10,6 +10,7 @@ import {
   type DungSuActivity,
 } from '@/lib/fengshui/lich-dung-su';
 import { VerdictBadge } from '../VerdictBadge';
+import { AdvisorName, AdvisorText } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -71,7 +72,9 @@ function DayPanel({
 
       <div className="px-4 py-4">
         <p className="text-sm font-medium text-ink">{check.verdictLabel}</p>
-        <p className="text-xs text-muted mt-1 leading-relaxed">{check.detail}</p>
+        <p className="text-xs text-muted mt-1 leading-relaxed">
+          <AdvisorText text={check.detail} />
+        </p>
         <p className="text-xs text-muted mt-2 leading-relaxed">{activity.hint}</p>
       </div>
 
@@ -94,7 +97,7 @@ function DayPanel({
         className="px-4 py-3 border-t border-fog text-[11px]"
         style={{ color: primaryColor }}
       >
-        Việc hệ trọng nên hỏi thêm trụ trì / thầy trong chùa.
+        Việc hệ trọng nên hỏi thêm <AdvisorName fallback="trụ trì / thầy trong chùa" />.
       </p>
     </div>
   );
@@ -405,7 +408,7 @@ export function LichDungSu({ primaryColor }: Props) {
 
       <p className="mt-5 text-xs text-muted leading-relaxed">
         Dựa trên nhật lịch nên · kiêng (lunar-typescript). Chỉ mang tính tham
-        khảo dân gian; việc hệ trọng nên hỏi trụ trì.
+        khảo dân gian; việc hệ trọng nên hỏi <AdvisorName />.
       </p>
     </div>
   );

@@ -11,6 +11,8 @@ import {
 } from '@/lib/fengshui/cai-tang';
 import { VerdictBadge } from '../VerdictBadge';
 import { inputCls, labelCls } from '../FieldStyles';
+import { AdvisorName, AdvisorText } from '@/components/SitePersonaContext';
+import { HeTrongAiPanel } from './HeTrongAiPanel';
 
 interface Props {
   primaryColor: string;
@@ -72,7 +74,9 @@ function DayPanel({
 
       <div className="px-4 py-4">
         <p className="text-sm font-medium text-ink">{check.verdictLabel}</p>
-        <p className="text-xs text-muted mt-1 leading-relaxed">{check.detail}</p>
+        <p className="text-xs text-muted mt-1 leading-relaxed">
+          <AdvisorText text={check.detail} />
+        </p>
         <p className="text-xs text-muted mt-2 leading-relaxed">{stepHint}</p>
         {check.xungNote ? (
           <p
@@ -83,6 +87,54 @@ function DayPanel({
             {check.xungNote}
           </p>
         ) : null}
+      </div>
+
+      {check.folkWarnings.length > 0 || check.xungDay.length > 0 ? (
+        <div className="px-4 py-4 border-t border-fog">
+          <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
+            Bách kỵ dân gian · xung tuổi trong ngày
+          </p>
+          <ul className="space-y-1.5">
+            {check.folkWarnings.map((f) => (
+              <li key={f.key} className="flex items-start gap-2.5">
+                <VerdictBadge verdict={f.severity} className="mt-0.5" />
+                <p className="text-[11px] text-muted leading-relaxed">
+                  <b className="text-ink font-medium">{f.label}:</b> {f.detail}
+                </p>
+              </li>
+            ))}
+            {check.xungDay.map((x) => (
+              <li key={x.person.label} className="flex items-start gap-2.5">
+                <VerdictBadge verdict={x.verdict} className="mt-0.5" />
+                <p className="text-[11px] text-muted leading-relaxed">
+                  {x.detail}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      <div className="px-4 py-4 border-t border-fog">
+        <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
+          Giờ hoàng đạo trong ngày (đã lọc giờ xung tuổi)
+        </p>
+        {check.goodHours.length > 0 ? (
+          <ul className="flex flex-wrap gap-1.5">
+            {check.goodHours.map((h) => (
+              <li
+                key={`${h.chi}-${h.range}`}
+                className="px-2.5 py-1 text-[11px] border border-emerald-800/25 bg-emerald-50 text-emerald-900"
+              >
+                Giờ {h.ganZhi} · {h.range} · {h.tianShen}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted">
+            Không còn giờ hoàng đạo thuận trong ngày này.
+          </p>
+        )}
       </div>
 
       <div className="px-4 py-4 border-t border-fog grid sm:grid-cols-2 gap-4">
@@ -104,8 +156,8 @@ function DayPanel({
         className="px-4 py-3 border-t border-fog text-[11px]"
         style={{ color: primaryColor }}
       >
-        Cải táng / bốc mộ là việc hệ trọng — nên tham vấn trụ trì trước khi ấn
-        định ngày.
+        Cải táng / bốc mộ là việc hệ trọng — nên tham vấn <AdvisorName /> trước
+        khi ấn định ngày.
       </p>
     </div>
   );
@@ -118,17 +170,29 @@ export function CaiTang({ primaryColor }: Props) {
   const [month, setMonth] = useState(t.m);
   const [selected, setSelected] = useState({ y: t.y, m: t.m, d: t.d });
   const [deceasedYear, setDeceasedYear] = useState<string>('');
+  const [eldestSonYear, setEldestSonYear] = useState<string>('');
 
   const deceasedBirthYear = (() => {
     const n = Number(deceasedYear);
     return deceasedYear && n >= 1900 && n <= 2100 ? n : null;
   })();
+  const eldestSonBirthYear = (() => {
+    const n = Number(eldestSonYear);
+    return eldestSonYear && n >= 1900 && n <= 2100 ? n : null;
+  })();
 
   const step = getCaiTangStep(stepId);
 
   const { cells, goodDays, badDays } = useMemo(
-    () => scanCaiTangMonth(year, month, stepId, deceasedBirthYear),
-    [year, month, stepId, deceasedBirthYear],
+    () =>
+      scanCaiTangMonth(
+        year,
+        month,
+        stepId,
+        deceasedBirthYear,
+        eldestSonBirthYear,
+      ),
+    [year, month, stepId, deceasedBirthYear, eldestSonBirthYear],
   );
 
   const selectedCheck = useMemo(() => {
@@ -168,8 +232,8 @@ export function CaiTang({ primaryColor }: Props) {
     <div>
       <p className="text-sm text-muted leading-relaxed mb-4">
         Chọn bước nghi lễ và xem ngày nên · kiêng theo nhật lịch. Thường kết hợp
-        Phá thổ / Khởi khoan (bốc) rồi An táng lại — hỏi trụ trì về khoa lễ cầu
-        siêu.
+        Phá thổ / Khởi khoan (bốc) rồi An táng lại — hỏi <AdvisorName /> về
+        khoa lễ cầu siêu.
       </p>
 
       <div className="mb-4">
@@ -199,21 +263,38 @@ export function CaiTang({ primaryColor }: Props) {
         <p className="mt-2 text-xs text-muted leading-relaxed">{step.hint}</p>
       </div>
 
-      <label className={`${labelCls()} mb-4 block max-w-xs`}>
-        Năm sinh người mất (tuỳ chọn)
-        <input
-          type="number"
-          min={1900}
-          max={2100}
-          value={deceasedYear}
-          onChange={(e) => setDeceasedYear(e.target.value)}
-          placeholder="vd. 1945"
-          className={`mt-1 ${inputCls}`}
-        />
-        <span className="mt-1 block text-[11px] text-muted font-normal">
-          Để kiểm tra năm cải táng có xung tuổi người mất không.
-        </span>
-      </label>
+      <div className="mb-4 grid sm:grid-cols-2 gap-4">
+        <label className={labelCls()}>
+          Năm sinh người mất (tuỳ chọn)
+          <input
+            type="number"
+            min={1900}
+            max={2100}
+            value={deceasedYear}
+            onChange={(e) => setDeceasedYear(e.target.value)}
+            placeholder="vd. 1945"
+            className={`mt-1 ${inputCls}`}
+          />
+          <span className="mt-1 block text-[11px] text-muted font-normal">
+            Kiểm tra năm và NGÀY cải táng có xung tuổi người mất không.
+          </span>
+        </label>
+        <label className={labelCls()}>
+          Năm sinh trưởng nam (tuỳ chọn)
+          <input
+            type="number"
+            min={1900}
+            max={2100}
+            value={eldestSonYear}
+            onChange={(e) => setEldestSonYear(e.target.value)}
+            placeholder="vd. 1970"
+            className={`mt-1 ${inputCls}`}
+          />
+          <span className="mt-1 block text-[11px] text-muted font-normal">
+            Lọc ngày giờ không xung tuổi trưởng nam (người chủ lễ).
+          </span>
+        </label>
+      </div>
 
       <div className="flex items-center justify-between gap-3">
         <button
@@ -301,7 +382,7 @@ export function CaiTang({ primaryColor }: Props) {
               cell.solarDay === t.d;
             const check = cell.check;
             const isGood = check?.verdict === 'good';
-            const isBad = Boolean(check?.inJi || check?.allForbidden);
+            const isBad = check?.verdict === 'bad';
 
             return (
               <button
@@ -423,17 +504,34 @@ export function CaiTang({ primaryColor }: Props) {
       ) : null}
 
       {selectedCheck ? (
-        <DayPanel
-          check={selectedCheck}
-          stepLabel={step.label}
-          stepHint={step.hint}
-          primaryColor={primaryColor}
-        />
+        <>
+          <DayPanel
+            check={selectedCheck}
+            stepLabel={step.label}
+            stepHint={step.hint}
+            primaryColor={primaryColor}
+          />
+          <HeTrongAiPanel
+            primaryColor={primaryColor}
+            className="mt-4"
+            resetKey={`${stepId}-${selected.y}-${selected.m}-${selected.d}-${deceasedBirthYear ?? ''}-${eldestSonBirthYear ?? ''}`}
+            payload={{
+              topic: 'cai_tang',
+              year: selected.y,
+              month: selected.m,
+              day: selected.d,
+              stepId,
+              deceasedBirthYear,
+              eldestSonBirthYear,
+            }}
+          />
+        </>
       ) : null}
 
       <p className="mt-5 text-xs text-muted leading-relaxed">
         Tham khảo nhật lịch dân gian (lunar-typescript). Phong tục cải táng /
-        cát táng khác nhau theo vùng — luôn xin ý kiến trụ trì trước khi làm lễ.
+        cát táng khác nhau theo vùng — luôn xin ý kiến <AdvisorName /> trước
+        khi làm lễ.
       </p>
     </div>
   );

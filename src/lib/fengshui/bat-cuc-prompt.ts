@@ -1,5 +1,5 @@
 /**
- * System prompt cho AI luận Bát Cực Linh Số — giọng trụ trì,
+ * System prompt cho AI luận nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận — giọng trụ trì,
  * mệnh lệnh chuyên sâu riêng từng chủ đề (SIM, tài khoản, biển số, CCCD…).
  * Luôn ràng buộc: chỉ luận trên khối dữ liệu đã tính sẵn, không bịa cặp số.
  */
@@ -21,7 +21,7 @@ const VOICE_BLOCK = `Giọng văn:
 - Phần nào dữ liệu không đủ thì nói thẳng "phần này cần xem thêm mới chắc", KHÔNG suy đoán bừa.
 - Nói theo mức độ (thuận lợi / khá / cần lưu ý), tránh khẳng định tuyệt đối kiểu "chắc chắn sẽ", tránh hù dọa; nhắc đây là phép xem số mang tính tham khảo, việc đại sự cần cân nhắc thêm.
 
-Kiến thức nền Bát Cực Linh Số (dùng để giải thích, không thay dữ liệu):
+Kiến thức nền nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận (dùng để giải thích, không thay dữ liệu):
 - 8 sao: Sinh Khí, Thiên Y, Diên Niên, Phục Vị (cát) · Họa Hại, Lục Sát, Ngũ Quỷ, Tuyệt Mệnh (hung).
 - Số 0 và 5 là biến số: 0 ẩn tàng (khóa/biến chất năng lượng), 5 hiển lộ (khuếch đại cát lẫn hung).
 - Phần đuôi dãy số có sức nặng lớn nhất; đuôi 0/05 sách xếp đại kỵ "Tứ đại giai không".
@@ -123,8 +123,8 @@ export function batCucTopicLabels(topic: BatCucTopicId): {
 } {
   const cfg = BAT_CUC_TOPICS[topic];
   return {
-    dataLabel: `bảng phân tích Bát Cực Linh Số của ${cfg.dataLabel}`,
-    seenLabel: `đã tách cặp quái số và lập xong bảng sao Bát Cực cho ${cfg.dataLabel} của quý vị`,
+    dataLabel: `bảng phân tích Âm Dương Ngũ Hành, Kinh dịch diệu luận của ${cfg.dataLabel}`,
+    seenLabel: `đã tách cặp quái số và lập xong bảng sao cho ${cfg.dataLabel} của quý vị`,
   };
 }
 
@@ -160,13 +160,36 @@ export function ensureBatCucFollowUpBlock(
   return `${body}\n\n<<<goi-y>>>\n${suggestions.join('\n')}\n<<<het-goi-y>>>`;
 }
 
+/** Persona ghi đè cho site không phải chùa (VD: Lý Gia Phúc An). */
+export interface PromptPersona {
+  /** VD: "với vai trò Thầy Phong Thủy Phúc An, thầy phong thủy trực tiếp luận giải…" */
+  aiRoleIntro: string;
+  /** Danh xưng ngắn: "thầy" / "trụ trì" */
+  role: string;
+  /** Hướng dẫn kết bài (mời xem sim / gọi thầy…) */
+  aiOutro?: string;
+}
+
 export function buildBatCucSystemPrompt(
   templeName: string,
   topic: BatCucTopicId,
+  persona?: PromptPersona | null,
 ): string {
   const place = (templeName || 'chùa').trim() || 'chùa';
   const cfg = BAT_CUC_TOPICS[topic];
-  return `Bạn đang nói chuyện với Phật tử với vai trò trụ trì ${place}, luận ${cfg.dataLabel.toUpperCase()} theo phương pháp BÁT CỰC LINH SỐ (số tự năng lượng học).
+  if (persona) {
+    const voice = VOICE_BLOCK
+      .replaceAll('trụ trì', persona.role)
+      .replaceAll('Phật tử', 'khách');
+    return `Bạn đang nói chuyện với khách ${persona.aiRoleIntro}, luận ${cfg.dataLabel.toUpperCase()} theo nguyên lý ÂM DƯƠNG NGŨ HÀNH, KINH DỊCH DIỆU LUẬN (số tự năng lượng học).
+
+${voice}
+
+${TOPIC_MISSIONS[topic]}
+
+${persona.aiOutro ? `Lưu ý thêm: ${persona.aiOutro}\n\n` : ''}${SUGGEST_BLOCK}`;
+  }
+  return `Bạn đang nói chuyện với Phật tử với vai trò trụ trì ${place}, luận ${cfg.dataLabel.toUpperCase()} theo nguyên lý ÂM DƯƠNG NGŨ HÀNH, KINH DỊCH DIỆU LUẬN (số tự năng lượng học).
 
 ${VOICE_BLOCK}
 

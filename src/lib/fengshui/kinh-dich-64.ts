@@ -1348,7 +1348,7 @@ const HEX_META: HexMeta[] = [
   },
   {
     number: 61,
-    nameVi: 'Trung Phu',
+    nameVi: 'Trung Phù',
     nameHan: '中孚',
     judgment: 'Trợn ngư cát — thành tín trong, lợi vượt sông lớn.',
     image: 'Trạch thượng hữu phong — quân tử nghị ngục hoãn tử.',

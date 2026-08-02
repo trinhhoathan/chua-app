@@ -13,6 +13,7 @@ import {
 import { NGU_HANH_COLOR } from '@/lib/fengshui/nap-am-ngu-hanh';
 import { TuViChatPanel } from '@/components/fengshui/tools/TuViChatPanel';
 import { TuViEssaySection } from '@/components/fengshui/tools/TuViEssaySection';
+import { AdvisorName } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -368,7 +369,9 @@ export function HopTuoiMenh({
             <p className="text-sm text-muted">
               Phép xem dân gian theo năm sinh (nạp âm · can chi · cung phi).
               Muốn tinh hơn cần so cả tứ trụ ngày giờ của hai người — bấm luận
-              chuyên sâu bên dưới để trụ trì {templeName} giảng rõ từng điểm.
+              chuyên sâu bên dưới để{' '}
+              <AdvisorName fallback={`trụ trì ${templeName}`} /> giảng rõ từng
+              điểm.
             </p>
           </div>
 

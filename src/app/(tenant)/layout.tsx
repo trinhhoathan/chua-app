@@ -5,6 +5,8 @@ import {
   getTemplePublicOrigin,
   toAbsoluteMediaUrl,
 } from '@/lib/site-url';
+import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import { LyGiaShell } from '@/components/ly-gia/LyGiaShell';
 import { TopNav } from '@/components/temple/TopNav';
 import { TempleFooter } from '@/components/temple/TempleFooter';
 import { ContactDock } from '@/components/temple/ContactDock';
@@ -92,6 +94,10 @@ export default async function TenantLayout({
         </div>
       </div>
     );
+  }
+
+  if (isLyGiaPhucAnSite(temple)) {
+    return <LyGiaShell temple={temple}>{children}</LyGiaShell>;
   }
 
   const primary = temple.primary_color || '#7A1F1F';

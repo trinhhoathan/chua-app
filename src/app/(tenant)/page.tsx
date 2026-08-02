@@ -1,4 +1,7 @@
 import { getCurrentTemple } from '@/lib/tenant';
+import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import { LyGiaHome } from '@/components/ly-gia/LyGiaHome';
+import { getFeaturedSims } from '@/lib/sim/catalog';
 import { getTempleWaterTransparency } from '@/lib/transparency';
 import { getUpcomingTempleEvents } from '@/lib/temple-events';
 import { getPublicChantingSchedules } from '@/app/actions/chanting';
@@ -22,6 +25,11 @@ import { GallerySection } from '@/components/temple/GallerySection';
 export default async function HomePage() {
   const temple = await getCurrentTemple();
   if (!temple) return null;
+
+  if (isLyGiaPhucAnSite(temple)) {
+    const featuredSims = await getFeaturedSims(temple.id, 8);
+    return <LyGiaHome temple={temple} featuredSims={featuredSims} />;
+  }
 
   const [transparency, events, chanting] = await Promise.all([
     getTempleWaterTransparency(temple.id),

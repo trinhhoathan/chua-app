@@ -8,6 +8,8 @@ import {
 } from '@/lib/fengshui/muon-tuoi-lam-nha';
 import { VerdictBadge } from '../VerdictBadge';
 import { inputCls, labelCls } from '../FieldStyles';
+import { AdvisorName } from '@/components/SitePersonaContext';
+import { HeTrongAiPanel } from './HeTrongAiPanel';
 
 interface Props {
   primaryColor: string;
@@ -38,7 +40,7 @@ function CandidateCard({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium text-ink">
-            Sinh {c.birthYear} · {c.canChi}
+            Sinh {c.birthYear} · {c.canChi} · {c.napAm}
           </p>
           <p className="text-xs text-muted mt-0.5">
             Tuổi mụ {c.ageMu} (năm làm nhà)
@@ -62,6 +64,11 @@ function CandidateCard({
         <li>Hoang Ốc: {c.hoangOc.detail}</li>
         <li>Tam Tai: {c.tamTai.detail}</li>
         <li>Xung năm: {c.xungNam.detail}</li>
+        {c.ownerRelation ? (
+          <li className="sm:col-span-2">
+            Đối chiếu chủ nhà: {c.ownerRelation.detail}
+          </li>
+        ) : null}
       </ul>
     </li>
   );
@@ -80,8 +87,8 @@ export function MuonTuoiLamNha({ primaryColor }: Props) {
   );
 
   const person = useMemo(
-    () => checkBorrowPerson(personYear, targetYear),
-    [personYear, targetYear],
+    () => checkBorrowPerson(personYear, targetYear, ownerYear),
+    [personYear, targetYear, ownerYear],
   );
 
   return (
@@ -169,13 +176,15 @@ export function MuonTuoiLamNha({ primaryColor }: Props) {
             </p>
             <p className="text-xs text-muted mb-3 leading-relaxed">
               Ưu tiên người thân huyết thống (cha, chú, bác, anh…), tuổi mụ{' '}
-              {28}–{72}, không phạm Kim Lâu / Hoang Ốc trong năm làm nhà.
+              {28}–{72}, không phạm Kim Lâu / Hoang Ốc trong năm làm nhà,
+              không lục xung · lục hại tuổi chủ nhà; cộng điểm khi tam hợp /
+              lục hợp chi hoặc nạp âm tương sinh với chủ nhà.
             </p>
 
             {result.best.length === 0 ? (
               <p className="text-sm text-muted">
                 Không tìm thấy ứng viên “nên mượn” trong khoảng tuổi phổ biến.
-                Thử nới tiêu chí hoặc hỏi trụ trì.
+                Thử nới tiêu chí hoặc hỏi <AdvisorName />.
               </p>
             ) : (
               <ul className="space-y-3">
@@ -249,13 +258,24 @@ export function MuonTuoiLamNha({ primaryColor }: Props) {
               </ul>
             ) : null}
           </section>
+
+          <HeTrongAiPanel
+            primaryColor={primaryColor}
+            resetKey={`${ownerYear}-${targetYear}-${checkedPerson ? personYear : ''}`}
+            payload={{
+              topic: 'muon_tuoi',
+              ownerYear,
+              targetYear,
+              personYear: checkedPerson ? personYear : null,
+            }}
+          />
         </div>
       ) : null}
 
       <p className="mt-6 text-xs text-muted leading-relaxed">
         Mượn tuổi là tục dân gian khi phạm Kim Lâu / Hoang Ốc: người được mượn
         thường chủ trì động thổ hoặc đứng tên ngày lành. Việc hệ trọng nên hỏi
-        thêm trụ trì / thầy trong chùa.
+        thêm <AdvisorName fallback="trụ trì / thầy trong chùa" />.
       </p>
     </div>
   );

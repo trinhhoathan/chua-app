@@ -3,10 +3,10 @@
  * bảng dân gian dùng cho lễ dâng sao giải hạn tại chùa.
  */
 
-import { formatCanChi, tuoiMu, yearCanChi } from './lunar';
+import { formatCanChi, tuoiMu, yearCanChi, type Chi } from './lunar';
+import { getAlmanacDay } from './lunar-almanac';
 import {
   checkTamTai,
-  checkXungNam,
   type Verdict,
 } from './rules';
 
@@ -121,15 +121,24 @@ const STAR_INFO: Record<string, Omit<CuuDieuStar, 'name'>> = {
   },
 };
 
-export type TaiSuiKind = 'dong' | 'xung' | 'binh';
+/**
+ * Năm dạng phạm Thái Tuế: trị (đồng chi), xung (lục xung),
+ * hình (tương hình / tự hình), hại (lục hại), phá (lục phá).
+ */
+export type TaiSuiKind = 'tri' | 'xung' | 'hinh' | 'hai' | 'pha' | 'binh';
 
 export interface TaiSuiStatus {
+  /** Dạng phạm nặng nhất (trị > xung > hình > hại > phá) */
   kind: TaiSuiKind;
+  /** Tất cả dạng phạm trong năm (có thể trùng nhau, vd vừa hình vừa hại) */
+  kinds: TaiSuiKind[];
   verdict: Verdict;
   label: string;
   detail: string;
   yearCanChi: string;
   birthCanChi: string;
+  /** Phương vị Thái Tuế của năm — kiêng động thổ, đào bới hướng này */
+  position: string | null;
 }
 
 export interface SaoChieuMenhResult {
@@ -182,6 +191,80 @@ function getStar(name: string): CuuDieuStar {
   return { name, ...info };
 }
 
+const LUC_XUNG: Array<[Chi, Chi]> = [
+  ['Tý', 'Ngọ'],
+  ['Sửu', 'Mùi'],
+  ['Dần', 'Thân'],
+  ['Mão', 'Dậu'],
+  ['Thìn', 'Tuất'],
+  ['Tỵ', 'Hợi'],
+];
+const LUC_HAI: Array<[Chi, Chi]> = [
+  ['Tý', 'Mùi'],
+  ['Sửu', 'Ngọ'],
+  ['Dần', 'Tỵ'],
+  ['Mão', 'Thìn'],
+  ['Thân', 'Hợi'],
+  ['Dậu', 'Tuất'],
+];
+const TUONG_HINH: Array<[Chi, Chi]> = [
+  ['Tý', 'Mão'],
+  ['Dần', 'Tỵ'],
+  ['Tỵ', 'Thân'],
+  ['Dần', 'Thân'],
+  ['Sửu', 'Tuất'],
+  ['Tuất', 'Mùi'],
+  ['Sửu', 'Mùi'],
+];
+const TU_HINH: Chi[] = ['Thìn', 'Ngọ', 'Dậu', 'Hợi'];
+const LUC_PHA: Array<[Chi, Chi]> = [
+  ['Tý', 'Dậu'],
+  ['Mão', 'Ngọ'],
+  ['Tỵ', 'Thân'],
+  ['Dần', 'Hợi'],
+  ['Thìn', 'Sửu'],
+  ['Tuất', 'Mùi'],
+];
+
+function inPairs(pairs: Array<[Chi, Chi]>, a: Chi, b: Chi): boolean {
+  return pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a));
+}
+
+const TAI_SUI_KIND_INFO: Record<
+  Exclude<TaiSuiKind, 'binh'>,
+  { label: string; note: string }
+> = {
+  tri: {
+    label: 'Trị Thái Tuế (đồng chi)',
+    note: 'tuổi trùng chi năm — Thái Tuế "ngồi" ngay bản mệnh, năm tuổi nên giữ mình, kiêng đại sự đầu năm',
+  },
+  xung: {
+    label: 'Xung Thái Tuế',
+    note: 'chi tuổi lục xung chi năm — biến động mạnh nhất trong các dạng phạm, đại sự nên thận trọng',
+  },
+  hinh: {
+    label: 'Hình Thái Tuế',
+    note: 'chi tuổi tương hình chi năm — dễ thị phi, kiện tụng, va chạm',
+  },
+  hai: {
+    label: 'Hại Thái Tuế',
+    note: 'chi tuổi lục hại chi năm — dễ bị cản trở, tiểu nhân, hao tổn ngầm',
+  },
+  pha: {
+    label: 'Phá Thái Tuế',
+    note: 'chi tuổi lục phá chi năm — dễ đổ vỡ kế hoạch, hao tài lặt vặt',
+  },
+};
+
+/** Phương vị Thái Tuế của năm (lấy theo nhật lịch giữa năm). */
+function taiSuiPosition(viewYear: number): string | null {
+  try {
+    return getAlmanacDay(viewYear, 6, 1).positionTaiSuiYear || null;
+  } catch {
+    return null;
+  }
+}
+
 function taiSuiStatus(
   birthYear: number,
   viewYear: number,
@@ -190,37 +273,63 @@ function taiSuiStatus(
   const year = yearCanChi(viewYear);
   const birthCanChi = formatCanChi(birth);
   const yearCanChiStr = formatCanChi(year);
+  const position = taiSuiPosition(viewYear);
 
+  const kinds: Exclude<TaiSuiKind, 'binh'>[] = [];
   if (birth.chi === year.chi) {
+    kinds.push('tri');
+    if (TU_HINH.includes(birth.chi)) kinds.push('hinh');
+  }
+  if (inPairs(LUC_XUNG, birth.chi, year.chi)) kinds.push('xung');
+  if (birth.chi !== year.chi && inPairs(TUONG_HINH, birth.chi, year.chi)) {
+    kinds.push('hinh');
+  }
+  if (inPairs(LUC_HAI, birth.chi, year.chi)) kinds.push('hai');
+  if (inPairs(LUC_PHA, birth.chi, year.chi)) kinds.push('pha');
+
+  const positionNote = position
+    ? ` Phương Thái Tuế năm nay: ${position} — kiêng động thổ, đào bới phía này.`
+    : '';
+
+  if (kinds.length === 0) {
     return {
-      kind: 'dong',
-      verdict: 'bad',
-      label: 'Phạm Thái Tuế (đồng)',
-      detail: `Chi tuổi ${birth.chi} trùng chi năm ${viewYear} (${year.chi}) — phạm Thái Tuế bản mệnh. Nên cầu an / dâng sao tại chùa.`,
+      kind: 'binh',
+      kinds: ['binh'],
+      verdict: 'good',
+      label: 'Không phạm Thái Tuế',
+      detail: `Chi năm ${viewYear} (${year.chi}) không trị, không xung / hình / hại / phá tuổi ${birth.chi}.${positionNote}`,
       yearCanChi: yearCanChiStr,
       birthCanChi,
+      position,
     };
   }
 
-  const xung = checkXungNam(birthYear, viewYear);
-  if (xung.verdict === 'caution') {
-    return {
-      kind: 'xung',
-      verdict: 'bad',
-      label: 'Xung Thái Tuế',
-      detail: `Chi năm ${viewYear} (${year.chi}) xung tuổi ${birth.chi}. Đại sự nên thận trọng; nên lễ cầu an.`,
-      yearCanChi: yearCanChiStr,
-      birthCanChi,
-    };
-  }
+  const order: Exclude<TaiSuiKind, 'binh'>[] = ['tri', 'xung', 'hinh', 'hai', 'pha'];
+  const sorted = order.filter((k) => kinds.includes(k));
+  const main = sorted[0];
+  const verdict: Verdict = main === 'tri' || main === 'xung' ? 'bad' : 'caution';
+
+  const label =
+    sorted.length > 1
+      ? `${TAI_SUI_KIND_INFO[main].label} (kèm ${sorted
+          .slice(1)
+          .map((k) => TAI_SUI_KIND_INFO[k].label.split(' ')[0].toLowerCase())
+          .join(', ')})`
+      : TAI_SUI_KIND_INFO[main].label;
+
+  const detail = `Tuổi ${birth.chi} với năm ${viewYear} (${year.chi}): ${sorted
+    .map((k) => TAI_SUI_KIND_INFO[k].note)
+    .join('; ')}. Nên đăng ký cầu an / dâng sao tại chùa.${positionNote}`;
 
   return {
-    kind: 'binh',
-    verdict: 'good',
-    label: 'Không phạm Thái Tuế',
-    detail: `Chi năm ${viewYear} (${year.chi}) không đồng / không xung tuổi ${birth.chi}.`,
+    kind: main,
+    kinds: sorted,
+    verdict,
+    label,
+    detail,
     yearCanChi: yearCanChiStr,
     birthCanChi,
+    position,
   };
 }
 

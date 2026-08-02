@@ -108,6 +108,7 @@ function normalizeTemple(row: Record<string, unknown>): Temple {
     bank_name: (row.bank_name as string) ?? null,
     bank_account_number: (row.bank_account_number as string) ?? null,
     bank_account_holder: (row.bank_account_holder as string) ?? null,
+    bank_bin: (row.bank_bin as string) ?? null,
     payment_code: (row.payment_code as string) ?? null,
     water_price_vnd: Number(row.water_price_vnd ?? 80000),
     water_profit_share_pct: Number(row.water_profit_share_pct ?? 50),

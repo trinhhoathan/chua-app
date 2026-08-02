@@ -151,19 +151,45 @@ export const POPULAR_BANK_APPS: BankApp[] = [
   },
 ];
 
+/** Mã NH nhận cho tham số `ba` (doc VietQR dùng app code, vd `msb`) — fallback BIN. */
+function toRecipientBankCode(recipientBin: string): string {
+  const found = POPULAR_BANK_APPS.find((b) => b.bin === recipientBin);
+  return found?.app ?? recipientBin;
+}
+
+export interface BankPayDeeplinkOptions {
+  /** Số tiền VND — tham số `am` */
+  amount?: number;
+  /** Nội dung CK — tham số `tn` */
+  transferContent?: string;
+  /** Tên chủ TK nhận — tham số `bn` */
+  accountHolder?: string;
+}
+
 /**
- * Deeplink mở app ngân hàng (VietQR).
- * `ba` = STK nhận @ BIN ngân hàng nhận (VietinBank công ty).
+ * Deeplink mở app ngân hàng (VietQR): https://dl.vietqr.io/pay
+ * Gửi đủ `app`, `ba`, `am`, `tn`, `bn` để app NH hỗ trợ autofill
+ * điền sẵn số tiền + nội dung CK (VietinBank, BIDV, ACB, OCB…).
  */
 export function buildBankPayDeeplink(
   bankApp: BankApp,
   recipientAccount: string,
   recipientBin: string,
+  options: BankPayDeeplinkOptions = {},
 ): string {
-  const ba = `${recipientAccount.replace(/\s+/g, '')}@${recipientBin}`;
+  const ba = `${recipientAccount.replace(/\s+/g, '')}@${toRecipientBankCode(recipientBin)}`;
   const params = new URLSearchParams({
     app: bankApp.app,
     ba,
   });
+  if (options.amount && options.amount > 0) {
+    params.set('am', String(Math.round(options.amount)));
+  }
+  if (options.transferContent) {
+    params.set('tn', options.transferContent);
+  }
+  if (options.accountHolder) {
+    params.set('bn', options.accountHolder);
+  }
   return `https://dl.vietqr.io/pay?${params.toString()}`;
 }

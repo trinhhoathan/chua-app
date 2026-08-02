@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import type { Temple } from '@/types/database';
+import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
 import {
   NAV_SECTION_LABELS,
   PHAT_HOC_NAV_ORDER,
+  PHAT_HOC_NAV_ORDER_LY_GIA,
   toolHref,
   toolsByNavSection,
 } from '@/lib/fengshui/tools';
@@ -13,8 +15,10 @@ interface Props {
 
 export function PhatHocNav({ temple }: Props) {
   const primary = temple.primary_color || '#7A1F1F';
+  const isLyGia = isLyGiaPhucAnSite(temple);
+  const navOrder = isLyGia ? PHAT_HOC_NAV_ORDER_LY_GIA : PHAT_HOC_NAV_ORDER;
 
-  const bySection = PHAT_HOC_NAV_ORDER.map((section) => {
+  const bySection = navOrder.map((section) => {
     const all = toolsByNavSection(section);
     const ready = all.filter((t) => t.status === 'ready');
     const soon = all.filter((t) => t.status === 'coming_soon');
@@ -33,11 +37,14 @@ export function PhatHocNav({ temple }: Props) {
             Phật học · Tâm linh
           </p>
           <h2 className="font-display text-3xl md:text-4xl text-ink leading-tight">
-            Lịch lễ · Kinh · Tham gia chùa
+            {isLyGia
+              ? 'Lịch lễ · Kinh · Tu học'
+              : 'Lịch lễ · Kinh · Tham gia chùa'}
           </h2>
           <p className="mt-4 text-muted leading-relaxed">
-            Hướng dẫn Phật tử của {temple.name}: vía lễ, kinh khấn, và các việc
-            thực tế tại chùa (sớ, quy y, hoạt động).
+            {isLyGia
+              ? `Kho Phật học tham khảo của ${temple.name}: ngày vía, kinh khấn và tu học.`
+              : `Hướng dẫn Phật tử của ${temple.name}: vía lễ, kinh khấn, và các việc thực tế tại chùa (sớ, quy y, hoạt động).`}
           </p>
         </div>
 

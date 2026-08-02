@@ -1,5 +1,5 @@
 /**
- * Bói SIM · số điện thoại — adapter trên engine Bát Cực Linh Số dùng chung
+ * Bói SIM · số điện thoại — adapter trên engine Âm Dương Ngũ Hành dùng chung
  * (src/lib/fengshui/bat-cuc.ts). Phần riêng của SIM: parse số điện thoại VN,
  * 81 Số Lý (4 số cuối), gợi ý nghề nghiệp và luận giải văn bản.
  */
@@ -51,7 +51,7 @@ export interface BoiSimResult {
   starCounts: Record<StarId, number>;
   catPairs: number;
   hungPairs: number;
-  /** điểm Du Niên Bát Cực (đã gồm 0/5, tổ hợp, đuôi) */
+  /** điểm Du Niên (đã gồm 0/5, tổ hợp, đuôi) */
   duNienScore: number;
   combos: ComboNote[];
   tail: TailAnalysis;
@@ -236,13 +236,13 @@ export function analyzeBoiSim(
   if ('error' in core) {
     return {
       error:
-        'Dãy số có quá nhiều số 0/5 liên tiếp, không đủ cặp quái số để luận theo Bát Cực Linh Số.',
+        'Dãy số có quá nhiều số 0/5 liên tiếp, không đủ cặp quái số để luận theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận.',
     };
   }
   if (core.pairs.length < 2) {
     return {
       error:
-        'Dãy số có quá nhiều số 0/5 liên tiếp, không đủ cặp quái số để luận theo Bát Cực Linh Số.',
+        'Dãy số có quá nhiều số 0/5 liên tiếp, không đủ cặp quái số để luận theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận.',
     };
   }
 
@@ -270,7 +270,7 @@ export function analyzeBoiSim(
   const nutScore =
     core.tongNut === 1 || core.tongNut === 6 || core.tongNut === 8 ? 75 : 55;
 
-  // Trọng số tổng: Bát Cực Linh Số là trục chính (70%),
+  // Trọng số tổng: nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận là trục chính (70%),
   // các hệ tham khảo phụ chiếm phần còn lại.
   const soLyScore = soLyMeta.score * 10;
   const overallScore = Math.round(
@@ -298,7 +298,7 @@ export function analyzeBoiSim(
     'Số điện thoại là vật mang theo hằng ngày — dùng để tham khảo trường khí, không thay cho nỗ lực và phúc đức.';
   if (verdict === 'tot') {
     advice =
-      'Cấu trúc Bát Cực nghiêng cát rõ rệt — đây là sim đẹp, nên giữ dùng lâu dài. Vẫn cần hợp đạo làm ăn và giữ tâm an để cát khí phát huy.';
+      'Cấu trúc Âm Dương Ngũ Hành nghiêng cát rõ rệt — đây là sim đẹp, nên giữ dùng lâu dài. Vẫn cần hợp đạo làm ăn và giữ tâm an để cát khí phát huy.';
   } else if (verdict === 'kha') {
     advice =
       'Sim khá tốt, dùng ổn định được. Nếu có dịp đổi, ưu tiên dãy có Thiên Y hoặc Diên Niên đóng ở 3 số cuối để vừa kiếm vừa giữ được tiền.';

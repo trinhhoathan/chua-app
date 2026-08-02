@@ -766,6 +766,11 @@ export function viTerm(raw: string): string {
   return purgeHan(out);
 }
 
+/** Dịch một địa chi đơn (子 → Tý) — tránh rơi xuống âm Hán Việt chung (子 → Tử). */
+export function viZhi(zhi: string): string {
+  return ZHI[zhi] ?? viTerm(zhi);
+}
+
 export function viList(items: string[]): string[] {
   return items.map(viTerm).filter(Boolean);
 }

@@ -14,8 +14,8 @@ interface Props {
   templeName: string;
 }
 
-const QUICK_QTY = [10, 50, 100, 1000];
-const MIN_QTY = 10;
+const QUICK_QTY = [1, 5, 10, 50, 100];
+const MIN_QTY = 1;
 const MAX_QTY = 100000;
 
 function formatVnd(n: number): string {
@@ -93,9 +93,9 @@ export function WaterStickyBar({
           pulse ? 'water-bar-pulse' : ''
         }`}
       >
-        <div className="mx-auto max-w-3xl px-5 py-3">
+        <div className="mx-auto max-w-[52rem] px-5 py-3">
           <div className="flex flex-row items-stretch gap-3">
-            <div className="min-w-0 flex-1 rounded-md bg-white/[0.06] ring-1 ring-white/10 px-2.5 py-2">
+            <div className="min-w-0 flex-1 rounded-md bg-white/[0.06] ring-1 ring-white/10 px-3 py-2">
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                 <span className="shrink-0 text-[10px] tracking-[0.2em] uppercase text-white/45">
                   Thỉnh nước
@@ -214,7 +214,7 @@ export function WaterStickyBar({
                     className="mt-1 w-full px-3 py-2 bg-white border border-fog text-ink"
                   />
                   <span className="text-[10px] text-muted">
-                    Tối thiểu {MIN_QTY} thùng
+                    Tối thiểu {MIN_QTY} thùng (24 chai nước)
                   </span>
                 </label>
                 <label className="block text-xs text-muted">
@@ -235,16 +235,6 @@ export function WaterStickyBar({
                     onChange={(e) => setPhone(e.target.value)}
                     className="mt-1 w-full px-3 py-2 bg-white border border-fog text-ink"
                     placeholder="09xxxxxxxx"
-                  />
-                </label>
-                <label className="block text-xs text-muted">
-                  Ghi chú (không bắt buộc)
-                  <textarea
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    rows={2}
-                    className="mt-1 w-full px-3 py-2 bg-white border border-fog text-ink resize-none"
-                    placeholder="Hồi hướng / nguyện cầu ..."
                   />
                 </label>
               </div>

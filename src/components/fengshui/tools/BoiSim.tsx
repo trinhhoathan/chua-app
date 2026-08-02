@@ -22,6 +22,7 @@ import {
 } from '@/components/fengshui/tools/BatCucResultBlocks';
 import { BatCucEssaySection } from '@/components/fengshui/tools/BatCucEssaySection';
 import { BatCucChatPanel } from '@/components/fengshui/tools/BatCucChatPanel';
+import { SimBetterUpsell } from '@/components/sim/SimBetterUpsell';
 import { inputCls, labelCls } from '../FieldStyles';
 
 interface Props {
@@ -51,7 +52,7 @@ function ResultView({
       {/* Kết luận tổng */}
       <div className="border border-fog bg-gradient-to-b from-[#faf6ef] to-white px-4 py-5 sm:px-6">
         <p className="text-[10px] uppercase tracking-wide text-muted">
-          Bát Cực Linh Số · luận giải số điện thoại
+          nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận · luận giải số điện thoại
         </p>
         <p className="font-display text-2xl text-ink mt-1 tabular-nums">
           {result.display}
@@ -76,7 +77,7 @@ function ResultView({
         <p className="mt-3 text-sm text-ink leading-relaxed">{result.advice}</p>
         <p className="mt-2 text-xs text-muted">
           Cát {result.catPairs}/{result.pairs.length} cặp · Hung{' '}
-          {result.hungPairs}/{result.pairs.length} cặp · Điểm Bát Cực{' '}
+          {result.hungPairs}/{result.pairs.length} cặp · Điểm luận số{' '}
           {result.duNienScore}/100
         </p>
         {result.tail.warning ? (
@@ -312,7 +313,7 @@ export function BoiSim({
   const [result, setResult] = useState<BoiSimResult | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
 
-  // Ngữ cảnh AI: dùng chung engine + builder với 13 trang Bát Cực còn lại
+  // Ngữ cảnh AI: dùng chung engine + builder với 13 trang Âm Dương Ngũ Hành còn lại
   const analysisContext = useMemo(() => {
     if (!result) return '';
     const parsed = parseBatCucInput('sim', result.digits.join(''));
@@ -338,7 +339,7 @@ export function BoiSim({
   return (
     <div>
       <p className="text-sm text-muted leading-relaxed mb-4">
-        Luận giải SIM theo <span className="text-ink">Bát Cực Linh Số</span> —
+        Luận giải SIM theo <span className="text-ink">nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận</span> —
         tách dãy số thành từng cặp quái số đối chiếu 8 từ trường (Sinh Khí ·
         Thiên Y · Diên Niên · Phục Vị · Họa Hại · Lục Sát · Ngũ Quỷ · Tuyệt
         Mệnh), xét biến số 0·5, tổ hợp chế hóa giữa các sao, 3 số cuối và 5
@@ -390,11 +391,17 @@ export function BoiSim({
         <div className="mt-8 space-y-5">
           <ResultView result={result} primaryColor={primaryColor} />
 
+          {/* Site Lý Gia: gợi ý số điểm cao hơn trong kho */}
+          <SimBetterUpsell
+            score={result.overallScore}
+            primaryColor={primaryColor}
+          />
+
           {/* Tra cứu 8 từ trường */}
           <section className="border border-fog bg-white">
             <div className="px-4 py-3 border-b border-fog">
               <p className="text-[10px] uppercase tracking-wide text-muted">
-                Tra cứu tám từ trường Bát Cực Linh Số
+                Tra cứu tám từ trường Âm Dương Ngũ Hành
               </p>
               <p className="text-sm text-ink mt-0.5">{BAT_CUC_TABLE_NOTE}</p>
             </div>

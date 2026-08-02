@@ -251,7 +251,7 @@ function FullResult({
               .join(' · ')}
           </p>
           <p className="text-[12px] text-muted leading-relaxed">
-            Sách Bát Cực chỉ luận chữ số; chữ cái được quy đổi theo vị trí
+            Phương pháp này chỉ luận chữ số; chữ cái được quy đổi theo vị trí
             alphabet (A=1…Z=26, cộng dồn về 1–9) để tham khảo quái số, không
             đưa vào chuỗi cặp chính.
           </p>
@@ -345,7 +345,7 @@ function ShortResult({
   );
 }
 
-/** Trang công cụ Bát Cực Linh Số dùng chung cho 13 chủ đề (ngoài SIM). */
+/** Trang công cụ nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận dùng chung cho 13 chủ đề (ngoài SIM). */
 export function BatCucTool({
   topic,
   primaryColor,
@@ -425,7 +425,7 @@ export function BatCucTool({
     <div>
       <p className="text-sm text-muted leading-relaxed mb-4">
         {cfg.description} Phương pháp{' '}
-        <span className="text-ink">Bát Cực Linh Số</span>: tách dãy số thành
+        <span className="text-ink">nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận</span>: tách dãy số thành
         cặp quái số đối chiếu 8 từ trường, xét biến số 0·5, tổ hợp chế hóa và
         phần đuôi.{' '}
         {cfg.askBirthYear
@@ -435,7 +435,7 @@ export function BatCucTool({
 
       {cfg.secure ? (
         <p className="text-[12px] leading-relaxed border border-amber-700/30 bg-amber-50/70 text-amber-900 px-3 py-2 mb-4">
-          Bảo mật: dãy số được phân tích ngay trên máy của quý vị. Khi hỏi AI,
+          Bảo mật: dãy số được phân tích ngay trên máy của quý vị. Khi hỏi luận sâu,
           hệ thống chỉ gửi kết quả phân tích đã che số gốc
           {topic === 'mat_khau'
             ? ' (che toàn bộ)'
@@ -550,7 +550,7 @@ export function BatCucTool({
           {/* Kết luận tổng */}
           <div className="border border-fog bg-gradient-to-b from-[#faf6ef] to-white px-4 py-5 sm:px-6">
             <p className="text-[10px] uppercase tracking-wide text-muted">
-              Bát Cực Linh Số · {cfg.title}
+              nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận · {cfg.title}
             </p>
             <p className="font-display text-2xl text-ink mt-1 tabular-nums break-all">
               {result.parsed.display}
@@ -630,7 +630,7 @@ export function BatCucTool({
                   Gợi ý giá đẹp lân cận (±3%)
                 </p>
                 <p className="text-sm text-ink mt-0.5">
-                  Máy đã xếp hạng theo engine Bát Cực — ưu tiên đuôi Thiên Y /
+                  Máy đã xếp hạng theo engine Âm Dương Ngũ Hành — ưu tiên đuôi Thiên Y /
                   Diên Niên
                 </p>
               </div>
@@ -664,7 +664,7 @@ export function BatCucTool({
           <section className="border border-fog bg-white">
             <div className="px-4 py-3 border-b border-fog">
               <p className="text-[10px] uppercase tracking-wide text-muted">
-                Tra cứu tám từ trường Bát Cực Linh Số
+                Tra cứu tám từ trường Âm Dương Ngũ Hành
               </p>
               <p className="text-sm text-ink mt-0.5">{BAT_CUC_TABLE_NOTE}</p>
             </div>

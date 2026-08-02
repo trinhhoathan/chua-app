@@ -49,3 +49,6 @@ next-env.d.ts
 /so-data-gz/
 /so-data*.zip
 /so-data*.tar.gz
+
+# scraped dumps
+/data/simkinhdich/

@@ -1,10 +1,10 @@
 /**
- * Engine Bát Cực Linh Số (八極靈數) dùng chung cho mọi loại dãy số:
+ * Engine luận số theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận dùng chung cho mọi loại dãy số:
  * SIM, tài khoản ngân hàng, số nhà, biển số xe, CCCD, thẻ, mã số thuế,
  * giá bán, ngày sinh, mật khẩu, số ghế…
  *
- * Nguồn phương pháp: bộ sách "Số Tự Năng Lượng Học — Bát Cực Linh Số"
- * (Thẩm Lập Minh) và "Bát Cực Linh Số — Luận Giải Số Điện Thoại":
+ * Nguồn phương pháp: bộ sách "nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận"
+ * (Thẩm Lập Minh) và "nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận — Luận Giải Số Điện Thoại":
  * 8 từ trường (4 cát · 4 hung) từ Du Niên Hậu Thiên Bát Quái,
  * số 0 · 5 là "biến số" (0 ẩn tàng — khóa/biến chất năng lượng,
  * 5 hiển lộ — khuếch đại), tổ hợp chế hóa giữa các sao và
@@ -138,7 +138,7 @@ export interface BatCucAnalysis {
   starCounts: Record<StarId, number>;
   catPairs: number;
   hungPairs: number;
-  /** điểm Du Niên Bát Cực (đã gồm 0/5, tổ hợp, đuôi) */
+  /** điểm Du Niên (đã gồm 0/5, tổ hợp, đuôi) */
   duNienScore: number;
   /** điểm tổng generic (Du Niên + âm dương + nút) — topic có thể tự trộn lại */
   overallScore: number;
@@ -173,7 +173,7 @@ export const STARS: Record<StarId, StarInfo> = {
     tagline: 'Đại cát — quý nhân, lạc quan, vượng khí.',
     chuVe: 'Quý nhân phù trợ · cơ hội mới · tinh thần vui vẻ',
     meaning:
-      'Sinh Khí là sao tốt nhất về mặt tinh thần trong Bát Cực Linh Số. Người mang nhiều từ trường Sinh Khí lạc quan, bao dung, gặp khó không nản, thường xuyên có quý nhân xuất hiện giúp đỡ đúng lúc — gặp dữ hóa lành.',
+      'Sinh Khí là sao tốt nhất về mặt tinh thần trong nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận. Người mang nhiều từ trường Sinh Khí lạc quan, bao dung, gặp khó không nản, thường xuyên có quý nhân xuất hiện giúp đỡ đúng lúc — gặp dữ hóa lành.',
     taiLoc:
       'Chiêu tài nhờ quý nhân và cơ hội mới; tiền đến tự nhiên nhưng do tính dễ hài lòng nên cần chủ động nắm bắt, tránh bỏ lỡ vận may.',
     suNghiep:
@@ -442,7 +442,7 @@ export const DIGIT_MEANINGS: Record<number, DigitMeaning> = {
     element: 'moc',
     elementLabel: 'Mộc',
     nature: 'Gió — mềm dẻo, thấm sâu, giỏi giao thiệp, buôn bán.',
-    folk: 'Dân gian kiêng đọc chệch "tứ = tử"; trong Bát Cực, 4 (Tốn) vẫn là quái số bình thường, đi với 1 thành Sinh Khí rất tốt.',
+    folk: 'Dân gian kiêng đọc chệch "tứ = tử"; trong Âm Dương Ngũ Hành, 4 (Tốn) vẫn là quái số bình thường, đi với 1 thành Sinh Khí rất tốt.',
   },
   5: {
     digit: 5,
@@ -467,7 +467,7 @@ export const DIGIT_MEANINGS: Record<number, DigitMeaning> = {
     element: 'kim',
     elementLabel: 'Kim',
     nature: 'Đầm — vui vẻ, khẩu thuyết, giao lưu, đổi mới.',
-    folk: 'Dân gian đọc "thất" (mất) nhưng trong Bát Cực, 7 (Đoài) đi với 6 thành Sinh Khí.',
+    folk: 'Dân gian đọc "thất" (mất) nhưng trong Âm Dương Ngũ Hành, 7 (Đoài) đi với 6 thành Sinh Khí.',
   },
   8: {
     digit: 8,
@@ -606,7 +606,7 @@ export function detectPatterns(digits: number[]): string[] {
 }
 
 /**
- * Tách cặp theo Bát Cực Linh Số: 0 và 5 không thuộc quái nào,
+ * Tách cặp theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận: 0 và 5 không thuộc quái nào,
  * chúng là "biến số" xen giữa hai quái số — 5 khuếch đại (hiển lộ),
  * 0 khóa/biến chất năng lượng (ẩn tàng).
  */
@@ -891,7 +891,7 @@ export function computeAspects(
   });
 }
 
-/** Phân tích Bát Cực đầy đủ trên một dãy chữ số bất kỳ (>= 2 cặp quái). */
+/** Phân tích Âm Dương Ngũ Hành đầy đủ trên một dãy chữ số bất kỳ (>= 2 cặp quái). */
 export function analyzeBatCuc(
   digits: number[],
   opts: BatCucOptions = {},
@@ -901,7 +901,7 @@ export function analyzeBatCuc(
   if (pairs.length < 1) {
     return {
       error:
-        'Dãy số quá ngắn hoặc toàn 0/5 — không đủ cặp quái số để luận theo Bát Cực Linh Số.',
+        'Dãy số quá ngắn hoặc toàn 0/5 — không đủ cặp quái số để luận theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận.',
     };
   }
 

@@ -9,6 +9,7 @@ import {
 } from '@/lib/banks';
 import {
   buildVietQrUrl,
+  toVietQrTransferContent,
   type CompanyBankAccount,
 } from '@/lib/payment';
 
@@ -62,13 +63,19 @@ export function PaymentCheckout({
     [status],
   );
 
+  /** Nội dung CK thật trên QR / app NH (không dấu -, vì NH hay bỏ). */
+  const transferContent = useMemo(
+    () => toVietQrTransferContent(orderCode),
+    [orderCode],
+  );
+
   const qrUrl = useMemo(
     () =>
       buildVietQrUrl(bank, {
         amount,
-        addInfo: orderCode,
+        addInfo: transferContent,
       }),
-    [bank, amount, orderCode],
+    [bank, amount, transferContent],
   );
 
   const poll = useCallback(async () => {
@@ -82,20 +89,24 @@ export function PaymentCheckout({
       if (data.status) setStatus(data.status);
       if (data.paid) {
         try {
-          localStorage.setItem('tuvi-last-paid-order', orderCode);
+          localStorage.setItem('tuvi-last-paid-order', transferContent);
         } catch {
           /* ignore */
         }
-        router.replace(`/dat-nuoc/${encodeURIComponent(orderCode)}/thanh-cong`);
+        router.replace(
+          `/dat-nuoc/${encodeURIComponent(transferContent)}/thanh-cong`,
+        );
       }
     } catch {
       // ignore transient network errors
     }
-  }, [orderCode, router]);
+  }, [orderCode, transferContent, router]);
 
   useEffect(() => {
     if (paid) {
-      router.replace(`/dat-nuoc/${encodeURIComponent(orderCode)}/thanh-cong`);
+      router.replace(
+        `/dat-nuoc/${encodeURIComponent(transferContent)}/thanh-cong`,
+      );
       return;
     }
     const id = window.setInterval(poll, 2500);
@@ -108,7 +119,7 @@ export function PaymentCheckout({
       window.clearInterval(id);
       document.removeEventListener('visibilitychange', onVis);
     };
-  }, [paid, poll, orderCode, router]);
+  }, [paid, poll, transferContent, router]);
 
   async function copyText(label: string, value: string) {
     try {
@@ -127,6 +138,11 @@ export function PaymentCheckout({
       selected,
       bank.accountNumber,
       bank.bankBin,
+      {
+        amount,
+        transferContent,
+        accountHolder: bank.accountHolder,
+      },
     );
     window.location.href = url;
   }
@@ -136,14 +152,17 @@ export function PaymentCheckout({
       <div className="border border-fog bg-paper p-5 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs text-muted">Nội dung chuyển khoản</p>
+            <p className="text-xs text-muted">Mã giao dịch / nội dung CK</p>
             <p className="font-mono text-xl tracking-widest text-ink">
-              {orderCode}
+              {transferContent}
+            </p>
+            <p className="mt-1 text-[11px] text-muted">
+              Dùng mã này để mở khóa luận giải sau khi thanh toán.
             </p>
           </div>
           <button
             type="button"
-            onClick={() => copyText('code', orderCode)}
+            onClick={() => copyText('code', transferContent)}
             className="text-xs px-3 py-1.5 border border-fog hover:bg-mist"
           >
             {copied === 'code' ? 'Đã chép' : 'Chép mã'}
@@ -167,16 +186,25 @@ export function PaymentCheckout({
             {copied === 'amount' ? 'Đã chép' : 'Chép mức phát tâm'}
           </button>
         </div>
-        <div className="text-xs text-muted pt-1 space-y-0.5 border-t border-fog">
+        <div className="text-xs text-muted pt-1 space-y-1.5 border-t border-fog">
           <p>
             <span className="text-ink font-medium">Ngân hàng nhận: </span>
             {bank.bankName}
           </p>
-          <p>
-            <span className="text-ink font-medium">STK: </span>
-            {bank.accountNumber}
-          </p>
-          <p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="min-w-0">
+              <span className="text-ink font-medium">STK: </span>
+              {bank.accountNumber}
+            </p>
+            <button
+              type="button"
+              onClick={() => copyText('stk', bank.accountNumber)}
+              className="shrink-0 whitespace-nowrap text-xs px-3 py-1.5 border border-fog text-ink hover:bg-mist"
+            >
+              {copied === 'stk' ? 'Đã chép' : 'Chép số tài khoản'}
+            </button>
+          </div>
+          <p className="whitespace-nowrap overflow-x-auto">
             <span className="text-ink font-medium">Chủ TK: </span>
             {bank.accountHolder}
           </p>
@@ -185,14 +213,28 @@ export function PaymentCheckout({
 
       {isMobile ? (
         <div className="space-y-4">
+          {qrUrl ? (
+            <div className="flex flex-col items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrUrl}
+                alt="Mã QR VietQR"
+                className="w-56 h-auto bg-white p-3 border border-fog"
+              />
+              <p className="mt-2 text-xs text-muted text-center max-w-xs">
+                Quét QR bằng app ngân hàng bất kỳ — số tiền và nội dung CK đã
+                điền sẵn.
+              </p>
+            </div>
+          ) : null}
           <div>
             <h2 className="font-display text-2xl text-ink">
-              Chọn ngân hàng thanh toán
+              Hoặc mở app ngân hàng
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Sau khi mở app, chuyển khoản đúng số tiền và nội dung{' '}
-              <span className="font-mono text-ink">{orderCode}</span>. Hệ thống
-              tự nhận khi tiền vào (SePay).
+              Nếu app không điền sẵn, chuyển khoản đúng số tiền và nội dung{' '}
+              <span className="font-mono text-ink">{transferContent}</span>. Hệ thống
+              tự nhận khi tiền vào.
             </p>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[42vh] overflow-y-auto pr-1">
@@ -203,21 +245,20 @@ export function PaymentCheckout({
                   key={b.code}
                   type="button"
                   onClick={() => setSelected(b)}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 border text-center transition-colors ${
+                  aria-label={b.name}
+                  title={b.name}
+                  className={`aspect-square flex items-center justify-center p-1 border transition-colors ${
                     active
                       ? 'border-ink bg-mist'
-                      : 'border-fog bg-paper hover:border-ink/40'
+                      : 'border-ink/15 bg-paper hover:border-ink/35'
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={b.logo}
                     alt={b.name}
-                    className="w-9 h-9 object-contain"
+                    className="w-full h-full object-contain"
                   />
-                  <span className="text-[11px] text-ink leading-tight">
-                    {b.name}
-                  </span>
                 </button>
               );
             })}

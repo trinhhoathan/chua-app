@@ -9,6 +9,7 @@ import {
   solarToLunar,
 } from '@/lib/fengshui/lunar';
 import { inputCls, labelCls } from '../FieldStyles';
+import { AdvisorName } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -108,8 +109,8 @@ export function GioHoangDao({ primaryColor }: Props) {
       </ul>
 
       <p className="mt-5 text-xs text-muted leading-relaxed">
-        Tham khảo dân gian theo chi ngày. Việc hệ trọng nên hỏi thêm trụ trì /
-        thầy trong chùa.
+        Tham khảo dân gian theo chi ngày. Việc hệ trọng nên hỏi thêm{' '}
+        <AdvisorName fallback="trụ trì / thầy trong chùa" />.
       </p>
     </div>
   );

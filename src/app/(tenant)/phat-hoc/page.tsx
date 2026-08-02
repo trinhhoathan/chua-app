@@ -1,9 +1,13 @@
 import Link from 'next/link';
 import { getCurrentTemple } from '@/lib/tenant';
+import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import { getSitePersona } from '@/lib/site-persona';
 import {
   NAV_SECTION_LABELS,
   PHAT_HOC_NAV_ORDER,
+  PHAT_HOC_NAV_ORDER_LY_GIA,
   groupToolsByNavSection,
+  isThamGiaTool,
   toolsByDomain,
   toolHref,
 } from '@/lib/fengshui/tools';
@@ -12,8 +16,14 @@ export default async function PhatHocHub() {
   const temple = await getCurrentTemple();
   if (!temple) return null;
   const primary = temple.primary_color || '#7A1F1F';
-  const tools = toolsByDomain('phat_hoc');
-  const grouped = groupToolsByNavSection(PHAT_HOC_NAV_ORDER);
+  const isLyGia = isLyGiaPhucAnSite(temple);
+  const persona = getSitePersona(temple);
+  // Site Lý Gia: ẩn cả nhóm «Tham gia» (không vận hành sổ / quy y / nước)
+  const tools = toolsByDomain('phat_hoc').filter(
+    (t) => !isLyGia || !isThamGiaTool(t),
+  );
+  const navOrder = isLyGia ? PHAT_HOC_NAV_ORDER_LY_GIA : PHAT_HOC_NAV_ORDER;
+  const grouped = groupToolsByNavSection(navOrder);
 
   return (
     <main className="pt-24 pb-16 px-6 md:px-12">
@@ -25,11 +35,14 @@ export default async function PhatHocHub() {
           Phật học · Tâm linh
         </p>
         <h1 className="font-display text-3xl md:text-4xl text-ink">
-          Lịch lễ · Kinh · Tham gia chùa
+          {isLyGia
+            ? 'Lịch lễ · Kinh · Tu học'
+            : 'Lịch lễ · Kinh · Tham gia chùa'}
         </h1>
         <p className="mt-3 text-muted max-w-2xl leading-relaxed">
-          Kho mục lục hỗ trợ trụ trì hướng dẫn Phật tử của {temple.name}. Nhóm
-          «Tham gia» nối thẳng sớ, quy y, hoạt động và cúng dường.
+          {persona.upsell === 'sim'
+            ? `Kho mục lục Phật học tham khảo của ${temple.name} — do ${persona.displayName} tuyển chọn.`
+            : `Kho mục lục hỗ trợ trụ trì hướng dẫn Phật tử của ${temple.name}. Nhóm «Tham gia» nối thẳng sớ, quy y, hoạt động và cúng dường.`}
         </p>
         <p className="mt-3 text-sm">
           <Link

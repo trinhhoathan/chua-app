@@ -1,5 +1,5 @@
 /**
- * Config 14 chủ đề Bát Cực Linh Số: nhãn trang, kiểu nhập, parser,
+ * Config 14 chủ đề nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận: nhãn trang, kiểu nhập, parser,
  * phương diện nhấn mạnh, câu luận mẫu gửi AI, câu mồi chat,
  * ghi chú thỉnh nước và hàm dựng ngữ cảnh AI (đã mask dữ liệu nhạy cảm).
  */
@@ -71,7 +71,7 @@ export interface BatCucTopicConfig {
   shortMode: boolean;
   /** phương diện nhấn mạnh, hiển thị và luận trước */
   aspectFocus: AspectId[];
-  /** câu luận mẫu gửi AI khi bấm "Luận sâu bằng AI" */
+  /** câu luận mẫu khi bấm luận sâu */
   essayQuestion: string;
   /** 4 câu mồi khi mở chat */
   chatSuggestions: string[];
@@ -88,7 +88,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     id: 'sim',
     slug: 'boi-sim',
     title: 'Bói SIM · số điện thoại',
-    description: 'Luận vận khí, ngoại giao, sự nghiệp theo Bát Cực Linh Số.',
+    description: 'Luận vận khí, ngoại giao, sự nghiệp theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận.',
     dataLabel: 'số điện thoại',
     inputKind: 'text',
     inputLabel: 'Số điện thoại',
@@ -99,7 +99,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     shortMode: false,
     aspectFocus: ['tai_loc', 'su_nghiep', 'quy_nhan'],
     essayQuestion:
-      'Luận sâu số điện thoại này theo Bát Cực Linh Số: từ trường chủ đạo, tài lộc, sự nghiệp, quý nhân và 3 số cuối; có nên giữ dùng lâu dài không?',
+      'Luận sâu số điện thoại này theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận: từ trường chủ đạo, tài lộc, sự nghiệp, quý nhân và 3 số cuối; có nên giữ dùng lâu dài không?',
     chatSuggestions: [
       'Sim này hợp làm ăn kinh doanh không?',
       '3 số cuối của sim tôi tốt hay xấu?',
@@ -115,9 +115,9 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Nên chọn đuôi sim thế nào cho hợp mệnh?',
       'Tổng nút sim có quan trọng không?',
     ],
-    donateNote: 'Hỏi sâu bói sim Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu bói sim theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
-      'Hỏi về số điện thoại đã xem — trụ trì luận theo bảng sao Bát Cực Linh Số của dãy số (không luận lá số tử vi ở đây).',
+      'Hỏi về số điện thoại đã xem — trụ trì luận theo bảng sao theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận của dãy số (không luận lá số tử vi ở đây).',
   },
   tai_khoan: {
     id: 'tai_khoan',
@@ -129,7 +129,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     inputLabel: 'Số tài khoản',
     placeholder: 'VD: 190368686868',
     inputHint:
-      'Chỉ phân tích trên máy; khi hỏi AI hệ thống tự che số, chỉ gửi cấu trúc sao và 4 số cuối.',
+      'Chỉ phân tích trên máy; khi hỏi luận sâu, hệ thống tự che số, chỉ gửi cấu trúc sao và 4 số cuối.',
     askBirthYear: true,
     secure: true,
     applyTailTaboo: true,
@@ -151,7 +151,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Số 0 trong tài khoản ảnh hưởng dòng tiền không?',
       'Chọn số tài khoản mới nên ưu tiên gì?',
     ],
-    donateNote: 'Hỏi sâu số tài khoản Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu số tài khoản theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về số tài khoản đã xem — số gốc đã được che, trụ trì luận trên cấu trúc sao và 4 số cuối.',
   },
@@ -159,7 +159,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     id: 'so_nha',
     slug: 'so-nha',
     title: 'Số nhà · căn hộ',
-    description: 'Năng lượng không gian sống theo quái số và Bát Cực.',
+    description: 'Năng lượng không gian sống theo quái số và Âm Dương Ngũ Hành.',
     dataLabel: 'số nhà / căn hộ',
     inputKind: 'text',
     inputLabel: 'Số nhà / căn hộ',
@@ -185,7 +185,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Có nên treo biển số phụ để hóa giải không?',
       'Số nhà ảnh hưởng đến việc buôn bán tại nhà không?',
     ],
-    donateNote: 'Hỏi sâu số nhà · căn hộ Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu số nhà · căn hộ theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về số nhà / căn hộ đã xem — trụ trì luận quái số, cặp sao và tổng nút của số nhà với không gian sống.',
   },
@@ -206,7 +206,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     shortMode: false,
     aspectFocus: ['suc_khoe', 'tai_loc'],
     essayQuestion:
-      'Luận biển số xe này theo Bát Cực Linh Số, trọng tâm AN TOÀN di chuyển và tài lộc công việc làm ăn gắn với chiếc xe; đuôi biển số nói gì?',
+      'Luận biển số xe này theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận, trọng tâm AN TOÀN di chuyển và tài lộc công việc làm ăn gắn với chiếc xe; đuôi biển số nói gì?',
     chatSuggestions: [
       'Biển số này đi đường có bình an không?',
       'Xe này dùng chạy dịch vụ / làm ăn tốt không?',
@@ -220,7 +220,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Biển số có hợp mệnh chủ xe không?',
       'Có cần cúng xe hay chọn ngày lấy xe không?',
     ],
-    donateNote: 'Hỏi sâu biển số xe Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu biển số xe theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về biển số xe đã xem — trụ trì luận an toàn di chuyển và tài lộc theo dãy số chính của biển (không luận hôn nhân, gia đạo ở đây).',
   },
@@ -234,7 +234,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     inputLabel: 'Số CCCD / CMND / hộ chiếu',
     placeholder: 'VD: 001204012345 hoặc C1234567',
     inputHint:
-      'CCCD 12 số được giải mã cấu trúc (mã tỉnh, giới tính, năm sinh) theo Thông tư 07/2016/TT-BCA. Số được che khi hỏi AI.',
+      'CCCD 12 số được giải mã cấu trúc (mã tỉnh, giới tính, năm sinh) theo Thông tư 07/2016/TT-BCA. Số được che khi hỏi luận sâu.',
     askBirthYear: false,
     secure: true,
     applyTailTaboo: false,
@@ -255,7 +255,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Tổng nút của số định danh nói gì?',
       'Số hộ chiếu có cần xem như CCCD không?',
     ],
-    donateNote: 'Hỏi sâu số căn cước Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu số căn cước theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về số định danh đã xem — số gốc đã che, trụ trì luận trường khí nền và cách bồi bổ bằng các dãy số hậu thiên (tuyệt đối không khuyên đổi giấy tờ).',
   },
@@ -269,7 +269,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     inputLabel: 'Số thẻ (12–19 số)',
     placeholder: 'VD: 9704 3612 3456 7890',
     inputHint:
-      'Hệ thống kiểm tra Luhn để xác nhận nhập đúng; 6 số đầu là mã BIN ngân hàng (không luận). Số được che khi hỏi AI.',
+      'Hệ thống kiểm tra Luhn để xác nhận nhập đúng; 6 số đầu là mã BIN ngân hàng (không luận). Số được che khi hỏi luận sâu.',
     askBirthYear: true,
     secure: true,
     applyTailTaboo: true,
@@ -290,7 +290,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Tuyệt Mệnh trong số thẻ nghĩa là gì?',
       'Đuôi 0 trên thẻ có đáng ngại không?',
     ],
-    donateNote: 'Hỏi sâu số thẻ Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu số thẻ theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về số thẻ đã xem — số gốc đã che, trụ trì luận trên cấu trúc sao phần số chính và 4 số cuối. Tuyệt đối không chia sẻ CVV hay ngày hết hạn.',
   },
@@ -323,7 +323,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Tổng nút MST nói gì về công ty?',
       'Ngày thành lập công ty có quan trọng hơn MST không?',
     ],
-    donateNote: 'Hỏi sâu mã số thuế Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu mã số thuế theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về mã số thuế đã xem — trụ trì luận vận khí kinh doanh và pháp lý theo cấu trúc sao (mã cấp cố định, luận để hiểu và bồi bổ, không khuyên đổi).',
   },
@@ -357,7 +357,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Chữ cái trong mã có ý nghĩa không?',
       'Có nên xin đổi mã nhân viên không?',
     ],
-    donateNote: 'Hỏi sâu mã nhân viên Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu mã nhân viên theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về mã nhân viên đã xem — trụ trì luận đường công danh, quan hệ công sở theo cấu trúc sao của phần số.',
   },
@@ -390,7 +390,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Số phòng họp quan trọng hay số phòng ngồi quan trọng?',
       'Chuyển sang phòng số nào thì tốt hơn?',
     ],
-    donateNote: 'Hỏi sâu số phòng làm việc Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu số phòng làm việc theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về số phòng / tầng đã xem — trụ trì luận năng lượng không gian làm việc theo quái số và cặp sao.',
   },
@@ -410,7 +410,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     shortMode: true,
     aspectFocus: ['tai_loc', 'quy_nhan'],
     essayQuestion:
-      'Luận mức giá này theo Bát Cực Linh Số: cấu trúc sao của phần số có nghĩa, đuôi giá nói gì về sức mua và dòng tiền; trong các mức giá đẹp lân cận đã gợi ý, nên chốt mức nào và vì sao?',
+      'Luận mức giá này theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận: cấu trúc sao của phần số có nghĩa, đuôi giá nói gì về sức mua và dòng tiền; trong các mức giá đẹp lân cận đã gợi ý, nên chốt mức nào và vì sao?',
     chatSuggestions: [
       'Giá này bán hàng có chạy không?',
       'Nên niêm yết giá chẵn hay giá lẻ?',
@@ -424,7 +424,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Tổng nút của giá nói gì?',
       'Bán nhà / xe nên ra giá thế nào cho cát?',
     ],
-    donateNote: 'Hỏi sâu giá bán Bát Cực Linh Số',
+    donateNote: 'Hỏi sâu giá bán theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận',
     chatIntro:
       'Hỏi về mức giá đã xem — trụ trì luận cấu trúc sao của con số giá và cách chọn mức chốt mang cát khí.',
   },
@@ -458,7 +458,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Con số may mắn của tôi là gì?',
       'Ngày sinh âm lịch có luận khác không?',
     ],
-    donateNote: 'Hỏi sâu ngày sinh linh số Bát Cực',
+    donateNote: 'Hỏi sâu ngày sinh linh số Âm Dương Ngũ Hành',
     chatIntro:
       'Hỏi về ngày sinh đã xem — trụ trì luận từ trường bẩm sinh của dãy số ngày sinh và mệnh Nạp Âm (không lập lá số tử vi ở đây).',
   },
@@ -492,9 +492,9 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Có cần xem thêm giờ hoàng đạo không?',
       'Sự kiện online có cần chọn giờ không?',
     ],
-    donateNote: 'Hỏi sâu ngày giờ sự kiện Bát Cực',
+    donateNote: 'Hỏi sâu ngày giờ sự kiện Âm Dương Ngũ Hành',
     chatIntro:
-      'Hỏi về ngày giờ sự kiện đã xem — trụ trì luận dãy số ngày giờ theo Bát Cực; việc đại sự nên kết hợp thêm xem ngày truyền thống.',
+      'Hỏi về ngày giờ sự kiện đã xem — trụ trì luận dãy số ngày giờ theo Âm Dương Ngũ Hành; việc đại sự nên kết hợp thêm xem ngày truyền thống.',
   },
   mat_khau: {
     id: 'mat_khau',
@@ -506,7 +506,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
     inputLabel: 'Mật khẩu / mã PIN (phần số)',
     placeholder: 'VD: 1368 hoặc abc1368',
     inputHint:
-      'Phân tích hoàn toàn trên máy của quý vị. Khi hỏi AI, hệ thống CHỈ gửi cấu trúc sao đã che — tuyệt đối không gửi mật khẩu gốc. Không nhập mật khẩu ngân hàng đang dùng.',
+      'Phân tích hoàn toàn trên máy của quý vị. Khi hỏi luận sâu, hệ thống CHỈ gửi cấu trúc sao đã che — tuyệt đối không gửi mật khẩu gốc. Không nhập mật khẩu ngân hàng đang dùng.',
     askBirthYear: false,
     secure: true,
     applyTailTaboo: true,
@@ -527,7 +527,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Đổi PIN có cần chọn ngày không?',
       'Mật khẩu chữ + số thì luận phần nào?',
     ],
-    donateNote: 'Hỏi sâu mật khẩu · PIN Bát Cực',
+    donateNote: 'Hỏi sâu mật khẩu · PIN Âm Dương Ngũ Hành',
     chatIntro:
       'Hỏi về dãy PIN đã xem — số gốc đã che hoàn toàn, trụ trì chỉ luận trên cấu trúc sao. Nhắc quý vị: không dùng dãy dễ đoán (ngày sinh, 1234) cho tài khoản quan trọng.',
   },
@@ -561,7 +561,7 @@ export const BAT_CUC_TOPICS: Record<BatCucTopicId, BatCucTopicConfig> = {
       'Có nên đổi chỗ nếu số ghế xấu không?',
       'Số may mắn nên chọn khi bốc thăm là gì?',
     ],
-    donateNote: 'Hỏi sâu số thứ tự · ghế Bát Cực',
+    donateNote: 'Hỏi sâu số thứ tự · ghế Âm Dương Ngũ Hành',
     chatIntro:
       'Hỏi về số thứ tự / ghế đã xem — trụ trì luận nhanh theo quái số, cặp sao và tổng nút; con số nhỏ nên xem nhẹ nhàng, đừng quá đặt nặng.',
   },
@@ -963,7 +963,7 @@ function fullAnalysisLines(a: BatCucAnalysis, hideDigits = false): string[] {
     ...a.tail.notes.map((n) => `- ${n}`),
     '',
     '## Điểm số',
-    `- Điểm Du Niên Bát Cực: ${a.duNienScore}/100`,
+    `- Điểm Du Niên: ${a.duNienScore}/100`,
     ...(hideDigits
       ? []
       : [
@@ -1046,14 +1046,14 @@ export function buildBatCucPromptContext(
 ): string {
   const cfg = BAT_CUC_TOPICS[topic];
   const lines: string[] = [
-    `# DỮ LIỆU BÁT CỰC LINH SỐ — ${cfg.title.toUpperCase()}`,
+    `# DỮ LIỆU ÂM DƯƠNG NGŨ HÀNH · KINH DỊCH DIỆU LUẬN — ${cfg.title.toUpperCase()}`,
     '',
     `- Loại dãy số: ${cfg.dataLabel}`,
     `- Dãy số${cfg.secure ? ' (đã che bảo mật)' : ''}: ${parsed.aiDisplay}`,
   ];
   if (parsed.letters.length) {
     lines.push(
-      `- Chữ cái tách riêng (không thuộc chuỗi cặp Bát Cực, chỉ tham khảo): ${parsed.letters
+      `- Chữ cái tách riêng (không thuộc chuỗi cặp quái số, chỉ tham khảo): ${parsed.letters
         .map((l) => `${l.letter}=${l.alphaIndex}→quy về ${l.reduced}`)
         .join(', ')}`,
     );

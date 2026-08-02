@@ -19,7 +19,13 @@ export function ToolShell({ tool, primaryColor, children }: Props) {
       <div
         className={`mx-auto min-w-0 w-full ${
           tool.slug === 'lich-van-nien' ||
-          tool.slug === 'kinh-tung-thuong-dung'
+          tool.slug === 'kinh-tung-thuong-dung' ||
+          tool.slug === 'giao-ly-can-ban' ||
+          tool.slug === 'phap-thoai' ||
+          tool.slug === 'hoi-dap-phat-hoc' ||
+          tool.slug === 'he-phai-tong-mon' ||
+          tool.slug === 'danh-tang-cao-tang' ||
+          tool.slug === 'tran-trieu-than-ung'
             ? 'max-w-3xl'
             : 'max-w-2xl'
         }`}

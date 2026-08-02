@@ -26,6 +26,8 @@ import {
   savePaidOrderCode,
 } from '@/lib/fengshui/tuvi-html';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { useSitePersona } from '@/components/SitePersonaContext';
+import { useStickToBottom } from '@/components/fengshui/useStickToBottom';
 import { inputCls, labelCls } from '../FieldStyles';
 
 interface Props {
@@ -42,7 +44,6 @@ type CastStep = 'intention' | 'casting';
 type ChatRole = 'user' | 'assistant';
 type ChatMessage = { id: string; role: ChatRole; content: string };
 
-const FREE_QUESTIONS = 1;
 const TOSS_MS = 1100;
 
 const COIN_YANG = '/images/kinh-dich/coin-yang.svg';
@@ -525,6 +526,8 @@ export function KinhDich64({
   templeName = 'chùa',
   templeId = '',
 }: Props) {
+  const persona = useSitePersona();
+  const isSimSite = persona.upsell === 'sim';
   const [tab, setTab] = useState<Tab>('cast');
   const [castStep, setCastStep] = useState<CastStep>('intention');
   const [phase, setPhase] = useState<CastPhase>('idle');
@@ -553,11 +556,14 @@ export function KinhDich64({
   const [userQuestionCount, setUserQuestionCount] = useState(0);
   const [orderCode, setOrderCode] = useState('');
   const [unlocked, setUnlocked] = useState(false);
+  /** Lượt luận giải còn lại theo ví server (X-Ai-Remaining); null = chưa biết, -1 = không giới hạn */
+  const [serverRemaining, setServerRemaining] = useState<number | null>(null);
   const [initialDone, setInitialDone] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const streamAccRef = useRef('');
   const timers = useRef<number[]>([]);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const { containerRef, bottomRef, onScroll, onWheel, stickToBottom } =
+    useStickToBottom([messages, streaming]);
   const intentLockedRef = useRef<{ question: string; dongTamAt: string } | null>(
     null,
   );
@@ -586,8 +592,9 @@ export function KinhDich64({
     [result],
   );
 
+  // Nguồn sự thật là ví server: chỉ khóa khi server báo hết lượt (402 / X-Ai-Remaining = 0)
   const lockedForChat =
-    userQuestionCount >= FREE_QUESTIONS && !unlocked;
+    !unlocked && serverRemaining != null && serverRemaining === 0;
 
   const displayDongTam = editingTime ? dongTam : liveNow;
 
@@ -619,10 +626,6 @@ export function KinhDich64({
       abortRef.current?.abort();
     };
   }, []);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streaming]);
 
   async function verifyOrder(code: string): Promise<boolean> {
     try {
@@ -762,9 +765,11 @@ export function KinhDich64({
       const qIndex =
         opts.questionIndex ?? (isInitial ? 0 : userQuestionCount);
 
-      if (!isInitial && qIndex >= FREE_QUESTIONS && !unlocked) {
+      if (!isInitial && lockedForChat) {
         setError(
-          'Đã dùng hết 1 câu hỏi thêm miễn phí. Thỉnh nước và nhập mã đơn để hỏi tiếp.',
+          isSimSite
+            ? 'Đã dùng hết lượt luận giải miễn phí. Gọi thầy hoặc chọn sim hợp mệnh trong kho để được tư vấn tiếp.'
+            : 'Đã dùng hết lượt luận giải miễn phí. Thỉnh nước và nhập mã đơn để hỏi tiếp.',
         );
         return;
       }
@@ -812,11 +817,15 @@ export function KinhDich64({
           }),
         });
 
+        const remainHeader = res.headers.get('X-Ai-Remaining');
+        if (remainHeader !== null) setServerRemaining(Number(remainHeader));
+
         if (!res.ok) {
           const data = (await res.json().catch(() => null)) as {
             error?: string;
             code?: string;
           } | null;
+          if (res.status === 402) setServerRemaining(0);
           throw new Error(
             data?.error ||
               'Không luận giải được lúc này. Quý vị thử lại sau.',
@@ -877,6 +886,7 @@ export function KinhDich64({
       streaming,
       userQuestionCount,
       unlocked,
+      lockedForChat,
       messages,
       templeName,
       orderCode,
@@ -884,7 +894,7 @@ export function KinhDich64({
   );
 
   async function unlockWithCode() {
-    const code = orderCode.trim().toUpperCase();
+    const code = orderCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (!code) {
       setError('Vui lòng nhập mã đơn thỉnh nước.');
       return;
@@ -898,6 +908,7 @@ export function KinhDich64({
     }
     setOrderCode(code);
     setUnlocked(true);
+    setServerRemaining(null);
     savePaidOrderCode(code, templeId || undefined);
     setError(null);
   }
@@ -906,6 +917,7 @@ export function KinhDich64({
     const q = raw.trim();
     if (!q || streaming) return;
     setInput('');
+    stickToBottom();
     void sendAi(q, { questionIndex: userQuestionCount });
   }
 
@@ -1316,13 +1328,14 @@ export function KinhDich64({
                 <div className="px-4 py-3 border-b border-fog flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <p className="text-sm font-medium text-ink">
-                      Luận giải cùng trụ trì
+                      Luận giải cùng {isSimSite ? persona.displayName : 'trụ trì'}
                     </p>
                     <p className="text-[11px] text-muted mt-0.5">
-                      Luận đầu miễn phí · hỏi thêm 1 câu miễn phí · từ câu 2
-                      cần thỉnh nước
-                      {userQuestionCount > 0
-                        ? ` · đã hỏi thêm ${userQuestionCount}/${FREE_QUESTIONS}`
+                      {isSimSite
+                        ? 'Có lượt luận giải miễn phí — hết lượt thì gọi thầy tư vấn'
+                        : 'Có lượt luận giải miễn phí — hết lượt thì thỉnh nước, nhập mã đơn để cộng lượt'}
+                      {serverRemaining != null && serverRemaining >= 0
+                        ? ` · còn ${serverRemaining} lượt`
                         : ''}
                     </p>
                   </div>
@@ -1330,28 +1343,39 @@ export function KinhDich64({
                     <button
                       type="button"
                       disabled={streaming}
-                      onClick={() =>
+                      onClick={() => {
+                        stickToBottom();
                         void sendAi(
-                          `Xin trụ trì luận giải quẻ này theo 4 tầng (Hào từ · Tượng · Biến quẻ · Ứng kỳ).
+                          `Xin ${isSimSite ? 'thầy' : 'trụ trì'} luận giải quẻ này theo 4 tầng (Hào từ · Tượng · Biến quẻ · Ứng kỳ).
 Giờ động tâm: ${intentLockedRef.current?.dongTamAt ?? ''}.
 Câu hỏi: ${intentLockedRef.current?.question ?? ''}.
 Xin luận sát câu hỏi, trang nghiêm và hướng thiện.`,
                           { isInitial: true },
-                        )
-                      }
+                        );
+                      }}
                       className="px-3 py-1.5 text-xs text-white disabled:opacity-60"
                       style={{ backgroundColor: primaryColor }}
                     >
-                      {streaming ? 'Đang luận…' : 'Mời trụ trì luận giải'}
+                      {streaming
+                        ? 'Đang luận…'
+                        : isSimSite
+                          ? 'Mời thầy luận giải'
+                          : 'Mời trụ trì luận giải'}
                     </button>
                   ) : null}
                 </div>
 
-                <div className="px-3 py-3 max-h-[28rem] overflow-y-auto space-y-3">
+                <div
+                  ref={containerRef}
+                  onScroll={onScroll}
+                  onWheel={onWheel}
+                  className="px-3 py-3 max-h-[28rem] overflow-y-auto space-y-3"
+                >
                   {messages.length === 0 && !streaming ? (
                     <p className="text-xs text-muted text-center py-6">
-                      Bấm «Mời trụ trì luận giải» để nhận luận đầu (miễn phí),
-                      rồi được hỏi thêm 1 câu; từ câu hỏi thứ 2 cần thỉnh nước.
+                      {isSimSite
+                        ? 'Bấm «Mời thầy luận giải» để nhận luận đầu (miễn phí), rồi được hỏi thêm 1 câu.'
+                        : 'Bấm «Mời trụ trì luận giải» để nhận luận đầu (miễn phí), rồi được hỏi thêm 1 câu; từ câu hỏi thứ 2 cần thỉnh nước.'}
                     </p>
                   ) : null}
 
@@ -1414,49 +1438,71 @@ Xin luận sát câu hỏi, trang nghiêm và hướng thiện.`,
                 </div>
 
                 {lockedForChat ? (
-                  <div className="px-4 py-3 border-t border-fog space-y-2 bg-stone-50/80">
-                    <p className="text-xs font-medium text-ink">
-                      Từ câu hỏi thứ 2 cần thỉnh nước
-                    </p>
-                    <p className="text-[0.7rem] text-muted leading-relaxed">
-                      Quý vị đã dùng hết 1 câu hỏi thêm miễn phí. Thỉnh nước
-                      ủng hộ chùa để hỏi tiếp về quẻ này — công đức duy trì đèn
-                      nước công quả.
-                    </p>
-                    <div className="flex flex-wrap gap-2 items-end">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openWaterDonateForm({
-                            note: 'Hỏi tiếp luận giải Kinh Dịch',
-                            qty: 10,
-                          })
-                        }
-                        className="text-xs px-2.5 py-1.5 text-white"
-                        style={{ backgroundColor: primaryColor }}
-                      >
-                        Thỉnh nước
-                      </button>
-                      <label className={`${labelCls()} flex-1 min-w-[8rem]`}>
-                        Mã đơn đã thanh toán
-                        <input
-                          value={orderCode}
-                          onChange={(e) =>
-                            setOrderCode(e.target.value.toUpperCase())
-                          }
-                          className={`mt-1 ${inputCls}`}
-                          placeholder="VD: A3K9MP2Q"
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => void unlockWithCode()}
-                        className="text-xs px-2.5 py-1.5 border border-fog text-ink"
-                      >
-                        Mở khóa
-                      </button>
+                  isSimSite ? (
+                    <div className="px-4 py-3 border-t border-fog space-y-2 bg-stone-50/80">
+                      <p className="text-xs font-medium text-ink">
+                        Đã dùng hết câu hỏi thêm miễn phí
+                      </p>
+                      <p className="text-[0.7rem] text-muted leading-relaxed">
+                        Muốn {persona.displayName} luận sâu hơn về quẻ này?
+                        Gọi thầy tư vấn trực tiếp, hoặc vào kho sim chọn dãy
+                        số hợp mệnh đã chấm điểm sẵn.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <a
+                          href="/sim"
+                          className="text-xs px-2.5 py-1.5 text-white"
+                          style={{ backgroundColor: primaryColor }}
+                        >
+                          Xem kho sim hợp mệnh
+                        </a>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="px-4 py-3 border-t border-fog space-y-2 bg-stone-50/80">
+                      <p className="text-xs font-medium text-ink">
+                        Từ câu hỏi thứ 2 cần thỉnh nước
+                      </p>
+                      <p className="text-[0.7rem] text-muted leading-relaxed">
+                        Quý vị đã dùng hết 1 câu hỏi thêm miễn phí. Thỉnh nước
+                        ủng hộ chùa để hỏi tiếp về quẻ này — công đức duy trì
+                        đèn nước công quả.
+                      </p>
+                      <div className="flex flex-wrap gap-2 items-end">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openWaterDonateForm({
+                              note: 'Hỏi tiếp luận giải Kinh Dịch',
+                              qty: 10,
+                            })
+                          }
+                          className="text-xs px-2.5 py-1.5 text-white"
+                          style={{ backgroundColor: primaryColor }}
+                        >
+                          Thỉnh nước
+                        </button>
+                        <label className={`${labelCls()} flex-1 min-w-[8rem]`}>
+                          Mã đơn đã thanh toán
+                          <input
+                            value={orderCode}
+                            onChange={(e) =>
+                              setOrderCode(e.target.value.toUpperCase())
+                            }
+                            className={`mt-1 ${inputCls}`}
+                            placeholder="VD: A3K9MP2Q"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => void unlockWithCode()}
+                          className="text-xs px-2.5 py-1.5 border border-fog text-ink"
+                        >
+                          Mở khóa
+                        </button>
+                      </div>
+                    </div>
+                  )
                 ) : null}
 
                 {error ? (
@@ -1479,7 +1525,9 @@ Xin luận sát câu hỏi, trang nghiêm và hướng thiện.`,
                       disabled={streaming || lockedForChat}
                       placeholder={
                         lockedForChat
-                          ? 'Thỉnh nước để hỏi tiếp…'
+                          ? isSimSite
+                            ? 'Gọi thầy để hỏi tiếp…'
+                            : 'Thỉnh nước để hỏi tiếp…'
                           : 'Hỏi về quẻ…'
                       }
                       className={`flex-1 ${inputCls} disabled:opacity-60`}

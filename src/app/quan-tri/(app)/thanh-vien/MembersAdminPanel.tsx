@@ -3,14 +3,17 @@
 import { useState, useTransition } from 'react';
 import {
   createTempleMemberAction,
+  listCredentialAuditLogsAction,
   listTempleMembersAction,
   resetTempleMemberPasswordAction,
   updateTempleMemberAction,
+  updateTempleMemberPhoneAction,
 } from '@/app/actions/members';
 import {
   DEFAULT_ADMIN_PIN,
   formatPhoneDisplay,
 } from '@/lib/admin-phone-auth';
+import { credentialActionLabel } from '@/lib/admin-credential-labels';
 
 export type MemberRow = {
   id: string;
@@ -25,16 +28,47 @@ export type MemberRow = {
   created_at: string;
 };
 
+export type CredentialLogRow = {
+  id: string;
+  action: 'password_reset' | 'password_change' | 'phone_change';
+  actor_phone: string | null;
+  actor_display_name: string | null;
+  target_phone: string | null;
+  target_display_name: string | null;
+  temple_id: string | null;
+  temple_name: string | null;
+  old_phone: string | null;
+  new_phone: string | null;
+  ip: string | null;
+  user_agent: string | null;
+  created_at: string;
+};
+
 type TempleOpt = { id: string; name: string };
+
+function formatWhen(iso: string) {
+  try {
+    return new Intl.DateTimeFormat('vi-VN', {
+      dateStyle: 'short',
+      timeStyle: 'medium',
+      timeZone: 'Asia/Ho_Chi_Minh',
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
 
 export function MembersAdminPanel({
   temples,
   initialMembers,
+  initialLogs,
 }: {
   temples: TempleOpt[];
   initialMembers: MemberRow[];
+  initialLogs: CredentialLogRow[];
 }) {
   const [members, setMembers] = useState(initialMembers);
+  const [logs, setLogs] = useState(initialLogs);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -48,6 +82,11 @@ export function MembersAdminPanel({
 
   function refreshFromServer(next: MemberRow[]) {
     setMembers(next);
+  }
+
+  async function refreshLogs() {
+    const listed = await listCredentialAuditLogsAction();
+    if (listed.ok && listed.logs) setLogs(listed.logs);
   }
 
   function createMember(e: React.FormEvent) {
@@ -175,6 +214,31 @@ export function MembersAdminPanel({
         return;
       }
       setMsg('Đã đặt lại mật khẩu.');
+      await refreshLogs();
+    });
+  }
+
+  function changePhone(m: MemberRow) {
+    const next = window.prompt(
+      `SĐT đăng nhập mới cho ${m.display_name ?? m.phone ?? 'thành viên'} (hiện: ${m.phone ?? '—'}):`,
+      m.phone ?? '',
+    );
+    if (next == null) return;
+    setMsg(null);
+    setErr(null);
+    start(async () => {
+      const res = await updateTempleMemberPhoneAction({
+        id: m.id,
+        phone: next.trim(),
+      });
+      if (!res.ok) {
+        setErr(res.error);
+        return;
+      }
+      const listed = await listTempleMembersAction();
+      if (listed.ok && listed.members) refreshFromServer(listed.members);
+      setMsg('Đã đổi SĐT đăng nhập.');
+      await refreshLogs();
     });
   }
 
@@ -366,6 +430,14 @@ export function MembersAdminPanel({
                       <button
                         type="button"
                         disabled={pending}
+                        onClick={() => changePhone(m)}
+                        className="px-2 py-1 text-xs border border-fog hover:bg-mist"
+                      >
+                        Đổi SĐT
+                      </button>
+                      <button
+                        type="button"
+                        disabled={pending}
                         onClick={() => resetPin(m)}
                         className="px-2 py-1 text-xs border border-fog hover:bg-mist"
                       >
@@ -379,6 +451,106 @@ export function MembersAdminPanel({
                 <tr>
                   <td colSpan={6} className="p-6 text-center text-muted">
                     Chưa có tài khoản nào.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="font-display text-xl text-ink">
+              Nhật ký bảo mật
+            </h2>
+            <p className="mt-1 text-sm text-muted max-w-2xl">
+              Ghi ai đổi mật khẩu / SĐT, lúc nào, IP nào. Không lưu nội dung mật
+              khẩu.
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              start(async () => {
+                await refreshLogs();
+              })
+            }
+            className="px-3 py-1.5 text-xs border border-fog hover:bg-mist disabled:opacity-60"
+          >
+            Làm mới
+          </button>
+        </div>
+        <div className="mt-4 overflow-x-auto border border-fog bg-paper">
+          <table className="w-full text-sm">
+            <thead className="bg-mist text-left text-xs uppercase tracking-wide text-muted">
+              <tr>
+                <th className="p-3">Thời gian</th>
+                <th className="p-3">Hành động</th>
+                <th className="p-3">Người thực hiện</th>
+                <th className="p-3">Đối tượng</th>
+                <th className="p-3">Chi tiết</th>
+                <th className="p-3">IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log) => (
+                <tr key={log.id} className="border-t border-fog align-top">
+                  <td className="p-3 whitespace-nowrap text-muted">
+                    {formatWhen(log.created_at)}
+                  </td>
+                  <td className="p-3">{credentialActionLabel(log.action)}</td>
+                  <td className="p-3">
+                    <p className="font-medium text-ink">
+                      {log.actor_display_name ?? '—'}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {log.actor_phone
+                        ? formatPhoneDisplay(log.actor_phone)
+                        : '—'}
+                    </p>
+                  </td>
+                  <td className="p-3">
+                    <p className="font-medium text-ink">
+                      {log.target_display_name ?? '—'}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {log.target_phone
+                        ? formatPhoneDisplay(log.target_phone)
+                        : '—'}
+                    </p>
+                    {log.temple_name ? (
+                      <p className="text-[11px] text-muted mt-0.5">
+                        {log.temple_name}
+                      </p>
+                    ) : null}
+                  </td>
+                  <td className="p-3 text-xs text-muted">
+                    {log.action === 'phone_change' ? (
+                      <span>
+                        {log.old_phone
+                          ? formatPhoneDisplay(log.old_phone)
+                          : '—'}{' '}
+                        →{' '}
+                        {log.new_phone
+                          ? formatPhoneDisplay(log.new_phone)
+                          : '—'}
+                      </span>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+                  <td className="p-3 whitespace-nowrap font-mono text-xs">
+                    {log.ip ?? '—'}
+                  </td>
+                </tr>
+              ))}
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-6 text-center text-muted">
+                    Chưa có sự kiện nào.
                   </td>
                 </tr>
               ) : null}

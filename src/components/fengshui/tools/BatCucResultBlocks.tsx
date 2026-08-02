@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Các khối hiển thị kết quả Bát Cực Linh Số dùng chung
+ * Các khối hiển thị kết quả nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận dùng chung
  * cho BoiSim.tsx và BatCucTool.tsx (14 trang).
  */
 
@@ -301,7 +301,7 @@ export function MethodNote() {
   return (
     <p className="text-[11px] text-muted leading-relaxed border border-fog bg-white px-4 py-3">
       Phương pháp luận theo bộ sách{' '}
-      <em>Số Tự Năng Lượng Học — Bát Cực Linh Số</em> (Thẩm Lập Minh): 8 từ
+      <em>nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận</em> (Thẩm Lập Minh): 8 từ
       trường Du Niên Hậu Thiên Bát Quái, biến số 0·5, tổ hợp chế hóa và nguyên
       tắc trọng phần đuôi dãy số. Kết quả mang tính tham khảo trường khí — việc
       hệ trọng nên kết hợp chánh kiến và thỉnh ý tại chùa.

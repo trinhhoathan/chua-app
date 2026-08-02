@@ -9,6 +9,12 @@ import {
   normalizeLoginPhone,
   phoneToLoginEmail,
 } from '@/lib/admin-phone-auth';
+import {
+  getRequestClientMeta,
+  listAdminCredentialLogs,
+  logAdminCredentialEvent,
+  type CredentialAuditRow,
+} from '@/lib/admin-credential-audit';
 
 async function requireSuperAdmin() {
   const ctx = await requireAdmin();
@@ -16,6 +22,22 @@ async function requireSuperAdmin() {
     throw new Error('FORBIDDEN');
   }
   return ctx;
+}
+
+async function findAuthUserByEmail(email: string) {
+  const admin = getSupabaseAdmin();
+  const perPage = 200;
+  let page = 1;
+  for (;;) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) throw error;
+    const found = data.users.find(
+      (u) => (u.email || '').toLowerCase() === email.toLowerCase(),
+    );
+    if (found) return found;
+    if (data.users.length < perPage) return null;
+    page += 1;
+  }
 }
 
 export type MemberAdminResult = { ok: true } | { ok: false; error: string };
@@ -215,8 +237,9 @@ export async function resetTempleMemberPasswordAction(input: {
   id: string;
   password: string;
 }): Promise<MemberAdminResult> {
+  let ctx;
   try {
-    await requireSuperAdmin();
+    ctx = await requireSuperAdmin();
   } catch {
     return { ok: false, error: 'Chỉ quản trị viên nền tảng mới đổi mật khẩu.' };
   }
@@ -227,7 +250,7 @@ export async function resetTempleMemberPasswordAction(input: {
   const admin = getSupabaseAdmin();
   const { data: row, error } = await admin
     .from('temple_admins')
-    .select('user_id')
+    .select('id, user_id, phone, display_name, temple_id')
     .eq('id', input.id)
     .maybeSingle();
   if (error || !row) return { ok: false, error: 'Không tìm thấy thành viên.' };
@@ -238,6 +261,150 @@ export async function resetTempleMemberPasswordAction(input: {
   );
   if (updErr) return { ok: false, error: updErr.message };
 
+  const client = await getRequestClientMeta();
+  await logAdminCredentialEvent({
+    action: 'password_reset',
+    actorUserId: ctx.userId,
+    actorPhone: ctx.phone,
+    actorDisplayName: ctx.displayName,
+    targetUserId: String(row.user_id),
+    targetAdminId: String(row.id),
+    targetPhone: (row.phone as string) ?? null,
+    targetDisplayName: (row.display_name as string) ?? null,
+    templeId: String(row.temple_id),
+    ip: client.ip,
+    userAgent: client.userAgent,
+  });
+
   revalidatePath('/quan-tri/thanh-vien');
   return { ok: true };
+}
+
+export async function updateTempleMemberPhoneAction(input: {
+  id: string;
+  phone: string;
+}): Promise<MemberAdminResult> {
+  let ctx;
+  try {
+    ctx = await requireSuperAdmin();
+  } catch {
+    return { ok: false, error: 'Chỉ quản trị viên nền tảng mới đổi SĐT.' };
+  }
+
+  const phone = normalizeLoginPhone(input.phone);
+  if (!phone) {
+    return {
+      ok: false,
+      error: 'Số điện thoại không hợp lệ (cần 10 số, bắt đầu bằng 0).',
+    };
+  }
+
+  const admin = getSupabaseAdmin();
+  const { data: row, error } = await admin
+    .from('temple_admins')
+    .select('id, user_id, phone, display_name, temple_id')
+    .eq('id', input.id)
+    .maybeSingle();
+  if (error || !row) return { ok: false, error: 'Không tìm thấy thành viên.' };
+
+  const oldPhone = normalizeLoginPhone(String(row.phone ?? '')) ?? String(row.phone ?? '');
+  if (oldPhone === phone) {
+    return { ok: false, error: 'SĐT mới trùng SĐT hiện tại.' };
+  }
+
+  const { data: phoneTaken } = await admin
+    .from('temple_admins')
+    .select('id')
+    .eq('phone', phone)
+    .eq('is_active', true)
+    .neq('id', input.id)
+    .maybeSingle();
+  if (phoneTaken) {
+    return { ok: false, error: 'Số điện thoại này đã được gán cho tài khoản khác.' };
+  }
+
+  const newEmail = phoneToLoginEmail(phone);
+  let emailTaken;
+  try {
+    emailTaken = await findAuthUserByEmail(newEmail);
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : 'Không kiểm tra được SĐT Auth.',
+    };
+  }
+  if (emailTaken && emailTaken.id !== row.user_id) {
+    return {
+      ok: false,
+      error: 'SĐT mới đã có tài khoản Auth khác. Không thể gán trùng.',
+    };
+  }
+
+  const { data: authUser, error: getUserErr } = await admin.auth.admin.getUserById(
+    String(row.user_id),
+  );
+  if (getUserErr || !authUser.user) {
+    return { ok: false, error: 'Không tìm thấy tài khoản Auth.' };
+  }
+
+  const { error: updAuthErr } = await admin.auth.admin.updateUserById(
+    String(row.user_id),
+    {
+      email: newEmail,
+      email_confirm: true,
+      user_metadata: {
+        ...(authUser.user.user_metadata || {}),
+        phone,
+      },
+    },
+  );
+  if (updAuthErr) return { ok: false, error: updAuthErr.message };
+
+  const { error: updRowErr } = await admin
+    .from('temple_admins')
+    .update({ phone })
+    .eq('id', input.id);
+  if (updRowErr) return { ok: false, error: updRowErr.message };
+
+  const client = await getRequestClientMeta();
+  await logAdminCredentialEvent({
+    action: 'phone_change',
+    actorUserId: ctx.userId,
+    actorPhone: ctx.phone,
+    actorDisplayName: ctx.displayName,
+    targetUserId: String(row.user_id),
+    targetAdminId: String(row.id),
+    targetPhone: phone,
+    targetDisplayName: (row.display_name as string) ?? null,
+    templeId: String(row.temple_id),
+    oldPhone,
+    newPhone: phone,
+    ip: client.ip,
+    userAgent: client.userAgent,
+  });
+
+  revalidatePath('/quan-tri/thanh-vien');
+  return { ok: true };
+}
+
+export async function listCredentialAuditLogsAction(): Promise<{
+  ok: boolean;
+  error?: string;
+  logs?: CredentialAuditRow[];
+}> {
+  try {
+    await requireSuperAdmin();
+  } catch {
+    return { ok: false, error: 'Chỉ quản trị viên nền tảng mới xem được.' };
+  }
+
+  try {
+    const logs = await listAdminCredentialLogs(80);
+    return { ok: true, logs };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : 'Không tải được nhật ký.',
+    };
+  }
 }

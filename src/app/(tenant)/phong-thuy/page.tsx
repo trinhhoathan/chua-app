@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getCurrentTemple } from '@/lib/tenant';
+import { getSitePersona } from '@/lib/site-persona';
 import {
   NAV_SECTION_LABELS,
   PHONG_THUY_NAV_ORDER,
@@ -46,6 +47,7 @@ export default async function PhongThuyHub() {
   const temple = await getCurrentTemple();
   if (!temple) return null;
   const primary = temple.primary_color || '#7A1F1F';
+  const persona = getSitePersona(temple);
   const grouped = groupToolsByNavSection(PHONG_THUY_NAV_ORDER);
   const count = phongThuyMenuTools().length;
 
@@ -62,8 +64,9 @@ export default async function PhongThuyHub() {
           Mỗi ngày · Hệ trọng · Tử vi
         </h1>
         <p className="mt-3 text-muted max-w-2xl leading-relaxed">
-          Bộ công cụ hỗ trợ trụ trì tư vấn Phật tử của {temple.name}. Quẻ / thần
-          số nằm nhóm «Tham khảo thêm» — không ưu tiên trên menu.
+          {persona.upsell === 'sim'
+            ? `Bộ công cụ ${persona.displayName} dùng để tư vấn khách của ${temple.name}. Quẻ / thần số nằm nhóm «Tham khảo thêm» — không ưu tiên trên menu.`
+            : `Bộ công cụ hỗ trợ trụ trì tư vấn Phật tử của ${temple.name}. Quẻ / thần số nằm nhóm «Tham khảo thêm» — không ưu tiên trên menu.`}
         </p>
         <p className="mt-3 text-sm">
           <Link

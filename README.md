@@ -33,7 +33,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
 SUPABASE_SERVICE_ROLE_KEY=<service_role — bắt buộc webhook/thông báo>
 ADMIN_KEY=<legacy key, tuỳ chọn>
 PAYMENT_WEBHOOK_SECRET=<secret cho POST /api/payments/webhook>
-SEPAY_WEBHOOK_API_KEY=<API Key cấu hình trên SePay Dashboard>
+SEPAY_WEBHOOK_API_KEY=<API Key cấu hình trên SePay Webhook — Apikey>
+SEPAY_API_TOKEN=<API Token Bearer từ Cấu hình công ty → API Access>
 ZALO_OA_ACCESS_TOKEN=   # tuỳ chọn — OA CS (cần user_id follower)
 ZALO_ZNS_ACCESS_TOKEN=  # khuyến nghị — Zalo ZNS gửi theo SĐT
 ZALO_ZNS_TEMPLATE_ID=   # template ZNS đã duyệt trên Zalo
@@ -50,11 +51,11 @@ COMPANY_BANK_ACCOUNT_HOLDER=CÔNG TY CP QUAN ÂM TRANG VIỆN
 COMPANY_VIETQR_URL=     # để trống — app tự sinh VietQR từ STK ở trên
 ```
 
-Phân biệt chùa trên sao kê bằng **mã đơn** dạng `CV-A3K9MP` / `BH-X7Q2TR`:
+Phân biệt chùa trên sao kê bằng **mã đơn** dạng `CVA3K9MP` / `BHX7Q2TR` (không dấu `-`):
 
 - `CV` = `temples.payment_code` của Chùa Cổ Viễn  
 - `BH` = Chùa Quan Âm Bắc Hồng  
-- Phần sau dấu `-` là mã đơn duy nhất  
+- Ghép liền tiền tố + 6 ký tự ngẫu nhiên  
 
 Webhook nhận `order_code` / `content` = nội dung CK → map về đúng chùa + ghi sổ quyết toán 50%.
 
@@ -257,7 +258,7 @@ Hook vào: tạo đơn nước, đánh dấu đã trả, nhận sớ.
 3. Bắt buộc có `SUPABASE_SERVICE_ROLE_KEY` trong `.env.local` (Dashboard → Settings → API).
 4. Local: dùng ngrok/cloudflare tunnel vì SePay cần URL public HTTPS.
 
-Khi khách CK với nội dung chứa mã đơn (`CV-XXXXXX`), SePay bắn webhook → app đánh dấu **đã thanh toán** → trang chờ tự chuyển sang **thành công**.
+Khi khách CK với nội dung chứa mã đơn (`CVXXXXXX`), SePay bắn webhook → app đánh dấu **đã thanh toán** → trang chờ tự chuyển sang **thành công**.
 
 Webhook nội bộ cũ vẫn còn: `POST /api/payments/webhook` (secret `PAYMENT_WEBHOOK_SECRET`).
 

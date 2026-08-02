@@ -7,6 +7,7 @@ import { AdminNav } from '@/components/admin/AdminNav';
 import { TempleScopePicker } from '@/components/admin/TempleScopePicker';
 import { requireAdmin, getTempleById, type TempleBrief } from '@/lib/auth';
 import { ADMIN_TEMPLE_COOKIE, PLATFORM_HQ } from '@/lib/platform-hq';
+import { isLyGiaDomain } from '@/lib/ly-gia-phuc-an';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -125,7 +126,12 @@ export default async function AdminLayout({
             </form>
           </div>
         </div>
-        <AdminNav isSuperAdmin={ctx.isSuperAdmin} />
+        <AdminNav
+          isSuperAdmin={ctx.isSuperAdmin}
+          siteUpsell={
+            selected ? (isLyGiaDomain(selected.domain) ? 'sim' : 'water') : null
+          }
+        />
       </header>
       <div className="mx-auto max-w-6xl px-4 md:px-6 py-8">{children}</div>
     </div>

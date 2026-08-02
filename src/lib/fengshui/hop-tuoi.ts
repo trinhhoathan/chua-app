@@ -245,6 +245,15 @@ export function cungPhiOfYear(year: number, gender: 'nam' | 'nu'): CungPhi {
   return CUNG_BY_SO[k];
 }
 
+/** Nạp âm (tên + hành) của một năm âm lịch. */
+export function napAmOfYear(year: number): { name: string; hanh: NguHanh } {
+  const canIdx = ((year - 4) % 10 + 10) % 10;
+  const chiIdx = ((year - 4) % 12 + 12) % 12;
+  const zh = GAN_ZH[canIdx] + ZHI_ZH[chiIdx];
+  const name = viTerm((LunarUtil.NAYIN as Record<string, string>)[zh] ?? '');
+  return { name, hanh: napAmHanhOf(name) };
+}
+
 export function buildHopTuoiPerson(
   input: HopTuoiPersonInput,
   fallbackName: string,

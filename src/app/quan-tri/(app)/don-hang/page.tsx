@@ -55,6 +55,7 @@ export default async function DonHangPage({ searchParams }: Props) {
               <th className="p-3">Mã</th>
               <th className="p-3">Phật tử</th>
               <th className="p-3">SĐT</th>
+              <th className="p-3">Địa chỉ</th>
               <th className="p-3 text-right">Thùng</th>
               <th className="p-3 text-right">Tổng</th>
               <th className="p-3">Trạng thái</th>
@@ -64,29 +65,45 @@ export default async function DonHangPage({ searchParams }: Props) {
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-muted">
+                <td colSpan={8} className="p-6 text-center text-muted">
                   Chưa có đơn.
                 </td>
               </tr>
             ) : (
-              orders.map((o) => (
-                <tr key={o.id} className="border-t border-fog">
-                  <td className="p-3 font-mono text-xs">{o.order_code}</td>
-                  <td className="p-3">{o.customer_name}</td>
-                  <td className="p-3 tabular-nums">{o.customer_phone}</td>
-                  <td className="p-3 text-right">{o.quantity}</td>
-                  <td className="p-3 text-right">{formatVnd(o.total_amount)}</td>
-                  <td className="p-3">{STATUS[o.status] ?? o.status}</td>
-                  <td className="p-3 text-right">
-                    {o.status === 'pending_payment' ? (
-                      <MarkPaidButton
-                        orderId={o.id}
-                        orderCode={o.order_code}
-                      />
-                    ) : null}
-                  </td>
-                </tr>
-              ))
+              orders.map((o) => {
+                const place = [o.customer_address, o.customer_ward]
+                  .map((s) => s?.trim())
+                  .filter(Boolean)
+                  .join(', ');
+                return (
+                  <tr key={o.id} className="border-t border-fog">
+                    <td className="p-3 font-mono text-xs">{o.order_code}</td>
+                    <td className="p-3">
+                      <div>{o.customer_name}</div>
+                      {o.note ? (
+                        <div className="mt-0.5 text-xs text-muted line-clamp-2">
+                          {o.note}
+                        </div>
+                      ) : null}
+                    </td>
+                    <td className="p-3 tabular-nums">{o.customer_phone}</td>
+                    <td className="p-3 max-w-[14rem] text-xs text-muted">
+                      {place || '—'}
+                    </td>
+                    <td className="p-3 text-right">{o.quantity}</td>
+                    <td className="p-3 text-right">{formatVnd(o.total_amount)}</td>
+                    <td className="p-3">{STATUS[o.status] ?? o.status}</td>
+                    <td className="p-3 text-right">
+                      {o.status === 'pending_payment' ? (
+                        <MarkPaidButton
+                          orderId={o.id}
+                          orderCode={o.order_code}
+                        />
+                      ) : null}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

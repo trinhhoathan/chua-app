@@ -261,6 +261,10 @@ export async function getTempleBasicsAction(templeId: string): Promise<
         primary_color: string | null;
         is_active: boolean;
         contact_links: TempleContactLinks;
+        bank_name: string | null;
+        bank_bin: string | null;
+        bank_account_number: string | null;
+        bank_account_holder: string | null;
       };
     }
   | { ok: false; error: string }
@@ -275,7 +279,7 @@ export async function getTempleBasicsAction(templeId: string): Promise<
   const { data, error } = await db
     .from('temples')
     .select(
-      'id, name, domain, temple_alt_name, payment_code, address, abbott_name, abbott_title, hotline, slogan, tagline, primary_color, is_active, contact_links',
+      'id, name, domain, temple_alt_name, payment_code, address, abbott_name, abbott_title, hotline, slogan, tagline, primary_color, is_active, contact_links, bank_name, bank_bin, bank_account_number, bank_account_holder',
     )
     .eq('id', templeId)
     .maybeSingle();
@@ -304,6 +308,10 @@ export async function getTempleBasicsAction(templeId: string): Promise<
         data.contact_links,
         data.hotline as string | null,
       ),
+      bank_name: (data.bank_name as string) ?? null,
+      bank_bin: (data.bank_bin as string) ?? null,
+      bank_account_number: (data.bank_account_number as string) ?? null,
+      bank_account_holder: (data.bank_account_holder as string) ?? null,
     },
   };
 }
@@ -324,6 +332,10 @@ export async function updateTempleBasicsAction(input: {
   zalo?: string;
   facebook?: string;
   isActive?: boolean;
+  bankName?: string;
+  bankBin?: string;
+  bankAccountNumber?: string;
+  bankAccountHolder?: string;
 }): Promise<TempleActionResult> {
   try {
     await requireSuperAdmin();
@@ -381,6 +393,12 @@ export async function updateTempleBasicsAction(input: {
       primary_color: input.primaryColor?.trim() || pickRandomTempleColor(),
       contact_links: links,
       is_active: input.isActive !== false,
+      bank_name: input.bankName?.trim() || null,
+      bank_bin: input.bankBin?.replace(/\D/g, '') || null,
+      bank_account_number:
+        input.bankAccountNumber?.replace(/\s+/g, '') || null,
+      bank_account_holder:
+        input.bankAccountHolder?.trim().toUpperCase() || null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', input.id);

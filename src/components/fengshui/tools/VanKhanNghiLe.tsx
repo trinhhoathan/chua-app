@@ -11,6 +11,7 @@ import {
   type VanKhanItem,
 } from '@/lib/fengshui/van-khan-nghi-le';
 import { inputCls, labelCls } from '../FieldStyles';
+import { AdvisorName } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -152,7 +153,7 @@ export function VanKhanNghiLe({ primaryColor, templeName }: Props) {
 
       <p className="mt-5 text-xs text-muted leading-relaxed">
         Bản mẫu phổ thông Bắc truyền. Mỗi chùa / hệ phái có thể khác câu chữ —
-        nên theo thầy trụ trì khi dự lễ.
+        nên theo <AdvisorName fallback="thầy trụ trì" /> khi dự lễ.
         <span className="block mt-1" style={{ color: primaryColor }}>
           Nhà chùa có thể bổ sung bản riêng sau.
         </span>

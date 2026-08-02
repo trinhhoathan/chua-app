@@ -358,19 +358,22 @@ const HOUR_RANGES = [
 ] as const;
 
 /** Giờ Hoàng đạo theo chi ngày (bảng dân gian phổ biến VN). */
+// Khởi Thanh Long: ngày Tý/Ngọ tại Thân, Sửu/Mùi tại Tuất, Dần/Thân tại Tý,
+// Mão/Dậu tại Dần, Thìn/Tuất tại Thìn, Tỵ/Hợi tại Ngọ; 6 giờ hoàng đạo là
+// Thanh Long, Minh Đường, Kim Quỹ, Bảo Quang, Ngọc Đường, Tư Mệnh.
 const HOANG_DAO_BY_DAY_CHI: Record<Chi, readonly Chi[]> = {
-  Tý: ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Thân', 'Dậu'],
-  Ngọ: ['Dần', 'Mão', 'Thìn', 'Tỵ', 'Thân', 'Dậu'],
-  Sửu: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Thân', 'Tuất'],
-  Mùi: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Thân', 'Tuất'],
+  Tý: ['Tý', 'Sửu', 'Mão', 'Ngọ', 'Thân', 'Dậu'],
+  Ngọ: ['Tý', 'Sửu', 'Mão', 'Ngọ', 'Thân', 'Dậu'],
+  Sửu: ['Dần', 'Mão', 'Tỵ', 'Thân', 'Tuất', 'Hợi'],
+  Mùi: ['Dần', 'Mão', 'Tỵ', 'Thân', 'Tuất', 'Hợi'],
   Dần: ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'],
   Thân: ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'],
   Mão: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Mùi', 'Dậu'],
   Dậu: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Mùi', 'Dậu'],
-  Thìn: ['Sửu', 'Dần', 'Thìn', 'Ngọ', 'Thân', 'Dậu'],
-  Tuất: ['Sửu', 'Dần', 'Thìn', 'Ngọ', 'Thân', 'Dậu'],
-  Tỵ: ['Dần', 'Thìn', 'Tỵ', 'Thân', 'Dậu', 'Hợi'],
-  Hợi: ['Dần', 'Thìn', 'Tỵ', 'Thân', 'Dậu', 'Hợi'],
+  Thìn: ['Dần', 'Thìn', 'Tỵ', 'Thân', 'Dậu', 'Hợi'],
+  Tuất: ['Dần', 'Thìn', 'Tỵ', 'Thân', 'Dậu', 'Hợi'],
+  Tỵ: ['Sửu', 'Thìn', 'Ngọ', 'Mùi', 'Tuất', 'Hợi'],
+  Hợi: ['Sửu', 'Thìn', 'Ngọ', 'Mùi', 'Tuất', 'Hợi'],
 };
 
 export interface HourSlot {

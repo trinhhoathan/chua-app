@@ -33,8 +33,7 @@ interface Props {
   templeAddress?: string | null;
   templeHotline?: string | null;
   templePhone?: string | null;
-  templeZalo?: string | null;
-  templeFacebook?: string | null;
+  templeAbbottName?: string | null;
 }
 
 type CalendarKind = 'solar' | 'lunar';
@@ -52,8 +51,7 @@ export function LapLaSoTuVi({
   templeAddress,
   templeHotline,
   templePhone,
-  templeZalo,
-  templeFacebook,
+  templeAbbottName,
 }: Props) {
   const [fullName, setFullName] = useState('');
   const [calendar, setCalendar] = useState<CalendarKind>('solar');
@@ -96,16 +94,14 @@ export function LapLaSoTuVi({
       address: templeAddress,
       hotline: templeHotline,
       phone: templePhone,
-      zalo: templeZalo,
-      facebook: templeFacebook,
+      abbottName: templeAbbottName,
     }),
     [
       templeName,
       templeAddress,
       templeHotline,
       templePhone,
-      templeZalo,
-      templeFacebook,
+      templeAbbottName,
     ],
   );
 
@@ -571,6 +567,7 @@ export function LapLaSoTuVi({
                   primaryColor={primaryColor}
                   templeName={templeName}
                   templeId={templeId}
+                  contactPhone={templeHotline || templePhone || null}
                   chart={result}
                   horoscope={horoscope}
                   palaceEssays={palaceEssays}
@@ -658,7 +655,7 @@ export function LapLaSoTuVi({
                   <p className="text-[0.7rem] text-muted mt-0.5">
                     {hasAnyInterpretation
                       ? 'Gồm chat luận giải và/hoặc 12 cung (nếu có)'
-                      : 'Chưa có luận giải — hỏi trụ trì hoặc mở khóa 12 cung trước'}
+                      : 'Chưa có luận giải — dùng khung chat hoặc mục 12 cung trước'}
                   </p>
                 </button>
                 {exporting ? (

@@ -8,6 +8,10 @@ type NavLink = {
   href: string;
   label: string;
   superOnly?: boolean;
+  /** Chỉ hiện với site bán nước (ẩn trên Lý Gia Phúc An). */
+  waterOnly?: boolean;
+  /** Chỉ hiện với site bán sim (Lý Gia Phúc An). */
+  simOnly?: boolean;
 };
 
 type NavGroup = {
@@ -44,11 +48,17 @@ const GROUPS: NavGroup[] = [
     id: 'van-hanh',
     label: 'Vận hành',
     items: [
-      { href: '/quan-tri/don-hang', label: 'Thỉnh nước' },
+      { href: '/quan-tri/don-hang', label: 'Thỉnh nước', waterOnly: true },
+      { href: '/quan-tri/sim', label: 'Kho Sim Phong Thủy', simOnly: true },
+      {
+        href: '/quan-tri/sim/don-hang',
+        label: 'Đơn hàng sim',
+        simOnly: true,
+      },
       { href: '/quan-tri/doi-soat', label: 'Đối soát' },
-      { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu' },
-      { href: '/quan-tri/viet-so', label: 'Viết sớ' },
-      { href: '/quan-tri/kho', label: 'Kho vận' },
+      { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu', waterOnly: true },
+      { href: '/quan-tri/viet-so', label: 'Viết sớ', waterOnly: true },
+      { href: '/quan-tri/kho', label: 'Kho vận', waterOnly: true },
     ],
   },
   {
@@ -75,7 +85,14 @@ function groupActive(pathname: string, items: NavLink[]) {
   return items.some((i) => linkActive(pathname, i.href));
 }
 
-export function AdminNav({ isSuperAdmin }: { isSuperAdmin: boolean }) {
+export function AdminNav({
+  isSuperAdmin,
+  siteUpsell = null,
+}: {
+  isSuperAdmin: boolean;
+  /** 'sim' = Lý Gia (ẩn mục nước) · 'water' = chùa (ẩn mục sim) · null = hiện hết. */
+  siteUpsell?: 'sim' | 'water' | null;
+}) {
   const pathname = usePathname();
   const [openId, setOpenId] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -109,12 +126,17 @@ export function AdminNav({ isSuperAdmin }: { isSuperAdmin: boolean }) {
     closeTimer.current = setTimeout(() => setOpenId(null), 120);
   }
 
-  const groups = GROUPS.filter((g) => !g.superOnly || isSuperAdmin).map(
-    (g) => ({
+  const groups = GROUPS.filter((g) => !g.superOnly || isSuperAdmin)
+    .map((g) => ({
       ...g,
-      items: g.items.filter((i) => !i.superOnly || isSuperAdmin),
-    }),
-  );
+      items: g.items.filter((i) => {
+        if (i.superOnly && !isSuperAdmin) return false;
+        if (i.waterOnly && siteUpsell === 'sim') return false;
+        if (i.simOnly && siteUpsell === 'water') return false;
+        return true;
+      }),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <nav className="border-t border-white/10 relative z-40">

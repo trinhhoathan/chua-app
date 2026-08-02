@@ -31,6 +31,7 @@ import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
 import { resolveEssayFollowUps } from '@/lib/fengshui/tuvi-prompt';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { useSitePersona } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -202,6 +203,7 @@ export function LuanGiaiTuVi({
   templeHotline,
   templePhone,
 }: Props) {
+  const persona = useSitePersona();
   const contactPhone = templeHotline || templePhone || null;
   const [fullName, setFullName] = useState('');
   const [calendar, setCalendar] = useState<CalendarKind>('solar');
@@ -800,7 +802,7 @@ export function LuanGiaiTuVi({
               <div className="border border-fog bg-white p-3 md:p-4">
                 {menhLoading && !menhText ? (
                   <p className="text-sm text-muted">
-                    Trụ trì đang luận cung Mệnh…
+                    {persona.thinkingLabel} cung Mệnh…
                   </p>
                 ) : (
                   <>
@@ -821,6 +823,7 @@ export function LuanGiaiTuVi({
                         suggestions={menhTeasers}
                         primaryColor={primaryColor}
                         notePrefix="Hỏi sâu luận giải tử vi"
+                        contactPhone={contactPhone}
                       />
                     ) : null}
                   </>
@@ -828,68 +831,115 @@ export function LuanGiaiTuVi({
               </div>
             ) : null}
 
-            <div className="border border-fog bg-white p-3 space-y-2 text-sm">
-              <p className="font-medium text-ink">
-                Muốn luận 12 cung hoặc chuyên sâu hơn?
-              </p>
-              <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
-                <li>
-                  Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ
-                </li>
-                <li>
-                  Liên hệ hỏi trụ trì trực tiếp
-                  {contactPhone ? (
-                    <>
-                      {' '}
-                      qua{' '}
-                      <a
-                        href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                        className="underline underline-offset-2"
-                        style={{ color: primaryColor }}
-                      >
-                        {contactPhone}
-                      </a>
-                    </>
-                  ) : (
-                    ' qua số điện thoại nhà chùa'
-                  )}
-                </li>
-                <li>
-                  Hỏi trụ trì thêm trong chat — miễn phí 3 câu; từ câu thứ 4 cần
-                  thỉnh nước để hỏi tiếp
-                </li>
-              </ul>
-              <div className="flex flex-wrap gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() =>
-                    openWaterDonateForm({
-                      note: 'Mở khóa luận giải 12 cung tử vi',
-                      qty: 10,
-                    })
-                  }
-                  className="px-3 py-2 text-sm text-white"
-                  style={{ background: primaryColor }}
-                >
-                  Thỉnh nước
-                </button>
-                {contactPhone ? (
+            {persona.upsell === 'sim' ? (
+              <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+                <p className="font-medium text-ink">
+                  Muốn luận 12 cung hoặc chuyên sâu hơn?
+                </p>
+                <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
+                  <li>
+                    Gọi {persona.displayName} tư vấn trực tiếp
+                    {contactPhone ? (
+                      <>
+                        {' '}
+                        qua{' '}
+                        <a
+                          href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                          className="underline underline-offset-2"
+                          style={{ color: primaryColor }}
+                        >
+                          {contactPhone}
+                        </a>
+                      </>
+                    ) : null}
+                  </li>
+                  <li>
+                    Chọn số trong Kho Sim Phong Thủy — từng sim đã được chấm
+                    điểm hợp mệnh sẵn
+                  </li>
+                </ul>
+                <div className="flex flex-wrap gap-2 pt-1">
                   <a
-                    href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                    href="/sim"
+                    className="px-3 py-2 text-sm text-white"
+                    style={{ background: primaryColor }}
+                  >
+                    Xem kho sim hợp mệnh
+                  </a>
+                  {contactPhone ? (
+                    <a
+                      href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                      className="px-3 py-2 text-sm border border-fog text-ink"
+                    >
+                      {persona.callLabel}
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+                <p className="font-medium text-ink">
+                  Muốn luận 12 cung hoặc chuyên sâu hơn?
+                </p>
+                <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
+                  <li>
+                    Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ
+                  </li>
+                  <li>
+                    Liên hệ hỏi trụ trì trực tiếp
+                    {contactPhone ? (
+                      <>
+                        {' '}
+                        qua{' '}
+                        <a
+                          href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                          className="underline underline-offset-2"
+                          style={{ color: primaryColor }}
+                        >
+                          {contactPhone}
+                        </a>
+                      </>
+                    ) : (
+                      ' qua số điện thoại nhà chùa'
+                    )}
+                  </li>
+                  <li>
+                    Hỏi trụ trì thêm trong chat — miễn phí 3 câu; từ câu thứ 4
+                    cần thỉnh nước để hỏi tiếp
+                  </li>
+                </ul>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openWaterDonateForm({
+                        note: 'Mở khóa luận giải 12 cung tử vi',
+                        qty: 10,
+                      })
+                    }
+                    className="px-3 py-2 text-sm text-white"
+                    style={{ background: primaryColor }}
+                  >
+                    Thỉnh nước
+                  </button>
+                  {contactPhone ? (
+                    <a
+                      href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                      className="px-3 py-2 text-sm border border-fog text-ink"
+                    >
+                      Gọi trụ trì
+                    </a>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setChatOpen(true)}
                     className="px-3 py-2 text-sm border border-fog text-ink"
                   >
-                    Gọi trụ trì
-                  </a>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => setChatOpen(true)}
-                  className="px-3 py-2 text-sm border border-fog text-ink"
-                >
-                  Hỏi trụ trì thêm
-                </button>
+                    Hỏi trụ trì thêm
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <TuViChatPanel

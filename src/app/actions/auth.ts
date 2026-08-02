@@ -10,6 +10,10 @@ import {
   normalizeLoginPhone,
   phoneToLoginEmail,
 } from '@/lib/admin-phone-auth';
+import {
+  getRequestClientMeta,
+  logAdminCredentialEvent,
+} from '@/lib/admin-credential-audit';
 
 export async function loginAction(formData: FormData): Promise<void> {
   const phoneRaw = String(formData.get('phone') ?? '').trim();
@@ -101,6 +105,23 @@ export async function changeOwnPasswordAction(input: {
   if (updateError) {
     return { ok: false, error: updateError.message };
   }
+
+  const membership =
+    ctx.memberships.find((m) => m.phone === ctx.phone) ?? ctx.memberships[0];
+  const client = await getRequestClientMeta();
+  await logAdminCredentialEvent({
+    action: 'password_change',
+    actorUserId: ctx.userId,
+    actorPhone: ctx.phone,
+    actorDisplayName: ctx.displayName,
+    targetUserId: ctx.userId,
+    targetAdminId: membership?.id ?? null,
+    targetPhone: ctx.phone,
+    targetDisplayName: ctx.displayName,
+    templeId: membership?.temple_id ?? ctx.temples[0]?.id ?? null,
+    ip: client.ip,
+    userAgent: client.userAgent,
+  });
 
   return { ok: true };
 }

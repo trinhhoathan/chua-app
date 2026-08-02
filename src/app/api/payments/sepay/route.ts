@@ -30,6 +30,9 @@ export async function POST(request: Request) {
     id?: number | string;
     gateway?: string;
     accountNumber?: string;
+    /** Số VA / tài khoản phụ (MSB bắt buộc qua VA) */
+    subAccount?: string | null;
+    va?: string | null;
     content?: string;
     code?: string | null;
     transferType?: string;
@@ -55,6 +58,9 @@ export async function POST(request: Request) {
   }
 
   const contentOrCode = body.code || body.content || '';
+  // Ưu tiên VA (MSB) — fallback STK chính.
+  const accountNumber =
+    body.subAccount || body.va || body.accountNumber || undefined;
   const result = await confirmWaterOrderPayment({
     contentOrCode,
     amount:
@@ -62,7 +68,7 @@ export async function POST(request: Request) {
         ? body.transferAmount
         : undefined,
     paymentRef: `sepay-${body.id ?? body.referenceCode ?? Date.now()}`,
-    accountNumber: body.accountNumber,
+    accountNumber,
   });
 
   if (!result.ok) {

@@ -8,6 +8,7 @@ import {
 } from '@/lib/fengshui/xuat-hanh';
 import { VerdictBadge } from '../VerdictBadge';
 import { inputCls, labelCls } from '../FieldStyles';
+import { AdvisorName, AdvisorText } from '@/components/SitePersonaContext';
 
 interface Props {
   primaryColor: string;
@@ -131,7 +132,7 @@ export function XuatHanh({ primaryColor }: Props) {
           <div>
             <p className="text-sm font-medium text-ink">{result.verdictLabel}</p>
             <p className="text-xs text-muted mt-1 leading-relaxed">
-              {result.verdictDetail}
+              <AdvisorText text={result.verdictDetail} />
             </p>
             <p className="text-xs text-muted mt-2 leading-relaxed">
               {result.purposeHint}
@@ -237,7 +238,8 @@ export function XuatHanh({ primaryColor }: Props) {
 
       <p className="mt-5 text-xs text-muted leading-relaxed">
         Tham khảo dân gian theo nhật lịch (lunar-typescript). Việc hệ trọng —
-        đi xa, khởi sự lớn — nên hỏi thêm trụ trì / thầy trong chùa.
+        đi xa, khởi sự lớn — nên hỏi thêm{' '}
+        <AdvisorName fallback="trụ trì / thầy trong chùa" />.
       </p>
     </div>
   );

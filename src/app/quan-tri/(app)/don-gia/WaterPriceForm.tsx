@@ -9,7 +9,7 @@ interface TemplePriceRow {
   water_price_vnd: number;
 }
 
-const PREVIEW_QTY = [10, 50, 100, 1000] as const;
+const PREVIEW_QTY = [1, 5, 10, 50, 100] as const;
 
 function formatVnd(n: number): string {
   return new Intl.NumberFormat('vi-VN').format(n);
@@ -138,7 +138,7 @@ export function WaterPriceForm({ temples }: { temples: TemplePriceRow[] }) {
         <h2 className="font-display text-xl text-ink">Xem trước mức phát tâm</h2>
         <p className="mt-2 text-sm text-muted">
           Theo mức đang nhập: <b className="text-ink">{formatVnd(price)}đ</b>
-          /thùng · tối thiểu 10 thùng mỗi lần thỉnh.
+          /thùng · tối thiểu 1 thùng (24 chai) mỗi lần thỉnh.
         </p>
         <ul className="mt-6 divide-y divide-fog border border-fog">
           {PREVIEW_QTY.map((q) => (

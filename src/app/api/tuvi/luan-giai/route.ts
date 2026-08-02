@@ -1,8 +1,18 @@
 import {
+  applyPromptPersona,
   buildTuViSystemPrompt,
   parseTuViSchool,
 } from '@/lib/fengshui/tuvi-prompt';
 import { assertAiRateLimit } from '@/lib/rate-limit';
+import { getCurrentTemple } from '@/lib/tenant';
+import { getSitePersona } from '@/lib/site-persona';
+import {
+  aiDeviceSetCookie,
+  consumeAiCredit,
+  isPaidOrderCode,
+  refundAiCredit,
+  type ConsumeResult,
+} from '@/lib/ai-quota';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +25,8 @@ type Body = {
   chartContext?: string;
   history?: ChatTurn[];
   templeName?: string;
+  /** Mã đơn nước/sim đã thanh toán — có thì không trừ ví lượt AI */
+  orderCode?: string;
   school?: string;
   noVanHan?: boolean;
   vanHanFocus?: boolean;
@@ -69,6 +81,25 @@ export async function POST(req: Request) {
     );
   }
 
+  // Ví lượt AI toàn hệ thống: mã đơn paid hợp lệ → không trừ ví
+  const orderCode = (body.orderCode || '').trim().toUpperCase();
+  let quota: ConsumeResult | null = null;
+  if (!(orderCode && (await isPaidOrderCode(orderCode)))) {
+    quota = await consumeAiCredit(req);
+    if (!quota.allowed) {
+      const res = Response.json(
+        {
+          code: 'quota_exhausted',
+          remaining: 0,
+          error: 'Quý vị đã dùng hết lượt luận giải miễn phí.',
+        },
+        { status: 402 },
+      );
+      res.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+      return res;
+    }
+  }
+
   const history = Array.isArray(body.history) ? body.history.slice(-12) : [];
   const focusedVan =
     vanHanFocus || daiVanFocus || napAmFocus || hopTuoiFocus || haLacFocus ||
@@ -97,27 +128,49 @@ export async function POST(req: Request) {
             ? 'đã lập xong lá số Bát tự của quý vị (tứ trụ, thập thần, tàng can, thần sát và vận trình đại vận – lưu niên)'
             : 'đã xem qua lá số của quý vị (mười hai cung, sao, đối cung–tam hợp và vận hạn theo thời gian xem)';
 
+  // Persona theo tenant: site Lý Gia dùng giọng "Thầy Phong Thủy Phúc An"
+  const temple = await getCurrentTemple().catch(() => null);
+  const sitePersona = temple ? getSitePersona(temple) : null;
+  const promptPersona =
+    sitePersona && sitePersona.upsell === 'sim'
+      ? {
+          aiRoleIntro: sitePersona.aiRoleIntro,
+          role: sitePersona.role,
+          aiOutro: sitePersona.aiOutro,
+        }
+      : null;
+  const advisor = promptPersona
+    ? sitePersona!.displayName
+    : `Trụ trì ${templeName}`;
+  const greeting = promptPersona
+    ? `Chào quý vị. ${advisor} ${seenLabel}. Quý vị muốn hỏi điều gì, cứ nói thẳng để tôi luận rõ.`
+    : `A Di Đà Phật. Trụ trì ${templeName} ${seenLabel}. Quý vị muốn hỏi điều gì, cứ nói thẳng để tôi luận rõ.`;
+
   const messages: Array<{ role: string; content: string }> = [
     {
       role: 'system',
-      content: buildTuViSystemPrompt(templeName, school, {
-        noVanHan: focusedVan ? false : noVanHan,
-        vanHanFocus: vanHanFocus || undefined,
-        daiVanFocus: daiVanFocus || undefined,
-        napAmFocus: napAmFocus || undefined,
-        hopTuoiFocus: hopTuoiFocus || undefined,
-        haLacFocus: haLacFocus || undefined,
-        dungThanFocus: dungThanFocus || undefined,
-        batTuFocus: batTuFocus || undefined,
-      }),
+      content: applyPromptPersona(
+        buildTuViSystemPrompt(templeName, school, {
+          noVanHan: focusedVan ? false : noVanHan,
+          vanHanFocus: vanHanFocus || undefined,
+          daiVanFocus: daiVanFocus || undefined,
+          napAmFocus: napAmFocus || undefined,
+          hopTuoiFocus: hopTuoiFocus || undefined,
+          haLacFocus: haLacFocus || undefined,
+          dungThanFocus: dungThanFocus || undefined,
+          batTuFocus: batTuFocus || undefined,
+        }),
+        templeName,
+        promptPersona,
+      ),
     },
     {
       role: 'user',
-      content: `Đây là ${dataLabel} cần trụ trì ${templeName} xem và luận giải (nguồn duy nhất, không bịa thêm):\n\n${chartContext}`,
+      content: `Đây là ${dataLabel} cần ${advisor} xem và luận giải (nguồn duy nhất, không bịa thêm):\n\n${chartContext}`,
     },
     {
       role: 'assistant',
-      content: `A Di Đà Phật. Trụ trì ${templeName} ${seenLabel}. Quý vị muốn hỏi điều gì, cứ nói thẳng để tôi luận rõ.`,
+      content: greeting,
     },
     ...history
       .filter(
@@ -153,6 +206,7 @@ export async function POST(req: Request) {
   });
 
   if (!upstream.ok || !upstream.body) {
+    if (quota) await refundAiCredit(quota.identity);
     return Response.json(
       {
         error: 'Không luận giải được lúc này. Quý vị thử lại sau giây lát.',
@@ -213,12 +267,15 @@ export async function POST(req: Request) {
     },
   });
 
-  return new Response(stream, {
+  const res = new Response(stream, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
       'Cache-Control': 'no-cache, no-transform',
       'X-Accel-Buffering': 'no',
       Connection: 'keep-alive',
+      'X-Ai-Remaining': String(quota ? quota.remaining : -1),
     },
   });
+  if (quota) res.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+  return res;
 }

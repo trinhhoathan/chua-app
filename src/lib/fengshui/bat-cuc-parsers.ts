@@ -1,8 +1,8 @@
 /**
- * Bóc tách các loại dãy số cho bộ công cụ Bát Cực Linh Số.
+ * Bóc tách các loại dãy số cho bộ công cụ nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận.
  *
  * Nguyên tắc chung:
- * - Chữ cái KHÔNG ép vào chuỗi cặp Bát Cực (sách chỉ luận số).
+ * - Chữ cái KHÔNG ép vào chuỗi cặp quái số (sách chỉ luận số).
  *   Tách riêng, quy đổi vị trí alphabet (A=1…Z=26 → cộng dồn về 1–9)
  *   để tham khảo quái số và đưa vào ngữ cảnh AI.
  * - Dữ liệu nhạy cảm (mật khẩu, PIN, tài khoản, thẻ) chỉ phân tích cục bộ;
@@ -49,7 +49,7 @@ export interface AlnumParse {
   display: string;
 }
 
-/** Tách một chuỗi bất kỳ thành phần số (để luận Bát Cực) + phần chữ (tham khảo). */
+/** Tách một chuỗi bất kỳ thành phần số (để luận Âm Dương Ngũ Hành) + phần chữ (tham khảo). */
 export function parseAlnum(raw: string): AlnumParse {
   const cleaned = raw.trim();
   const digits: number[] = [];
@@ -158,7 +158,7 @@ export interface PlateParse {
   /** seri chữ (1–2 ký tự) kèm quy đổi */
   series: LetterInfo[];
   seriesRaw: string;
-  /** dãy số chính (4–5 số) — phần luận Bát Cực */
+  /** dãy số chính (4–5 số) — phần luận Âm Dương Ngũ Hành */
   mainDigits: number[];
   /** toàn bộ chữ số trên biển (mã tỉnh + số chính) */
   allDigits: number[];
@@ -471,7 +471,7 @@ export interface DateDigitsParse {
   solar: { d: number; m: number; y: number; hour?: number };
 }
 
-/** Đổi ngày (giờ) thành dãy số ddMMyyyy(+hh) để luận Bát Cực + kèm âm lịch. */
+/** Đổi ngày (giờ) thành dãy số ddMMyyyy(+hh) để luận Âm Dương Ngũ Hành + kèm âm lịch. */
 export function dateToDigits(
   d: number,
   m: number,

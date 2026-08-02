@@ -11,6 +11,15 @@ import {
 } from './lunar-almanac';
 import { formatCanChi, yearCanChi } from './lunar';
 import { checkXungNam, type Verdict } from './rules';
+import {
+  folkBadDaysFor,
+  goodHoursForAlmanac,
+  xungTuoiNgay,
+  type ChonNgayPerson,
+  type FolkBadDay,
+  type GoodHourSlot,
+  type XungTuoiCheck,
+} from './chon-ngay';
 
 export type CaiTangStepId =
   | 'tong_quat'
@@ -103,6 +112,12 @@ export interface CaiTangDayCheck {
   inYi: boolean;
   inJi: boolean;
   allForbidden: boolean;
+  /** Bách kỵ tang lễ dân gian (Trùng tang / Trùng phục / Sát chủ âm / Thọ tử…) */
+  folkWarnings: FolkBadDay[];
+  /** Xung tuổi theo NGÀY (chi ngày với tuổi người mất / trưởng nam) */
+  xungDay: XungTuoiCheck[];
+  /** Giờ hoàng đạo trong ngày, đã lọc giờ xung tuổi */
+  goodHours: GoodHourSlot[];
   verdict: Verdict;
   verdictLabel: string;
   detail: string;
@@ -189,35 +204,74 @@ export function checkCaiTangDay(
   day: number,
   stepId: CaiTangStepId,
   deceasedBirthYear?: number | null,
+  eldestSonBirthYear?: number | null,
 ): CaiTangDayCheck {
   const step = getCaiTangStep(stepId);
   const almanac = getAlmanacDay(year, month, day);
-  return checkFromAlmanac(almanac, step, deceasedBirthYear);
+  return checkFromAlmanac(almanac, step, deceasedBirthYear, eldestSonBirthYear);
 }
 
 function checkFromAlmanac(
   almanac: AlmanacDay,
   step: CaiTangStep,
   deceasedBirthYear?: number | null,
+  eldestSonBirthYear?: number | null,
 ): CaiTangDayCheck {
   const yiHits = listHits(almanac.yi, step.matchLabels);
   const jiHits = listHits(almanac.ji, step.matchLabels);
   const allForbidden = almanac.ji.some((t) =>
     /mọi việc đều kiêng/i.test(t),
   );
-  const { verdict, verdictLabel, detail } = verdictFor(
+  let { verdict, verdictLabel, detail } = verdictFor(
     step,
     almanac,
     yiHits,
     jiHits,
   );
 
+  // Bách kỵ tang lễ dân gian (engine chọn ngày, chế độ tang lễ)
+  const folkWarnings = folkBadDaysFor(almanac, true);
+  const severeFolk = folkWarnings.filter((f) => f.severity === 'bad');
+  if (severeFolk.length > 0 && verdict !== 'bad') {
+    verdict = 'bad';
+    verdictLabel = `Phạm ${severeFolk.map((f) => f.label).join(', ')}`;
+    detail = `${detail} Ngày phạm ${severeFolk
+      .map((f) => f.label)
+      .join(', ')} — đại kỵ việc mồ mả, nên chọn ngày khác.`;
+  } else if (folkWarnings.length > 0 && verdict === 'good') {
+    verdict = 'caution';
+    detail = `${detail} Lưu ý ngày phạm ${folkWarnings
+      .map((f) => f.label)
+      .join(', ')} (kiêng vừa) — cân nhắc thêm.`;
+  }
+
+  // Xung tuổi theo chi ngày với người mất / trưởng nam
+  const persons: ChonNgayPerson[] = [];
+  if (deceasedBirthYear && deceasedBirthYear >= 1900) {
+    persons.push({ birthYear: deceasedBirthYear, label: 'người mất' });
+  }
+  if (eldestSonBirthYear && eldestSonBirthYear >= 1900) {
+    persons.push({ birthYear: eldestSonBirthYear, label: 'trưởng nam' });
+  }
+  const xungDay = xungTuoiNgay(almanac, persons);
+  const xungDayBad = xungDay.filter((x) => x.verdict === 'bad');
+  if (xungDayBad.length > 0 && verdict !== 'bad') {
+    verdict = 'bad';
+    verdictLabel = `Ngày xung tuổi ${xungDayBad
+      .map((x) => x.person.label)
+      .join(', ')}`;
+    detail = `${detail} ${xungDayBad.map((x) => x.detail).join(' ')}`;
+  }
+
+  const goodHours = goodHoursForAlmanac(almanac, persons).filter(
+    (h) => h.recommended,
+  );
+
   let xungDeceased: boolean | null = null;
   let xungNote: string | null = null;
   if (deceasedBirthYear && deceasedBirthYear >= 1900) {
     const xung = checkXungNam(deceasedBirthYear, almanac.solarYear);
-    // Xung theo chi năm mất / năm cải táng với tuổi người mất — dùng xung năm làm nhà logic (chi năm sinh vs chi năm sự kiện)
-    // Better: xung giữa chi năm sinh người mất và chi ngày cải táng? Traditional often checks year of cải táng vs birth chi.
+    // Xung năm tiến hành cải táng với tuổi người mất (chi năm vs chi tuổi)
     xungDeceased = xung.verdict === 'caution';
     xungNote = xungDeceased
       ? `Năm ${almanac.solarYear} (${formatCanChi(yearCanChi(almanac.solarYear))}) xung tuổi người mất (${formatCanChi(yearCanChi(deceasedBirthYear))}).`
@@ -239,6 +293,9 @@ function checkFromAlmanac(
     inYi: yiHits.length > 0,
     inJi: jiHits.length > 0,
     allForbidden,
+    folkWarnings,
+    xungDay,
+    goodHours,
     verdict,
     verdictLabel,
     detail,
@@ -263,6 +320,7 @@ export function scanCaiTangMonth(
   month: number,
   stepId: CaiTangStepId,
   deceasedBirthYear?: number | null,
+  eldestSonBirthYear?: number | null,
 ): {
   cells: CaiTangMonthCell[];
   goodDays: CaiTangDayCheck[];
@@ -280,10 +338,10 @@ export function scanCaiTangMonth(
   const pushDay = (y: number, m: number, d: number, inMonth: boolean) => {
     const almanac = getAlmanacDay(y, m, d);
     const check = inMonth
-      ? checkFromAlmanac(almanac, step, deceasedBirthYear)
+      ? checkFromAlmanac(almanac, step, deceasedBirthYear, eldestSonBirthYear)
       : null;
     if (check?.verdict === 'good') goodDays.push(check);
-    if (check && (check.inJi || check.allForbidden)) badDays.push(check);
+    if (check?.verdict === 'bad') badDays.push(check);
     cells.push({
       solarYear: y,
       solarMonth: m,

@@ -1,9 +1,17 @@
-import { getOrderByCode } from '@/app/actions/orders';
 import {
   buildKinhDichQueUserBlock,
   buildKinhDichSystemPrompt,
 } from '@/lib/fengshui/kinh-dich-prompt';
 import { assertAiRateLimit } from '@/lib/rate-limit';
+import { getCurrentTemple } from '@/lib/tenant';
+import { getSitePersona } from '@/lib/site-persona';
+import {
+  aiDeviceSetCookie,
+  consumeAiCredit,
+  isPaidOrderCode,
+  refundAiCredit,
+  type ConsumeResult,
+} from '@/lib/ai-quota';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,13 +32,6 @@ type Body = {
 };
 
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
-const FREE_USER_QUESTIONS = 1;
-
-function isPaidStatus(status: string | null | undefined): boolean {
-  return (
-    status === 'paid' || status === 'shipping' || status === 'delivered'
-  );
-}
 
 export async function POST(req: Request) {
   const limited = assertAiRateLimit(req, 'stream');
@@ -55,8 +56,6 @@ export async function POST(req: Request) {
   const queContext = (body.queContext || '').trim();
   const templeName = (body.templeName || 'chùa').trim() || 'chùa';
   const orderCode = (body.orderCode || '').trim().toUpperCase();
-  const isInitialReading = Boolean(body.isInitialReading);
-  const questionIndex = Number(body.questionIndex ?? 0);
 
   if (!question) {
     return Response.json({ error: 'Thiếu câu hỏi.' }, { status: 400 });
@@ -68,47 +67,63 @@ export async function POST(req: Request) {
     );
   }
 
-  // Gate: từ câu hỏi thêm thứ 2 trở đi cần mã đơn thỉnh nước đã thanh toán.
-  // questionIndex: số câu user đã gửi TRƯỚC câu này (0 = câu hỏi thêm đầu tiên).
-  // Free: isInitialReading HOẶC questionIndex < 1
-  const needsPaid =
-    !isInitialReading && questionIndex >= FREE_USER_QUESTIONS;
+  // Persona theo tenant: site Lý Gia dùng giọng "Thầy Phong Thủy Phúc An"
+  const temple = await getCurrentTemple().catch(() => null);
+  const sitePersona = temple ? getSitePersona(temple) : null;
+  const isSimSite = Boolean(sitePersona && sitePersona.upsell === 'sim');
 
-  if (needsPaid) {
-    if (!orderCode) {
-      return Response.json(
+  // Ví lượt AI toàn hệ thống: mã đơn paid hợp lệ → không trừ ví.
+  const orderPaid = orderCode ? await isPaidOrderCode(orderCode) : false;
+  let quota: ConsumeResult | null = null;
+  if (!orderPaid) {
+    quota = await consumeAiCredit(req);
+    if (!quota.allowed) {
+      const res = Response.json(
         {
-          error:
-            'Quý vị đã dùng hết 1 câu hỏi thêm miễn phí. Thỉnh nước ủng hộ chùa rồi nhập mã đơn để hỏi tiếp.',
-          code: 'order_required',
+          code: 'quota_exhausted',
+          remaining: 0,
+          error: isSimSite
+            ? 'Quý vị đã dùng hết lượt luận giải miễn phí. Gọi thầy tư vấn trực tiếp hoặc chọn sim hợp mệnh trong kho.'
+            : 'Quý vị đã dùng hết lượt luận giải miễn phí. Thỉnh nước ủng hộ chùa rồi nhập mã đơn để hỏi tiếp.',
         },
         { status: 402 },
       );
-    }
-    const order = await getOrderByCode(orderCode);
-    if (!order || !isPaidStatus(order.status)) {
-      return Response.json(
-        {
-          error:
-            'Mã đơn chưa thanh toán hoặc không hợp lệ. Vui lòng thỉnh nước ủng hộ chùa rồi thử lại.',
-          code: 'order_unpaid',
-        },
-        { status: 402 },
-      );
+      res.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+      return res;
     }
   }
 
   const history = Array.isArray(body.history) ? body.history.slice(-12) : [];
+  const advisor = isSimSite
+    ? sitePersona!.displayName
+    : `Trụ trì ${templeName}`;
+  const greeting = isSimSite
+    ? `Chào quý vị. ${advisor} đã xem quẻ của quý vị. Quý vị muốn hỏi điều gì, cứ nói thẳng để tôi luận rõ.`
+    : `A Di Đà Phật. Trụ trì ${templeName} đã xem quẻ của quý vị. Quý vị muốn hỏi điều gì, cứ nói thẳng để tôi luận rõ.`;
 
   const messages: Array<{ role: string; content: string }> = [
-    { role: 'system', content: buildKinhDichSystemPrompt(templeName) },
+    {
+      role: 'system',
+      content: buildKinhDichSystemPrompt(
+        templeName,
+        isSimSite
+          ? {
+              displayName: sitePersona!.displayName,
+              aiOutro: sitePersona!.aiOutro,
+            }
+          : null,
+      ),
+    },
     {
       role: 'user',
-      content: buildKinhDichQueUserBlock(queContext),
+      content: buildKinhDichQueUserBlock(
+        queContext,
+        isSimSite ? advisor : 'trụ trì',
+      ),
     },
     {
       role: 'assistant',
-      content: `A Di Đà Phật. Trụ trì ${templeName} đã xem quẻ của quý vị. Quý vị muốn hỏi điều gì, cứ nói thẳng để tôi luận rõ.`,
+      content: greeting,
     },
     ...history
       .filter(
@@ -141,6 +156,7 @@ export async function POST(req: Request) {
   });
 
   if (!upstream.ok || !upstream.body) {
+    if (quota) await refundAiCredit(quota.identity);
     return Response.json(
       {
         error: 'Không luận giải được lúc này. Quý vị thử lại sau giây lát.',
@@ -201,12 +217,15 @@ export async function POST(req: Request) {
     },
   });
 
-  return new Response(stream, {
+  const res = new Response(stream, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
       'Cache-Control': 'no-cache, no-transform',
       'X-Accel-Buffering': 'no',
       Connection: 'keep-alive',
+      'X-Ai-Remaining': String(quota ? quota.remaining : -1),
     },
   });
+  if (quota) res.headers.append('Set-Cookie', aiDeviceSetCookie(quota.identity));
+  return res;
 }

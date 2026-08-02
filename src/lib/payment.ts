@@ -1,7 +1,7 @@
 /**
  * Tài khoản ngân hàng của CÔNG TY (1 tài khoản duy nhất).
  * Phân biệt chùa bằng mã nội dung chuyển khoản:
- *   {payment_code}-{order_code}  ví dụ: CV-A3K9MP2Q
+ *   {payment_code}{suffix}  ví dụ: CVA3K9MP  (không dấu gạch)
  *
  * QR thanh toán dùng VietQR Quick Link (img.vietqr.io) — quét là điền sẵn
  * STK, số tiền và nội dung CK.
@@ -20,7 +20,7 @@ export interface CompanyBankAccount {
 export interface VietQrOptions {
   /** Số tiền VND (không dấu phẩy) */
   amount?: number;
-  /** Nội dung CK, ví dụ CV-A3K9MP */
+  /** Nội dung CK, ví dụ CVA3K9MP */
   addInfo?: string;
   /** Template: compact2 | compact | qr_only | print */
   template?: 'compact2' | 'compact' | 'qr_only' | 'print';
@@ -51,6 +51,24 @@ export function getCompanyBankAccount(): CompanyBankAccount {
 }
 
 /**
+ * Chuẩn hoá mã đơn: chỉ A–Z / 0–9, không dấu `-` / khoảng trắng.
+ * Dùng thống nhất cho QR, hiển thị, webhook, mở khóa luận giải.
+ */
+export function normalizeOrderCode(code: string): string {
+  return (code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+/** @deprecated dùng normalizeOrderCode */
+export function normalizeOrderCodeKey(code: string): string {
+  return normalizeOrderCode(code);
+}
+
+/** Nội dung CK đưa vào VietQR / app ngân hàng (= mã đơn chuẩn hoá). */
+export function toVietQrTransferContent(orderCode: string): string {
+  return normalizeOrderCode(orderCode).slice(0, 25);
+}
+
+/**
  * Sinh URL ảnh VietQR từ thông tin tài khoản (dùng được cả server và client).
  * Khi có `amount` + `addInfo`, app ngân hàng điền sẵn số tiền và nội dung CK.
  */
@@ -72,7 +90,8 @@ export function buildVietQrUrl(
     params.set('amount', String(Math.round(options.amount)));
   }
   if (options.addInfo) {
-    params.set('addInfo', options.addInfo.slice(0, 25));
+    const addInfo = toVietQrTransferContent(options.addInfo);
+    if (addInfo) params.set('addInfo', addInfo);
   }
   if (bank.accountHolder) {
     params.set('accountName', bank.accountHolder);
@@ -84,47 +103,68 @@ export function buildVietQrUrl(
   }`;
 }
 
-/** Nội dung CK: CV-A3K9MP2Q — dễ đọc trên sao kê, map về đúng chùa + đơn. */
+/** Nội dung CK = mã đơn (không gạch). */
 export function buildPaymentContent(
   paymentCode: string,
   orderCode: string,
 ): string {
-  const prefix = (paymentCode || 'XX').toUpperCase().replace(/[^A-Z0-9]/g, '');
-  const code = orderCode.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  return `${prefix}-${code}`;
+  const prefix = normalizeOrderCode(paymentCode || 'XX');
+  const code = normalizeOrderCode(orderCode);
+  // Nếu orderCode đã gồm prefix thì dùng luôn.
+  if (code.startsWith(prefix)) return code;
+  return `${prefix}${code}`;
 }
 
+/** Sinh mã đơn mới: {paymentCode}{6 ký tự} — không dấu gạch. */
 export function generateOrderCode(paymentCode?: string | null): string {
   const chars = 'ACDEFGHJKLMNPQRTUVWXY34679';
   let suffix = '';
   for (let i = 0; i < 6; i++) {
     suffix += chars[Math.floor(Math.random() * chars.length)];
   }
-  const prefix = (paymentCode || 'XX')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .slice(0, 4);
-  return `${prefix}-${suffix}`;
+  const prefix = normalizeOrderCode(paymentCode || 'XX').slice(0, 4);
+  return `${prefix}${suffix}`;
 }
 
 export function parsePaymentContent(content: string): {
   paymentCode: string | null;
   orderCode: string;
 } {
-  const cleaned = content.toUpperCase().replace(/\s+/g, '');
-  const match = cleaned.match(/^([A-Z0-9]{1,6})-([A-Z0-9]{4,12})$/);
+  const cleaned = normalizeOrderCode(content);
+  // Legacy có gạch: CV-XXXX
+  const legacy = content.toUpperCase().replace(/\s+/g, '');
+  const match = legacy.match(/^([A-Z0-9]{1,6})-([A-Z0-9]{4,12})$/);
   if (match) {
-    return { paymentCode: match[1], orderCode: cleaned };
+    return { paymentCode: match[1], orderCode: normalizeOrderCode(legacy) };
   }
   return { paymentCode: null, orderCode: cleaned };
 }
 
 /**
- * Tìm mã đơn trong nội dung CK ngân hàng / SePay
- * (ví dụ: "NGUYEN VAN A CV-GCMJND chuyen tien").
+ * Ứng viên mã đơn trong nội dung CK ngân hàng / SePay.
+ * Hỗ trợ legacy `CV-GCMJND` và dạng chuẩn `CVGCMJND`.
  */
-export function extractOrderCodeFromContent(content: string): string | null {
+export function extractOrderCodeCandidates(content: string): string[] {
   const upper = (content || '').toUpperCase();
-  const match = upper.match(/\b([A-Z0-9]{1,6}-[A-Z0-9]{4,12})\b/);
-  return match ? match[1] : null;
+  const out: string[] = [];
+
+  const withHyphen = upper.match(/\b([A-Z0-9]{1,6}-[A-Z0-9]{4,12})\b/g);
+  if (withHyphen) {
+    for (const h of withHyphen) out.push(normalizeOrderCode(h));
+  }
+
+  const tokens = upper.match(/\b[A-Z0-9]{6,16}\b/g) ?? [];
+  for (const t of tokens) {
+    if (/^\d/.test(t)) continue;
+    if (t.length < 7 || t.length > 12) continue;
+    if (!/^[A-Z]{1,4}[A-Z0-9]+$/.test(t)) continue;
+    out.push(normalizeOrderCode(t));
+  }
+
+  return [...new Set(out)];
+}
+
+export function extractOrderCodeFromContent(content: string): string | null {
+  const candidates = extractOrderCodeCandidates(content);
+  return candidates[0] ?? null;
 }

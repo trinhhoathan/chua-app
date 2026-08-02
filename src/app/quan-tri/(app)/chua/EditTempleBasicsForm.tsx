@@ -3,7 +3,9 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateTempleBasicsAction } from '@/app/actions/temples';
+import { POPULAR_BANK_APPS } from '@/lib/banks';
 import { TEMPLE_COLOR_PALETTE } from '@/lib/temple-defaults';
+import { isLyGiaDomain } from '@/lib/ly-gia-phuc-an';
 import type { TempleContactLinks } from '@/types/database';
 import { TempleColorPicker } from './TempleColorPicker';
 
@@ -25,6 +27,10 @@ export type TempleBasics = {
   primary_color: string | null;
   is_active: boolean;
   contact_links: TempleContactLinks;
+  bank_name: string | null;
+  bank_bin: string | null;
+  bank_account_number: string | null;
+  bank_account_holder: string | null;
 };
 
 export function EditTempleBasicsForm({ temple }: { temple: TempleBasics }) {
@@ -53,6 +59,18 @@ export function EditTempleBasicsForm({ temple }: { temple: TempleBasics }) {
     temple.primary_color ?? TEMPLE_COLOR_PALETTE[0],
   );
   const [isActive, setIsActive] = useState(temple.is_active);
+  const [bankName, setBankName] = useState(temple.bank_name ?? '');
+  const [bankBin, setBankBin] = useState(temple.bank_bin ?? '');
+  const [bankAccountNumber, setBankAccountNumber] = useState(
+    temple.bank_account_number ?? '',
+  );
+  const [bankAccountHolder, setBankAccountHolder] = useState(
+    temple.bank_account_holder ?? '',
+  );
+
+  // Bank đang chọn trong danh sách (khớp theo BIN)
+  const selectedBankCode =
+    POPULAR_BANK_APPS.find((b) => b.bin === bankBin)?.code ?? '';
 
   return (
     <form
@@ -78,6 +96,10 @@ export function EditTempleBasicsForm({ temple }: { temple: TempleBasics }) {
             tagline,
             primaryColor,
             isActive,
+            bankName,
+            bankBin,
+            bankAccountNumber,
+            bankAccountHolder,
           });
           if (!res.ok) {
             setErr(res.error);
@@ -145,9 +167,11 @@ export function EditTempleBasicsForm({ temple }: { temple: TempleBasics }) {
       </section>
 
       <section className="border border-fog bg-paper p-5 space-y-3">
-        <h2 className="font-display text-xl text-ink">Trụ trì</h2>
+        <h2 className="font-display text-xl text-ink">
+          {isLyGiaDomain(domain) ? 'Thầy Phong Thủy' : 'Trụ trì'}
+        </h2>
         <label className={labelCls}>
-          Tên trụ trì
+          {isLyGiaDomain(domain) ? 'Tên thầy' : 'Tên trụ trì'}
           <input
             className={inputCls}
             value={abbottName}
@@ -213,6 +237,81 @@ export function EditTempleBasicsForm({ temple }: { temple: TempleBasics }) {
             className={inputCls}
             value={tagline}
             onChange={(e) => setTagline(e.target.value)}
+          />
+        </label>
+      </section>
+
+      <section className="border border-fog bg-paper p-5 space-y-3">
+        <h2 className="font-display text-xl text-ink">
+          Tài khoản nhận tiền (VietQR)
+        </h2>
+        <p className="text-xs text-muted">
+          Dùng để sinh mã QR nhận thanh toán đơn sim / dịch vụ của riêng Phật tự
+          này. Bỏ trống nếu chưa dùng.
+        </p>
+        <label className={labelCls}>
+          Ngân hàng
+          <select
+            className={inputCls}
+            value={selectedBankCode}
+            onChange={(e) => {
+              const bank = POPULAR_BANK_APPS.find(
+                (b) => b.code === e.target.value,
+              );
+              if (bank) {
+                setBankName(bank.name);
+                setBankBin(bank.bin);
+              } else {
+                setBankName('');
+                setBankBin('');
+              }
+            }}
+          >
+            <option value="">— Chọn ngân hàng —</option>
+            {POPULAR_BANK_APPS.map((b) => (
+              <option key={b.code} value={b.code}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className={labelCls}>
+            Tên ngân hàng (tự sửa được)
+            <input
+              className={inputCls}
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              placeholder="VD: MBBank"
+            />
+          </label>
+          <label className={labelCls}>
+            Mã BIN (NAPAS)
+            <input
+              className={inputCls}
+              value={bankBin}
+              onChange={(e) => setBankBin(e.target.value.replace(/\D/g, ''))}
+              placeholder="VD: 970422"
+              maxLength={6}
+            />
+          </label>
+        </div>
+        <label className={labelCls}>
+          Số tài khoản
+          <input
+            className={inputCls}
+            value={bankAccountNumber}
+            onChange={(e) => setBankAccountNumber(e.target.value)}
+            placeholder="VD: 0123456789"
+          />
+        </label>
+        <label className={labelCls}>
+          Chủ tài khoản (IN HOA không dấu)
+          <input
+            className={inputCls}
+            value={bankAccountHolder}
+            onChange={(e) => setBankAccountHolder(e.target.value)}
+            placeholder="VD: TRINH VAN CUONG"
           />
         </label>
       </section>

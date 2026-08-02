@@ -5,9 +5,15 @@ import { DOMAIN_LABELS } from '@/lib/fengshui/tools';
 interface Props {
   tool: FengShuiToolMeta;
   primaryColor: string;
+  /** Danh xưng người tư vấn (mặc định "Trụ trì"). */
+  advisorTitle?: string;
 }
 
-export function ComingSoonPanel({ tool, primaryColor }: Props) {
+export function ComingSoonPanel({
+  tool,
+  primaryColor,
+  advisorTitle = 'Trụ trì',
+}: Props) {
   return (
     <div className="border border-fog bg-paper p-6 md:p-8 space-y-4">
       <p
@@ -18,8 +24,8 @@ export function ComingSoonPanel({ tool, primaryColor }: Props) {
       </p>
       <p className="text-ink leading-relaxed">
         Chức năng <strong className="font-medium">{tool.title}</strong> thuộc
-        nhóm {DOMAIN_LABELS[tool.domain]} đang được dựng khung. Trụ trì sẽ dùng
-        để hỗ trợ tư vấn Phật tử khi động cơ tính toán sẵn sàng.
+        nhóm {DOMAIN_LABELS[tool.domain]} đang được dựng khung. {advisorTitle}{' '}
+        sẽ dùng để hỗ trợ tư vấn khi động cơ tính toán sẵn sàng.
       </p>
       <ul className="text-sm text-muted space-y-1.5 list-disc pl-5">
         <li>Giai đoạn này chỉ đăng ký mục lục và trang chức năng.</li>
