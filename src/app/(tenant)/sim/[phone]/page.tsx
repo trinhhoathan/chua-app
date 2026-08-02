@@ -446,28 +446,50 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
             {birth ? (
               <Link
                 href={reportHref}
-                className="flex h-11 items-center justify-center gap-2 text-[0.85rem] font-semibold text-white"
+                className="grid min-h-11 w-full place-items-center px-3 py-2.5 text-[0.85rem] font-semibold text-white"
                 style={{ backgroundColor: primary }}
               >
-                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
-                  <path d="M14 2v6h6M9 15l2 2 4-4" />
-                </svg>
-                Nhận báo cáo chứng nhận (PDF có dấu thẩm định)
+                <span className="inline-flex max-w-full items-center justify-center gap-2 text-center">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-4 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    aria-hidden
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
+                    <path d="M14 2v6h6M9 15l2 2 4-4" />
+                  </svg>
+                  <span className="min-w-0 leading-snug text-balance">
+                    Nhận báo cáo chứng nhận (PDF có dấu thẩm định)
+                  </span>
+                </span>
               </Link>
             ) : (
               <button
                 type="button"
                 disabled
-                className="flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 text-[0.85rem] font-semibold text-white/80"
+                className="grid min-h-11 w-full cursor-not-allowed place-items-center px-3 py-2.5 text-[0.85rem] font-semibold text-white/80"
                 style={{ backgroundColor: primary, opacity: 0.45 }}
                 title="Nhập ngày sinh và ấn Xem độ hợp trước"
               >
-                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
-                  <path d="M14 2v6h6M9 15l2 2 4-4" />
-                </svg>
-                Nhận báo cáo chứng nhận (PDF có dấu thẩm định)
+                <span className="inline-flex max-w-full items-center justify-center gap-2 text-center">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-4 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    aria-hidden
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
+                    <path d="M14 2v6h6M9 15l2 2 4-4" />
+                  </svg>
+                  <span className="min-w-0 leading-snug text-balance">
+                    Nhận báo cáo chứng nhận (PDF có dấu thẩm định)
+                  </span>
+                </span>
               </button>
             )}
             <p className="mt-2 text-center text-[0.72rem] leading-relaxed text-muted">
