@@ -144,7 +144,7 @@ export default async function ToolPage({ params }: Props) {
               Vào kho sim →
             </Link>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {suggestedSims.map((sim) => (
               <SimCard key={sim.id} sim={sim} />
             ))}

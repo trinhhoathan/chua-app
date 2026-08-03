@@ -209,11 +209,11 @@ const REVIEWS = [
   },
 ] as const;
 
-const BIO_FALLBACK = `Với hơn hai thập niên nghiên cứu và hành nghề, thầy Lý Gia Phúc An chuyên tư vấn phong thủy nhà ở, không gian làm việc và luận giải vận mệnh theo Bát Tự — kết hợp lý số Đông phương với ứng dụng thực tế cho từng hoàn cảnh.
+const BIO_FALLBACK = `Với hơn 20 năm miệt mài nghiên cứu và hoạt động trong lĩnh vực Kiến trúc – Xây dựng, kết hợp nền tảng sâu sắc về Huyền học (Bát Tự, Tử vi, Phong thủy, Kinh dịch, Cảm xạ, Năng lượng lượng tử và năng lượng chữa lành...), thầy Lý Gia Phúc An mang đến góc nhìn đa chiều, toàn diện và khác biệt — gắn lý luận Đông phương với ứng dụng thực tế cho từng hoàn cảnh.
 
-Thầy đã đồng hành cùng nhiều gia chủ và doanh nghiệp tại Việt Nam, đồng thời tham gia các dự án tư vấn ở Singapore, Hong Kong, London, Paris, California và Melbourne. Phương châm xuyên suốt: phong thủy không phải mê tín, mà là khoa học của không gian và thời vận — phục vụ bằng sự tận tâm và chỉn chu.
+Bằng sự kết hợp nhuần nhuyễn giữa nguyên lý Âm Dương Ngũ Hành, Sinh Thần Bát Tự và Phong thủy khoa học, mỗi giải pháp không chỉ tối ưu hóa không gian sống mà còn kiến giải, định hướng chuẩn xác cho vận mệnh, sự nghiệp và mệnh cục của từng gia chủ.
 
-Các dịch vụ gồm kiến tạo vận mệnh & không gian, thiết kế chìa khóa trao tay, cải vận qua phong thủy, sim Bát Tự và đặt tên thương hiệu. Mỗi hạng mục hướng tới giải pháp rõ ràng, phù hợp mệnh chủ và mục tiêu sử dụng.`;
+Thầy đã đồng hành cùng nhiều gia chủ, doanh nghiệp tại Việt Nam và tham gia các dự án tư vấn ở Singapore, Hong Kong, London, Paris, California và Melbourne. Dịch vụ gồm kiến tạo vận mệnh & không gian, thiết kế chìa khóa trao tay, cải vận phong thủy, sim Bát Tự và đặt tên thương hiệu — hướng tới giải pháp rõ ràng, phù hợp mệnh chủ và mục tiêu sử dụng.`;
 
 export function LyGiaHome({
   temple,
