@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatBankTransferClipboard } from '@/lib/banks';
+import {
+  POPULAR_BANK_APPS_MOBILE,
+  bankSupportsAutofill,
+  buildBankPayDeeplink,
+  type BankApp,
+} from '@/lib/banks';
 import {
   buildVietQrUrl,
   shareOrSaveVietQrImage,
@@ -49,10 +54,12 @@ export function PaymentCheckout({
 }: Props) {
   const router = useRouter();
   const isMobile = useIsMobile();
+  const [selected, setSelected] = useState<BankApp | null>(null);
   const [status, setStatus] = useState(initialStatus);
   const [copied, setCopied] = useState<string | null>(null);
   const [qrShareBusy, setQrShareBusy] = useState(false);
   const [qrShareMsg, setQrShareMsg] = useState<string | null>(null);
+  const [waitingHint, setWaitingHint] = useState(false);
 
   const paid = useMemo(
     () =>
@@ -129,25 +136,6 @@ export function PaymentCheckout({
     }
   }
 
-  async function copyPayInfo() {
-    if (!bank.accountNumber) return;
-    try {
-      await navigator.clipboard.writeText(
-        formatBankTransferClipboard({
-          accountNumber: bank.accountNumber,
-          bankName: bank.bankName,
-          accountHolder: bank.accountHolder,
-          amount,
-          transferContent,
-        }),
-      );
-      setCopied('payinfo');
-      window.setTimeout(() => setCopied(null), 4000);
-    } catch {
-      /* ignore */
-    }
-  }
-
   async function shareQr() {
     if (!qrUrl || qrShareBusy) return;
     setQrShareBusy(true);
@@ -161,11 +149,29 @@ export function PaymentCheckout({
       );
     } catch {
       setQrShareMsg(
-        'Không lưu được ảnh tự động — hãy chụp màn hình mã QR phía trên.',
+        'Không lưu được ảnh — hãy chụp màn hình mã QR phía trên.',
       );
     } finally {
       setQrShareBusy(false);
     }
+  }
+
+  function openBankPay() {
+    if (!selected || !bank.accountNumber) return;
+    setWaitingHint(true);
+    const returnUrl =
+      typeof window !== 'undefined' ? window.location.href : undefined;
+    window.location.href = buildBankPayDeeplink(
+      selected,
+      bank.accountNumber,
+      bank.bankBin,
+      {
+        amount,
+        transferContent,
+        accountHolder: bank.accountHolder,
+        returnUrl,
+      },
+    );
   }
 
   return (
@@ -234,70 +240,95 @@ export function PaymentCheckout({
 
       {isMobile ? (
         <div className="space-y-4">
-          <ol className="space-y-2 border border-fog bg-mist/30 px-3 py-3 text-[0.8rem] leading-relaxed text-ink">
-            <li>
-              <span className="font-semibold" style={{ color: primaryColor }}>
-                1.
-              </span>{' '}
-              Lưu mã QR SePay (đủ STK · số tiền · nội dung).
-            </li>
-            <li>
-              <span className="font-semibold" style={{ color: primaryColor }}>
-                2.
-              </span>{' '}
-              Mở app ngân hàng → <span className="font-medium">Quét VietQR</span>{' '}
-              → camera hoặc <span className="font-medium">Chọn ảnh</span> vừa lưu.
-            </li>
-            <li>
-              <span className="font-semibold" style={{ color: primaryColor }}>
-                3.
-              </span>{' '}
-              Xác nhận chuyển khoản — hệ thống tự nhận khi tiền vào.
-            </li>
-          </ol>
-          <p className="border border-amber-700/20 bg-amber-50 px-3 py-2 text-[0.75rem] leading-relaxed text-amber-950/90">
-            Thông tin thanh toán nằm trong{' '}
-            <span className="font-medium">ảnh QR SePay</span>. Mở app rồi quét
-            mã — không dùng nút chuyển tiếp trống.
-          </p>
+          <div className="border border-fog bg-mist/40 px-3 py-3">
+            <h2 className="font-display text-xl text-ink">Thanh toán nhanh</h2>
+            <p className="mt-1 text-sm text-muted">
+              Chọn app ngân hàng của bạn → mở app, điền sẵn STK · số tiền · nội
+              dung → xác nhận chuyển khoản.
+            </p>
+            <div className="mt-3 grid max-h-[36vh] grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4">
+              {POPULAR_BANK_APPS_MOBILE.map((b) => {
+                const active = selected?.code === b.code;
+                return (
+                  <button
+                    key={b.code}
+                    type="button"
+                    onClick={() => setSelected(b)}
+                    aria-label={b.name}
+                    title={
+                      bankSupportsAutofill(b)
+                        ? `${b.name} — điền sẵn thông tin`
+                        : b.name
+                    }
+                    className={`relative flex aspect-square items-center justify-center border p-1 transition-colors ${
+                      active
+                        ? 'border-ink bg-paper'
+                        : 'border-ink/15 bg-paper hover:border-ink/35'
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={b.logo}
+                      alt={b.name}
+                      className="h-full w-full object-contain"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              disabled={!selected}
+              onClick={openBankPay}
+              className="mt-3 w-full py-3.5 text-sm font-medium text-white disabled:opacity-40"
+              style={{ backgroundColor: primaryColor }}
+            >
+              {selected
+                ? `Thanh toán bằng ${selected.name}`
+                : 'Chọn ngân hàng để thanh toán'}
+            </button>
+            {selected && !bankSupportsAutofill(selected) ? (
+              <p className="mt-2 text-center text-[0.7rem] leading-relaxed text-muted">
+                {selected.name} có thể chỉ mở app — nếu form trống, quét mã QR
+                SePay bên dưới.
+              </p>
+            ) : null}
+          </div>
 
           {qrUrl ? (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center border border-fog bg-paper px-3 py-4">
+              <p className="mb-2 text-center text-xs text-muted">
+                Hoặc quét / lưu mã QR SePay
+              </p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={qrUrl}
                 alt="Mã QR VietQR SePay"
-                className="h-auto w-64 border border-fog bg-white p-3"
+                className="h-auto w-56 border border-fog bg-white p-3"
               />
               <button
                 type="button"
                 disabled={qrShareBusy}
                 onClick={() => void shareQr()}
-                className="mt-3 w-full max-w-sm py-3.5 text-sm font-medium text-white disabled:opacity-40"
-                style={{ backgroundColor: primaryColor }}
+                className="mt-3 w-full max-w-xs border border-ink/20 bg-paper py-2.5 text-sm text-ink disabled:opacity-40"
               >
                 {qrShareBusy ? 'Đang lưu ảnh QR…' : 'Lưu mã QR vào máy'}
               </button>
               {qrShareMsg ? (
-                <p className="mt-2 max-w-sm text-center text-xs text-[#1B6B3A]">
+                <p className="mt-2 max-w-xs text-center text-xs text-[#1B6B3A]">
                   {qrShareMsg}
                 </p>
               ) : null}
-              <button
-                type="button"
-                onClick={() => void copyPayInfo()}
-                className="mt-2 w-full max-w-sm border border-ink/20 bg-paper py-2.5 text-sm text-ink"
-              >
-                {copied === 'payinfo'
-                  ? 'Đã chép STK · số tiền · nội dung'
-                  : 'Chép thông tin CK (dự phòng)'}
-              </button>
             </div>
           ) : null}
 
           <WaitingSpinner
             primaryColor={primaryColor}
-            label="Đang chờ xác nhận thanh toán…"
+            label={
+              waitingHint
+                ? 'Đã mở app ngân hàng — đang chờ tiền vào…'
+                : 'Đang chờ xác nhận thanh toán…'
+            }
           />
         </div>
       ) : (
