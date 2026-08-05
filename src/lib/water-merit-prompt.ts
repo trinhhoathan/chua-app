@@ -14,6 +14,11 @@ export function openWaterDonateForm(opts?: {
   qty?: number;
 }) {
   if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem('promo-engaged', '1');
+  } catch {
+    /* ignore */
+  }
   window.dispatchEvent(
     new CustomEvent(OPEN_WATER_DONATE_EVENT, {
       detail: opts ?? {},

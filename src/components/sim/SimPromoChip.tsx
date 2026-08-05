@@ -2,49 +2,63 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSitePersona } from '@/components/SitePersonaContext';
-
-const DISMISS_KEY = 'lgpa-sim-chip-dismissed';
+import {
+  SIM_ONLY_DELAY_MS,
+  canOfferSimOnlySite,
+  dismissSimPromo,
+  trackPromoPath,
+} from '@/lib/promo-chips';
 
 /**
- * Chip nổi quảng bá kho sim — ẩn trong khu /sim và sau khi khách đóng (nhớ theo phiên).
- * Trên site chùa: đặt góc phải (để chip Thỉnh nước ưu tiên góc trái).
+ * Chip sim cho site Lý Gia (không có chip nước cạnh tranh).
+ * Hiện dần sau vài trang / quan tâm — không nhảy ngay khi load.
  */
 export function SimPromoChip({
   primaryColor,
   side = 'left',
-  delayMs = 2500,
 }: {
   primaryColor: string;
   side?: 'left' | 'right';
+  /** @deprecated orchestrator tự tính delay */
   delayMs?: number;
 }) {
   const { role } = useSitePersona();
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    try {
-      if (sessionStorage.getItem(DISMISS_KEY) === '1') return;
-    } catch {
-      // sessionStorage bị chặn — vẫn hiện
-    }
-    const t = window.setTimeout(() => setVisible(true), delayMs);
-    return () => window.clearTimeout(t);
-  }, [delayMs]);
+    trackPromoPath(pathname);
+  }, [pathname]);
 
-  if (!visible || pathname.startsWith('/sim') || pathname.startsWith('/quan-tri')) {
-    return null;
-  }
+  useEffect(() => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    setVisible(false);
+
+    if (!canOfferSimOnlySite(pathname)) return;
+
+    timerRef.current = window.setTimeout(() => {
+      if (canOfferSimOnlySite(pathname)) setVisible(true);
+    }, SIM_ONLY_DELAY_MS);
+
+    return () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [pathname]);
+
+  if (!visible) return null;
 
   function dismiss() {
     setVisible(false);
-    try {
-      sessionStorage.setItem(DISMISS_KEY, '1');
-    } catch {
-      // ignore
-    }
+    dismissSimPromo();
   }
 
   const pos =
@@ -53,7 +67,7 @@ export function SimPromoChip({
       : 'left-4 bottom-4';
 
   return (
-    <div className={`fixed z-40 max-w-[15rem] animate-[fadeIn_.4s_ease] ${pos}`}>
+    <div className={`fixed z-40 max-w-[15rem] animate-[fadeIn_.45s_ease] ${pos}`}>
       <div className="relative border border-white/20 bg-ink/95 p-3.5 text-white shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur">
         <button
           type="button"

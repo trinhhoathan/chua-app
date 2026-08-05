@@ -15,8 +15,7 @@ import { TempleFooter } from '@/components/temple/TempleFooter';
 import { ContactDock } from '@/components/temple/ContactDock';
 import { WaterStickyBar } from '@/components/water/WaterStickyBar';
 import { WaterMeritFloatingNudge } from '@/components/water/WaterMeritFloatingNudge';
-import { WaterPromoChip } from '@/components/water/WaterPromoChip';
-import { SimPromoChip } from '@/components/sim/SimPromoChip';
+import { TemplePromoChips } from '@/components/promo/TemplePromoChips';
 
 export async function generateMetadata(): Promise<Metadata> {
   const temple = await getCurrentTemple();
@@ -142,16 +141,16 @@ export default async function TenantLayout({
           templeName={temple.name}
           templeId={temple.id}
         />
-        {/* Ưu tiên thỉnh nước trên site chùa — chip nổi khắp trang */}
-        <WaterPromoChip primaryColor={primary} templeName={temple.name} />
+        <TemplePromoChips
+          primaryColor={primary}
+          templeName={temple.name}
+          enableSim={simStore}
+        />
         <WaterStickyBar
           primaryColor={primary}
           unitPrice={temple.water_price_vnd}
           templeName={temple.name}
         />
-        {simStore ? (
-          <SimPromoChip primaryColor={primary} side="right" delayMs={4500} />
-        ) : null}
       </div>
     </SitePersonaProvider>
   );
