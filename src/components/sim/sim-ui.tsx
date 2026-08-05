@@ -89,12 +89,16 @@ export function SimCard({
   matchPercent,
   matchLabel,
   birthQuery,
+  primaryColor,
+  zaloUrl,
 }: {
   sim: SimListing;
   matchPercent?: number;
   matchLabel?: string;
   /** query string mang theo ngày sinh để trang chi tiết luận tiếp */
   birthQuery?: string;
+  primaryColor?: string;
+  zaloUrl?: string;
 }) {
   const discount = discountPercent(sim);
   const tag = primaryTag(sim);
@@ -210,6 +214,8 @@ export function SimCard({
             phoneDisplay={sim.phone_display}
             priceVnd={sim.price_vnd}
             birthQuery={birthQuery}
+            primaryColor={primaryColor}
+            zaloUrl={zaloUrl}
           />
         )}
       </div>
@@ -223,13 +229,20 @@ export function SimCard({
   );
 }
 
-export function SimEmptyState({ note }: { note?: string }) {
+export function SimEmptyState({
+  note,
+  advisorRole = 'trụ trì',
+}: {
+  note?: string;
+  /** Viết thường giữa câu: "thầy" / "trụ trì" */
+  advisorRole?: string;
+}) {
   return (
     <div className="border border-dashed border-fog bg-mist/40 px-6 py-14 text-center">
       <p className="font-display text-xl text-ink">Chưa tìm thấy sim phù hợp</p>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted">
         {note ??
-          'Thử nới bộ lọc, đổi khoảng giá hoặc nhắn Zalo để thầy tuyển số theo yêu cầu riêng của bạn.'}
+          `Thử nới bộ lọc, đổi khoảng giá hoặc nhắn Zalo để ${advisorRole} tuyển số theo yêu cầu riêng của bạn.`}
       </p>
     </div>
   );

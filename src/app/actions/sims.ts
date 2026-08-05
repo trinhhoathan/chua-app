@@ -5,7 +5,10 @@ import { supabase } from '@/lib/supabase';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { getCurrentDomain, getTempleByDomain } from '@/lib/tenant';
-import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
 import { generateOrderCode } from '@/lib/payment';
 import type { SimListing, SimOrder } from '@/types/database';
 
@@ -31,9 +34,14 @@ export async function createSimOrder(
   input: CreateSimOrderInput,
 ): Promise<CreateSimOrderResult> {
   const domain = await getCurrentDomain();
-  const temple = await getTempleByDomain(domain);
-  if (!temple || !isLyGiaPhucAnSite(temple)) {
+  const agentTemple = await getTempleByDomain(domain);
+  if (!agentTemple || !isSimStoreEnabled(agentTemple)) {
     return { ok: false, error: 'Kho sim chưa mở trên website này.' };
+  }
+
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) {
+    return { ok: false, error: 'Kho sim trung tâm chưa sẵn sàng.' };
   }
 
   const name = (input.customerName ?? '').trim();
@@ -62,7 +70,7 @@ export async function createSimOrder(
     .from('sim_listings')
     .select('*')
     .eq('id', input.simId)
-    .eq('temple_id', temple.id)
+    .eq('temple_id', warehouseId)
     .maybeSingle();
 
   const sim = simRow as SimListing | null;
@@ -76,11 +84,11 @@ export async function createSimOrder(
     };
   }
 
-  const orderCode = generateOrderCode(temple.payment_code);
+  const orderCode = generateOrderCode(agentTemple.payment_code);
   const hasServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
   const writer = hasServiceRole ? getSupabaseAdmin() : supabase;
 
-  // Nguồn kho (SĐT liên hệ) chỉ admin đọc được — snapshot qua service role
+  // Nguồn kho (supplier) — snapshot HH nguồn; HH đại lý tách riêng
   let sourceName: string | null = null;
   let commissionPercent: number | null = null;
   if (sim.source_id && hasServiceRole) {
@@ -88,7 +96,7 @@ export async function createSimOrder(
       .from('sim_sources')
       .select('name, commission_percent')
       .eq('id', sim.source_id)
-      .eq('temple_id', temple.id)
+      .eq('temple_id', warehouseId)
       .maybeSingle();
     if (src) {
       sourceName = String(src.name);
@@ -96,9 +104,11 @@ export async function createSimOrder(
     }
   }
 
+  const agentCommission = Number(agentTemple.sim_agent_commission_pct ?? 10);
+
   const { error: insertErr } = await writer.from('sim_orders').insert({
     order_code: orderCode,
-    temple_id: temple.id,
+    temple_id: agentTemple.id,
     sim_id: sim.id,
     phone: sim.phone,
     phone_display: sim.phone_display,
@@ -113,13 +123,13 @@ export async function createSimOrder(
     source_id: sim.source_id ?? null,
     source_name: sourceName,
     commission_percent: commissionPercent,
+    agent_commission_percent: agentCommission,
   });
 
   if (insertErr) {
     return { ok: false, error: `Không tạo được đơn: ${insertErr.message}` };
   }
 
-  // Giữ chỗ sim (chỉ khi có service role — RLS không mở update cho anon).
   if (hasServiceRole && sim.status === 'available') {
     await getSupabaseAdmin()
       .from('sim_listings')
@@ -145,8 +155,7 @@ export interface BetterSimBrief {
 }
 
 /**
- * Tìm các sim trong kho có điểm cao hơn (dùng cho khối upsell sau Bói Sim).
- * Chỉ hoạt động trên site Lý Gia Phúc An.
+ * Tìm các sim trong kho trung tâm có điểm cao hơn (upsell sau Bói Sim).
  */
 export async function findBetterSims(
   minScore: number,
@@ -154,9 +163,12 @@ export async function findBetterSims(
 ): Promise<{ sims: BetterSimBrief[]; total: number }> {
   const domain = await getCurrentDomain();
   const temple = await getTempleByDomain(domain);
-  if (!temple || !isLyGiaPhucAnSite(temple)) {
+  if (!temple || !isSimStoreEnabled(temple)) {
     return { sims: [], total: 0 };
   }
+
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) return { sims: [], total: 0 };
 
   const threshold = Math.min(99, Math.max(0, Math.floor(minScore)));
   const { data, count } = await supabase
@@ -165,7 +177,7 @@ export async function findBetterSims(
       'phone, phone_display, network, price_vnd, overall_score, element, tags',
       { count: 'exact' },
     )
-    .eq('temple_id', temple.id)
+    .eq('temple_id', warehouseId)
     .eq('status', 'available')
     .gt('overall_score', threshold)
     .order('overall_score', { ascending: false })
@@ -202,7 +214,6 @@ export async function getSimOrderByCode(
     return null;
   }
 
-  // Fallback: service role nếu RPC chưa được apply.
   if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
     const admin = getSupabaseAdmin();
     const { data: row } = await admin

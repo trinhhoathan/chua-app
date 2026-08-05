@@ -10,8 +10,8 @@ type NavLink = {
   superOnly?: boolean;
   /** Chỉ hiện với site bán nước (ẩn trên Lý Gia Phúc An). */
   waterOnly?: boolean;
-  /** Chỉ hiện với site bán sim (Lý Gia Phúc An). */
-  simOnly?: boolean;
+  /** Chỉ hiện khi đại lý / superAdmin theo dõi đơn sim. */
+  simAgent?: boolean;
 };
 
 type NavGroup = {
@@ -49,11 +49,15 @@ const GROUPS: NavGroup[] = [
     label: 'Vận hành',
     items: [
       { href: '/quan-tri/don-hang', label: 'Thỉnh nước', waterOnly: true },
-      { href: '/quan-tri/sim', label: 'Kho Sim Phong Thủy', simOnly: true },
+      {
+        href: '/quan-tri/sim',
+        label: 'Kho Sim Phong Thủy',
+        superOnly: true,
+      },
       {
         href: '/quan-tri/sim/don-hang',
-        label: 'Đơn hàng sim',
-        simOnly: true,
+        label: 'Thống kê đơn sim',
+        simAgent: true,
       },
       { href: '/quan-tri/doi-soat', label: 'Đối soát' },
       { href: '/quan-tri/so-cau', label: 'Sớ cầu an/siêu', waterOnly: true },
@@ -88,10 +92,13 @@ function groupActive(pathname: string, items: NavLink[]) {
 export function AdminNav({
   isSuperAdmin,
   siteUpsell = null,
+  simStoreEnabled = false,
 }: {
   isSuperAdmin: boolean;
-  /** 'sim' = Lý Gia (ẩn mục nước) · 'water' = chùa (ẩn mục sim) · null = hiện hết. */
+  /** 'sim' = Lý Gia (ẩn mục nước) · 'water' = chùa · null = hiện hết. */
   siteUpsell?: 'sim' | 'water' | null;
+  /** Đại lý (hoặc superAdmin) được xem thống kê đơn sim. */
+  simStoreEnabled?: boolean;
 }) {
   const pathname = usePathname();
   const [openId, setOpenId] = useState<string | null>(null);
@@ -132,7 +139,7 @@ export function AdminNav({
       items: g.items.filter((i) => {
         if (i.superOnly && !isSuperAdmin) return false;
         if (i.waterOnly && siteUpsell === 'sim') return false;
-        if (i.simOnly && siteUpsell === 'water') return false;
+        if (i.simAgent && !isSuperAdmin && !simStoreEnabled) return false;
         return true;
       }),
     }))

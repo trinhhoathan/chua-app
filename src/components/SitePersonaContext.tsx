@@ -10,6 +10,7 @@ import type { SitePersona } from '@/lib/site-persona';
  */
 const DEFAULT_PERSONA: SitePersona = {
   upsell: 'water',
+  simStoreEnabled: false,
   role: 'trụ trì',
   roleTitle: 'Trụ trì',
   displayName: 'trụ trì chùa',
@@ -37,6 +38,13 @@ export function SitePersonaProvider({
 
 export function useSitePersona(): SitePersona {
   return useContext(SitePersonaContext);
+}
+
+/** Danh xưng viết hoa đầu câu: "Thầy" / "Trụ trì". */
+export function useAdvisorRoleTitle(): string {
+  const { role } = useSitePersona();
+  if (!role) return 'Trụ trì';
+  return role.charAt(0).toUpperCase() + role.slice(1);
 }
 
 /**

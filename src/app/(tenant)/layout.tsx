@@ -6,12 +6,17 @@ import {
   toAbsoluteMediaUrl,
 } from '@/lib/site-url';
 import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import { isSimStoreEnabled } from '@/lib/sim/warehouse';
+import { getSitePersona } from '@/lib/site-persona';
+import { SitePersonaProvider } from '@/components/SitePersonaContext';
 import { LyGiaShell } from '@/components/ly-gia/LyGiaShell';
 import { TopNav } from '@/components/temple/TopNav';
 import { TempleFooter } from '@/components/temple/TempleFooter';
 import { ContactDock } from '@/components/temple/ContactDock';
 import { WaterStickyBar } from '@/components/water/WaterStickyBar';
 import { WaterMeritFloatingNudge } from '@/components/water/WaterMeritFloatingNudge';
+import { WaterPromoChip } from '@/components/water/WaterPromoChip';
+import { SimPromoChip } from '@/components/sim/SimPromoChip';
 
 export async function generateMetadata(): Promise<Metadata> {
   const temple = await getCurrentTemple();
@@ -96,44 +101,58 @@ export default async function TenantLayout({
     );
   }
 
+  const persona = getSitePersona(temple);
+
   if (isLyGiaPhucAnSite(temple)) {
-    return <LyGiaShell temple={temple}>{children}</LyGiaShell>;
+    return (
+      <SitePersonaProvider persona={persona}>
+        <LyGiaShell temple={temple}>{children}</LyGiaShell>
+      </SitePersonaProvider>
+    );
   }
 
   const primary = temple.primary_color || '#7A1F1F';
+  const simStore = isSimStoreEnabled(temple);
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={
-        {
-          '--primary-color': primary,
-          '--lacquer': primary,
-        } as React.CSSProperties
-      }
-    >
-      <TopNav temple={temple} />
-      <div className="flex flex-1 flex-col pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
-        <div className="flex-1">{children}</div>
-        <TempleFooter temple={temple} />
+    <SitePersonaProvider persona={persona}>
+      <div
+        className="min-h-screen flex flex-col"
+        style={
+          {
+            '--primary-color': primary,
+            '--lacquer': primary,
+          } as React.CSSProperties
+        }
+      >
+        <TopNav temple={temple} />
+        <div className="flex flex-1 flex-col pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
+          <div className="flex-1">{children}</div>
+          <TempleFooter temple={temple} />
+        </div>
+        <ContactDock
+          links={temple.contact_links}
+          mapsUrl={temple.maps_url}
+          primaryColor={primary}
+          templeName={temple.name}
+          templeId={temple.id}
+        />
+        <WaterMeritFloatingNudge
+          primaryColor={primary}
+          templeName={temple.name}
+          templeId={temple.id}
+        />
+        {/* Ưu tiên thỉnh nước trên site chùa — chip nổi khắp trang */}
+        <WaterPromoChip primaryColor={primary} templeName={temple.name} />
+        <WaterStickyBar
+          primaryColor={primary}
+          unitPrice={temple.water_price_vnd}
+          templeName={temple.name}
+        />
+        {simStore ? (
+          <SimPromoChip primaryColor={primary} side="right" delayMs={4500} />
+        ) : null}
       </div>
-      <ContactDock
-        links={temple.contact_links}
-        mapsUrl={temple.maps_url}
-        primaryColor={primary}
-        templeName={temple.name}
-        templeId={temple.id}
-      />
-      <WaterMeritFloatingNudge
-        primaryColor={primary}
-        templeName={temple.name}
-        templeId={temple.id}
-      />
-      <WaterStickyBar
-        primaryColor={primary}
-        unitPrice={temple.water_price_vnd}
-        templeName={temple.name}
-      />
-    </div>
+    </SitePersonaProvider>
   );
 }

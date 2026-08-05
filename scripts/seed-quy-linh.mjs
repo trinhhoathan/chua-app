@@ -95,9 +95,9 @@ const TEMPLE = {
 Tên chùa “Quý Linh” gợi nhắc sự quý kính đối với linh thiêng, khuyến khích mỗi người con Phật biết trân trọng thân người, gìn giữ giới hạnh và nuôi dưỡng tâm từ bi trong đời sống thường nhật. Trải qua các đợt trùng tu, chùa dần hình thành quần thể gồm chính điện, nhà tổ, giảng đường và khu thiền hành quanh hồ sen.
 
 Hằng năm, Quý Linh Tự tổ chức các khóa tu một ngày, lễ vía Phật – Bồ tát, lễ cầu an đầu năm và cầu siêu cuối năm. Phật tử gần xa về chùa không chỉ để lễ bái mà còn để học pháp, làm công quả và kết nối cộng đồng đạo hữu trong tinh thần lục hòa.`,
-  abbott_name: 'Thích Lê Thiện',
+  abbott_name: 'Đồng thầy Lê Thiện',
   abbott_title: 'Trụ trì Quý Linh Tự',
-  abbott_bio: `Đại đức Thích Lê Thiện hiện trụ trì Quý Linh Tự, phụng sự Tăng đoàn và đồng hành cùng Phật tử trên bước đường tu học.
+  abbott_bio: `Đồng thầy Lê Thiện hiện trụ trì Quý Linh Tự, phụng sự Tăng đoàn và đồng hành cùng Phật tử trên bước đường tu học.
 
 Thầy chú trọng giảng dạy Phật pháp ứng dụng vào đời sống, khuyến khích thiền tập, niệm Phật và phụng sự chúng sinh bằng những việc thiện nhỏ nhưng bền bỉ. Dưới sự dẫn dắt của Thầy, chùa thường xuyên tổ chức khóa tu, lễ cầu an — cầu siêu, chương trình khuyến học và các hoạt động từ thiện hướng về người khó khăn.
 
@@ -363,7 +363,7 @@ async function upsertDomains(templeId) {
 async function upsertAdmin(templeId) {
   const phone = normalizePhone(PHONE);
   const email = phoneEmail(phone);
-  const displayName = 'Thích Lê Thiện';
+  const displayName = 'Đồng thầy Lê Thiện';
 
   let user = await findUserByEmail(email);
   if (!user) {

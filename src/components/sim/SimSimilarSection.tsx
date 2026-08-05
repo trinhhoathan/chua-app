@@ -4,7 +4,15 @@ import { SimCard } from '@/components/sim/sim-ui';
 import type { SimListing } from '@/types/database';
 
 /** Khối "Số tương đương" — stream riêng để không chặn TTFB trang chi tiết. */
-export async function SimSimilarSection({ sim }: { sim: SimListing }) {
+export async function SimSimilarSection({
+  sim,
+  primaryColor,
+  zaloUrl,
+}: {
+  sim: SimListing;
+  primaryColor?: string;
+  zaloUrl?: string;
+}) {
   const similar = await getSimilarSims(sim);
   if (similar.length === 0) return null;
 
@@ -26,7 +34,12 @@ export async function SimSimilarSection({ sim }: { sim: SimListing }) {
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {similar.map((s) => (
-          <SimCard key={s.id} sim={s} />
+          <SimCard
+            key={s.id}
+            sim={s}
+            primaryColor={primaryColor}
+            zaloUrl={zaloUrl}
+          />
         ))}
       </div>
     </section>

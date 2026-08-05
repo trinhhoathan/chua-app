@@ -3,6 +3,7 @@ import type { Temple } from '@/types/database';
 import { formatVnd } from '@/lib/tenant';
 import { getWaterBottleBrand } from '@/lib/water-bottle-brand';
 import { WaterBottleShowcase } from '@/components/water/WaterBottleShowcase';
+import { OpenWaterDonateButton } from '@/components/water/OpenWaterDonateButton';
 
 interface Props {
   temple: Temple;
@@ -178,9 +179,10 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
           <ul className="mt-8 space-y-3">
             {TIERS.map((t) => (
               <li key={t.qty}>
-                <Link
-                  href="/dat-nuoc"
-                  className="block border border-fog bg-mist/50 px-5 py-4 hover:border-ink/20 transition-colors"
+                <OpenWaterDonateButton
+                  qty={t.qty}
+                  note={t.wish}
+                  className="block w-full text-left border border-fog bg-mist/50 px-5 py-4 hover:border-ink/20 transition-colors"
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <p className="text-ink font-medium">{t.title}</p>
@@ -189,27 +191,18 @@ export function WaterMeritsStory({ temple, compact = false }: Props) {
                     </p>
                   </div>
                   <p className="mt-1 text-sm text-muted">{t.wish}</p>
-                </Link>
+                </OpenWaterDonateButton>
               </li>
             ))}
           </ul>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            {!compact ? (
-              <Link
-                href="/dat-nuoc"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white"
-                style={{ backgroundColor: primary }}
-              >
-                Phát tâm thỉnh nước
-              </Link>
-            ) : (
-              <p className="text-sm text-muted leading-relaxed w-full">
-                Dùng thanh{' '}
-                <span className="text-ink font-medium">Thỉnh nước</span> ở đáy
-                màn hình để chọn số thùng và hoàn tất phát tâm.
-              </p>
-            )}
+            <OpenWaterDonateButton
+              className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white"
+              style={{ backgroundColor: primary }}
+            >
+              Chọn số thùng · phát tâm
+            </OpenWaterDonateButton>
             {bottleBrand ? (
               <Link
                 href="/thu-nhan-nuoc"

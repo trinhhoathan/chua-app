@@ -36,9 +36,12 @@ function formatTime(iso: string): string {
 export function SimOrdersPanel({
   templeId,
   initialOrders,
+  canManage = false,
 }: {
   templeId: string;
   initialOrders: SimOrder[];
+  /** Chỉ SuperAdmin được đổi trạng thái đơn. */
+  canManage?: boolean;
 }) {
   const [orders, setOrders] = useState<SimOrder[]>(initialOrders);
   const [statusFilter, setStatusFilter] = useState('');
@@ -126,27 +129,33 @@ export function SimOrdersPanel({
             <tr>
               <th className="p-2.5">Mã đơn</th>
               <th className="p-2.5">Sim</th>
-              <th className="p-2.5">Kho / HH</th>
+              <th className="p-2.5">HH đại lý</th>
               <th className="p-2.5 text-right">Giá</th>
               <th className="p-2.5">Khách</th>
               <th className="p-2.5">Ngày sinh / giờ</th>
               <th className="p-2.5">Trạng thái</th>
               <th className="p-2.5">Tạo lúc</th>
-              <th className="p-2.5" />
+              {canManage ? <th className="p-2.5" /> : null}
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={9} className="p-8 text-center text-muted">
+                <td
+                  colSpan={canManage ? 9 : 8}
+                  className="p-8 text-center text-muted"
+                >
                   Chưa có đơn sim nào.
                 </td>
               </tr>
             ) : (
               orders.map((o) => {
-                const hh =
-                  o.commission_percent != null
-                    ? Math.round((Number(o.price_vnd) * Number(o.commission_percent)) / 100)
+                const agentPct = o.agent_commission_percent;
+                const agentHh =
+                  agentPct != null
+                    ? Math.round(
+                        (Number(o.price_vnd) * Number(agentPct)) / 100,
+                      )
                     : null;
                 return (
                 <tr
@@ -158,17 +167,24 @@ export function SimOrdersPanel({
                     {o.phone_display}
                   </td>
                   <td className="p-2.5 text-xs text-muted">
-                    {o.source_name ? (
-                      <>
-                        <p className="font-medium text-ink">{o.source_name}</p>
-                        <p>
-                          HH {Number(o.commission_percent)}%
-                          {hh != null ? ` ≈ ${formatVnd(hh)}đ` : ''}
-                        </p>
-                      </>
+                    {agentPct != null ? (
+                      <p>
+                        {Number(agentPct)}%
+                        {agentHh != null
+                          ? ` ≈ ${formatVnd(agentHh)}đ`
+                          : ''}
+                      </p>
                     ) : (
                       '—'
                     )}
+                    {canManage && o.source_name ? (
+                      <p className="mt-0.5 text-[0.65rem]">
+                        Nguồn: {o.source_name}
+                        {o.commission_percent != null
+                          ? ` · HH kho ${o.commission_percent}%`
+                          : ''}
+                      </p>
+                    ) : null}
                   </td>
                   <td className="p-2.5 text-right text-ink">{formatVnd(o.price_vnd)}đ</td>
                   <td className="p-2.5">
@@ -199,43 +215,46 @@ export function SimOrdersPanel({
                     ) : null}
                   </td>
                   <td className="p-2.5 text-xs text-muted">{formatTime(o.created_at)}</td>
-                  <td className="p-2.5">
-                    <div className="flex flex-col gap-1">
-                      {o.status === 'pending_payment' ? (
-                        <ActionBtn
-                          color="#1B6B3A"
-                          onClick={() => void changeStatus(o, 'paid')}
-                        >
-                          ✓ Đã nhận tiền
-                        </ActionBtn>
-                      ) : null}
-                      {o.status === 'paid' ? (
-                        <ActionBtn
-                          color="#2563eb"
-                          onClick={() => void changeStatus(o, 'delivering')}
-                        >
-                          Giao sim
-                        </ActionBtn>
-                      ) : null}
-                      {o.status === 'paid' || o.status === 'delivering' ? (
-                        <ActionBtn
-                          color="#374151"
-                          onClick={() => void changeStatus(o, 'completed')}
-                        >
-                          Hoàn tất (sim đã bán)
-                        </ActionBtn>
-                      ) : null}
-                      {o.status !== 'completed' && o.status !== 'cancelled' ? (
-                        <button
-                          type="button"
-                          onClick={() => void changeStatus(o, 'cancelled')}
-                          className="text-left text-xs text-red-700 underline underline-offset-2"
-                        >
-                          Hủy đơn + nhả sim
-                        </button>
-                      ) : null}
-                    </div>
-                  </td>
+                  {canManage ? (
+                    <td className="p-2.5">
+                      <div className="flex flex-col gap-1">
+                        {o.status === 'pending_payment' ? (
+                          <ActionBtn
+                            color="#1B6B3A"
+                            onClick={() => void changeStatus(o, 'paid')}
+                          >
+                            ✓ Đã nhận tiền
+                          </ActionBtn>
+                        ) : null}
+                        {o.status === 'paid' ? (
+                          <ActionBtn
+                            color="#2563eb"
+                            onClick={() => void changeStatus(o, 'delivering')}
+                          >
+                            Giao sim
+                          </ActionBtn>
+                        ) : null}
+                        {o.status === 'paid' || o.status === 'delivering' ? (
+                          <ActionBtn
+                            color="#374151"
+                            onClick={() => void changeStatus(o, 'completed')}
+                          >
+                            Hoàn tất (sim đã bán)
+                          </ActionBtn>
+                        ) : null}
+                        {o.status !== 'completed' &&
+                        o.status !== 'cancelled' ? (
+                          <button
+                            type="button"
+                            onClick={() => void changeStatus(o, 'cancelled')}
+                            className="text-left text-xs text-red-700 underline underline-offset-2"
+                          >
+                            Hủy đơn + nhả sim
+                          </button>
+                        ) : null}
+                      </div>
+                    </td>
+                  ) : null}
                 </tr>
               );
               })

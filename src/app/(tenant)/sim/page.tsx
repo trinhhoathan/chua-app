@@ -2,7 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCurrentTemple } from '@/lib/tenant';
-import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
+import { LY_GIA } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
+import { simStoreContact, simStoreTitle } from '@/lib/sim/branding';
 import {
   querySims,
   priceRangeById,
@@ -31,24 +36,34 @@ import { SimCard, SimEmptyState } from '@/components/sim/sim-ui';
 import { SimRecentOrdersTicker } from '@/components/sim/SimRecentOrdersTicker';
 import type { SimElement } from '@/types/database';
 
-export const metadata: Metadata = {
-  title: 'Kho Sim Phong Thủy — chọn sim hợp mệnh, hợp tuổi | Lý Gia Phúc An',
-  description:
-    'Kho sim phong thủy do thầy Lý Gia Phúc An tuyển chọn theo nguyên lý Âm Dương Ngũ Hành, kinh dịch diệu luận và Bát Tự — lọc theo mệnh ngũ hành, ngày giờ sinh, ngành nghề. Đặt mua online, thanh toán QR.',
-};
-
 interface Props {
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
 const PAGE_SIZE = 24;
 
+export async function generateMetadata(): Promise<Metadata> {
+  const temple = await getCurrentTemple();
+  if (!temple || !isSimStoreEnabled(temple)) {
+    return { title: 'Kho Sim Phong Thủy' };
+  }
+  const title = simStoreTitle(temple.name);
+  return {
+    title: `${title} — chọn sim hợp mệnh, hợp tuổi`,
+    description: `Kho sim phong thủy của ${temple.name}: chấm điểm theo nguyên lý Âm Dương Ngũ Hành, kinh dịch diệu luận và Bát Tự — lọc theo mệnh, ngày giờ sinh, ngành nghề. Đặt mua online, thanh toán QR.`,
+  };
+}
+
 export default async function KhoSimPage({ searchParams }: Props) {
   const temple = await getCurrentTemple();
-  if (!temple || !isLyGiaPhucAnSite(temple)) notFound();
+  if (!temple || !isSimStoreEnabled(temple)) notFound();
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) notFound();
 
   const sp = await searchParams;
   const primary = temple.primary_color || LY_GIA.primary;
+  const contact = simStoreContact(temple);
+  const storeTitle = simStoreTitle(temple.name);
 
   // --- Bộ lọc từ URL ---
   const range = priceRangeById(sp.gia);
@@ -84,7 +99,7 @@ export default async function KhoSimPage({ searchParams }: Props) {
   const goal = parseGoal(sp.mt);
   const dungThan = birth ? buildSimDungThan(birth) : null;
 
-  const { sims, total, page } = await querySims(temple.id, filters);
+  const { sims, total, page } = await querySims(warehouseId, filters);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Bộ lọc quẻ Kinh Dịch (Mai Hoa Dịch Số)
@@ -129,21 +144,26 @@ export default async function KhoSimPage({ searchParams }: Props) {
       <section className="bg-ink text-white">
         <div className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-12">
           <p className="text-[0.72rem] uppercase tracking-[0.3em] text-gilt">
-            Sim phong thủy · Thầy tuyển chọn
+            {contact.eyebrow}
           </p>
           <h1 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
-            Kho Sim Phong Thủy Lý Gia Phúc An
+            {storeTitle}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">
             Mỗi số trong kho đều được chấm điểm theo nguyên lý Âm Dương Ngũ Hành, kinh
             dịch diệu luận (cặp quái, đuôi số, 81 số lý, âm dương, tổng nút) và đối chiếu
             Bát Tự — không bán số đẹp đại trà, chỉ chọn số đúng người, đúng mệnh, đúng
-            nghề.
+            nghề
+            {contact.isLyGia
+              ? '.'
+              : ` · đồng hành cùng ${temple.name}.`}
           </p>
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1.5 text-[0.72rem] text-white/55">
             <span>✓ Sim chính chủ, sang tên tận nơi</span>
             <span>✓ Kiểm tra sim xong mới thanh toán</span>
-            <span>✓ Thầy chọn ngày tốt kích sim miễn phí</span>
+            <span>
+              ✓ {contact.roleTitle} chọn ngày tốt kích sim miễn phí
+            </span>
             <span>✓ Hoàn tiền nếu số không đúng cam kết</span>
           </div>
         </div>
@@ -219,9 +239,10 @@ export default async function KhoSimPage({ searchParams }: Props) {
         {sims.length === 0 ? (
           <div className="mt-6">
             <SimEmptyState
+              advisorRole={contact.role}
               note={
                 purpose
-                  ? `Chưa có sim đạt điểm ${purpose.label} đủ cao trong kho — thử bỏ bớt bộ lọc hoặc nhắn Zalo để thầy tuyển số.`
+                  ? `Chưa có sim đạt điểm ${purpose.label} đủ cao trong kho — thử bỏ bớt bộ lọc hoặc nhắn Zalo để ${contact.role} tuyển số.`
                   : undefined
               }
             />
@@ -248,6 +269,8 @@ export default async function KhoSimPage({ searchParams }: Props) {
                       : undefined)
                   }
                   birthQuery={birthQuery}
+                  primaryColor={primary}
+                  zaloUrl={contact.zaloUrl}
                 />
               );
             })}
@@ -303,7 +326,7 @@ export default async function KhoSimPage({ searchParams }: Props) {
           {[
             {
               title: 'Chấm điểm bằng học thuật, không cảm tính',
-              body: 'Từng sim được chấm điểm theo nguyên lý Âm Dương Ngũ Hành, kinh dịch diệu luận — phân tích cặp quái, tổ hợp chế hóa, đuôi số và 81 số lý, cùng thuật toán với công cụ Bói Sim của thầy.',
+              body: 'Từng sim được chấm điểm theo nguyên lý Âm Dương Ngũ Hành, kinh dịch diệu luận — phân tích cặp quái, tổ hợp chế hóa, đuôi số và 81 số lý, cùng thuật toán với công cụ Bói Sim.',
             },
             {
               title: 'Đúng mệnh mới bán',
@@ -311,7 +334,9 @@ export default async function KhoSimPage({ searchParams }: Props) {
             },
             {
               title: 'Quy trình kích sim theo ngày tốt',
-              body: 'Sau khi nhận sim, thầy chọn ngày giờ hoàng đạo hợp tuổi để kích hoạt — nghi thức khai số truyền thống của Lý Gia Phúc An.',
+              body: contact.isLyGia
+                ? `Sau khi nhận sim, ${contact.role} chọn ngày giờ hoàng đạo hợp tuổi để kích hoạt — nghi thức khai số truyền thống của Lý Gia Phúc An.`
+                : `Sau khi nhận sim, ${contact.role} hướng dẫn ngày giờ hoàng đạo hợp tuổi để kích hoạt — đồng hành cùng ${temple.name}.`,
             },
           ].map((b) => (
             <div key={b.title} className="border border-fog bg-paper p-5">
@@ -330,17 +355,19 @@ export default async function KhoSimPage({ searchParams }: Props) {
           <div>
             <p className="font-display text-2xl">Chưa tìm được số ưng ý?</p>
             <p className="mt-1 text-sm text-white/80">
-              Nhắn Zalo ngày giờ sinh — thầy tuyển số theo yêu cầu riêng trong 24h, miễn phí.
+              Nhắn Zalo ngày giờ sinh — {contact.advisor} hỗ trợ tuyển số theo yêu cầu
+              riêng trong 24h.
             </p>
           </div>
           <a
-            href={LY_GIA.zaloUrl}
+            href={contact.zaloUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-white px-6 py-3 text-sm font-semibold"
             style={{ color: primary }}
           >
-            Nhắn Zalo {LY_GIA.phoneDisplay}
+            Nhắn Zalo
+            {contact.phoneDisplay ? ` ${contact.phoneDisplay}` : ''}
           </a>
         </section>
       </div>

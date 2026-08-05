@@ -12,8 +12,7 @@ function formatVnd(v: number): string {
 }
 
 /**
- * Khối upsell sau kết quả Bói Sim (chỉ hiện trên site Lý Gia):
- * liệt kê các sim trong kho có điểm Bát Cực cao hơn số vừa xem.
+ * Khối upsell sau kết quả Bói Sim — hiện khi site bật kho sim (đại lý / Lý Gia).
  */
 export function SimBetterUpsell({
   score,
@@ -24,12 +23,12 @@ export function SimBetterUpsell({
   primaryColor: string;
 }) {
   const persona = useSitePersona();
-  const isSimSite = persona.upsell === 'sim';
+  const storeOn = persona.simStoreEnabled;
   const [sims, setSims] = useState<BetterSimBrief[] | null>(null);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    if (!isSimSite) return;
+    if (!storeOn) return;
     let cancelled = false;
     findBetterSims(score, 6)
       .then((res) => {
@@ -43,9 +42,11 @@ export function SimBetterUpsell({
     return () => {
       cancelled = true;
     };
-  }, [isSimSite, score]);
+  }, [storeOn, score]);
 
-  if (!isSimSite || !sims || sims.length === 0) return null;
+  if (!storeOn || !sims || sims.length === 0) return null;
+
+  const templeTone = persona.upsell === 'water';
 
   return (
     <section
@@ -66,9 +67,11 @@ export function SimBetterUpsell({
         của quý vị
       </p>
       <p className="mt-1 text-sm text-muted leading-relaxed">
-        Số vừa xem đạt {score}/100. Dưới đây là vài dãy số đã được{' '}
-        {persona.displayName} chấm điểm sẵn — bấm vào từng số để xem luận giải
-        chi tiết và đặt mua.
+        Số vừa xem đạt {score}/100. Dưới đây là vài dãy số đã được chấm điểm
+        sẵn — bấm vào để xem luận giải và đặt mua
+        {templeTone
+          ? ' (công đức hỗ trợ Phật sự nhà chùa).'
+          : ` theo tư vấn của ${persona.displayName}.`}
       </p>
 
       <ul className="mt-4 grid grid-cols-2 gap-2">

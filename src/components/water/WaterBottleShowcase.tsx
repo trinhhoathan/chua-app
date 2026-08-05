@@ -75,22 +75,12 @@ export function WaterBottleShowcase({
           </ul>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {variant === 'purchase' ? (
-              <OpenWaterDonateButton
-                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white"
-                style={{ backgroundColor: primary }}
-              >
-                Chọn số thùng · phát tâm
-              </OpenWaterDonateButton>
-            ) : (
-              <Link
-                href="/dat-nuoc"
-                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white"
-                style={{ backgroundColor: primary }}
-              >
-                Phát tâm thỉnh nước
-              </Link>
-            )}
+            <OpenWaterDonateButton
+              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white"
+              style={{ backgroundColor: primary }}
+            >
+              Chọn số thùng · phát tâm
+            </OpenWaterDonateButton>
             <Link
               href="/thu-nhan-nuoc"
               className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium border border-fog text-ink hover:bg-mist"

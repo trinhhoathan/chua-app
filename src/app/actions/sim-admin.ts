@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { assertTempleAccess, getAdminDb } from '@/lib/auth';
+import { assertTempleAccess, getAdminDb, type AdminContext } from '@/lib/auth';
 import {
   buildSimScorePayload,
   generateDemoSims,
@@ -21,6 +21,23 @@ export type SimAdminResult = { ok: true } | { ok: false; error: string };
 
 function fail(e: unknown, fallback: string): { ok: false; error: string } {
   return { ok: false, error: e instanceof Error ? e.message : fallback };
+}
+
+async function requireSuperAdminForWarehouse(
+  templeId: string,
+): Promise<AdminContext | { ok: false; error: string }> {
+  try {
+    const ctx = await assertTempleAccess(templeId);
+    if (!ctx.isSuperAdmin) {
+      return {
+        ok: false,
+        error: 'Chỉ SuperAdmin được quản lý kho sim trung tâm.',
+      };
+    }
+    return ctx;
+  } catch {
+    return { ok: false, error: 'Không có quyền truy cập.' };
+  }
 }
 
 function revalidateSimPaths() {
@@ -51,11 +68,8 @@ export async function listSimsAdminAction(input: ListSimsAdminInput): Promise<{
   sims?: SimListing[];
   total?: number;
 }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
-  }
+  const gate = await requireSuperAdminForWarehouse(input.templeId);
+  if ('ok' in gate && gate.ok === false) return gate;
 
   const db = await getAdminDb();
   const page = Math.max(1, input.page ?? 1);
@@ -91,10 +105,9 @@ export async function exportSimsCsvAction(input: {
   templeId: string;
   status?: string;
 }): Promise<{ ok: boolean; error?: string; csv?: string; count?: number }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const db = await getAdminDb();
@@ -184,10 +197,9 @@ export async function createSimAction(input: {
   description?: string;
   sourceId?: string | null;
 }): Promise<SimAdminResult> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const payload = buildSimScorePayload(input.phone);
@@ -238,10 +250,9 @@ export async function updateSimAction(input: {
   description?: string | null;
   sourceId?: string | null;
 }): Promise<SimAdminResult> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -279,10 +290,9 @@ export async function deleteSimAction(input: {
   id: string;
   templeId: string;
 }): Promise<SimAdminResult> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const db = await getAdminDb();
@@ -303,10 +313,9 @@ export async function bulkUpdateSimPriceAction(input: {
   mode: 'percent' | 'amount' | 'set';
   value: number;
 }): Promise<SimAdminResult & { updated?: number }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
   if (input.ids.length === 0) {
     return { ok: false, error: 'Chưa chọn sim nào.' };
@@ -354,10 +363,9 @@ export async function startFlashSaleAction(input: {
   percentOff: number;
   hours: number;
 }): Promise<SimAdminResult & { updated?: number }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
   if (input.ids.length === 0) return { ok: false, error: 'Chưa chọn sim nào.' };
   const percent = Math.min(90, Math.max(1, Math.floor(input.percentOff)));
@@ -409,10 +417,9 @@ export async function endFlashSaleAction(input: {
   templeId: string;
   ids: string[];
 }): Promise<SimAdminResult & { updated?: number }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
   if (input.ids.length === 0) return { ok: false, error: 'Chưa chọn sim nào.' };
 
@@ -464,10 +471,9 @@ export async function importSimsAction(input: {
   inserted?: number;
   skipped?: string[];
 }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
   if (input.rows.length === 0) {
     return { ok: false, error: 'Không có dòng nào để import.' };
@@ -547,10 +553,9 @@ export async function seedDemoSimsAction(input: {
   templeId: string;
   count?: number;
 }): Promise<{ ok: boolean; error?: string; inserted?: number }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const count = Math.min(300, Math.max(1, input.count ?? 100));
@@ -602,10 +607,9 @@ export async function listSimSourcesAction(input: {
   templeId: string;
   includeInactive?: boolean;
 }): Promise<{ ok: boolean; error?: string; sources?: SimSource[] }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const db = await getAdminDb();
@@ -631,10 +635,9 @@ export async function upsertSimSourceAction(input: {
   commissionPercent?: number;
   active?: boolean;
 }): Promise<SimAdminResult & { source?: SimSource }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const name = input.name.trim();
@@ -691,10 +694,9 @@ export async function bulkAssignSimSourceAction(input: {
   ids: string[];
   sourceId: string | null;
 }): Promise<SimAdminResult & { updated?: number }> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
   if (input.ids.length === 0) {
     return { ok: false, error: 'Chưa chọn sim nào.' };
@@ -753,10 +755,9 @@ export async function updateSimOrderStatusAction(input: {
   templeId: string;
   status: SimOrderStatus;
 }): Promise<SimAdminResult> {
-  try {
-    await assertTempleAccess(input.templeId);
-  } catch {
-    return { ok: false, error: 'Không có quyền truy cập chùa này.' };
+  {
+    const gate = await requireSuperAdminForWarehouse(input.templeId);
+    if ('ok' in gate && gate.ok === false) return gate;
   }
 
   const db = await getAdminDb();

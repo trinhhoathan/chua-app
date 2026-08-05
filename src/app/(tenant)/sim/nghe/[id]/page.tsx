@@ -2,7 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCurrentTemple } from '@/lib/tenant';
-import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
+import { LY_GIA } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
+import { simStoreContact } from '@/lib/sim/branding';
 import { querySims } from '@/lib/sim/catalog';
 import {
   SIM_CAREERS,
@@ -20,25 +25,30 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const career = careerById(id);
-  if (!career) return { title: 'Sim theo ngành nghề | Lý Gia Phúc An' };
+  const temple = await getCurrentTemple();
+  const brand = temple?.name ? ` | ${temple.name}` : '';
+  if (!career) return { title: `Sim theo ngành nghề${brand}` };
   return {
-    title: `Sim phong thủy cho nghề ${career.label} — thầy tuyển theo ngũ hành | Lý Gia Phúc An`,
+    title: `Sim phong thủy cho nghề ${career.label}${brand}`,
     description: `${career.blurb} Kho sim hợp nghề ${career.label} (${career.examples}) đã chấm điểm theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận, đặt mua online.`,
   };
 }
 
 export default async function SimCareerLandingPage({ params }: Props) {
   const temple = await getCurrentTemple();
-  if (!temple || !isLyGiaPhucAnSite(temple)) notFound();
+  if (!temple || !isSimStoreEnabled(temple)) notFound();
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) notFound();
 
   const { id } = await params;
   const career = careerById(id);
   if (!career) notFound();
 
   const primary = temple.primary_color || LY_GIA.primary;
+  const contact = simStoreContact(temple);
   const elements = careerCompatibleElements(career);
 
-  const { sims, total } = await querySims(temple.id, {
+  const { sims, total } = await querySims(warehouseId, {
     elements,
     sort: 'score',
     pageSize: 24,
@@ -146,7 +156,8 @@ export default async function SimCareerLandingPage({ params }: Props) {
         {ranked.length === 0 ? (
           <div className="mt-4">
             <SimEmptyState
-              note={`Kho đang hết số hành ${elements.map((e) => elementLabel(e)).join('/')} — nhắn Zalo để thầy tuyển số hợp nghề ${career.label} theo yêu cầu.`}
+              advisorRole={contact.role}
+              note={`Kho đang hết số hành ${elements.map((e) => elementLabel(e)).join('/')} — nhắn Zalo để ${contact.role} hỗ trợ tuyển số hợp nghề ${career.label}.`}
             />
           </div>
         ) : (
@@ -157,6 +168,8 @@ export default async function SimCareerLandingPage({ params }: Props) {
                 sim={sim}
                 matchPercent={fit}
                 matchLabel={`hợp nghề ${career.label}`}
+                primaryColor={primary}
+                zaloUrl={contact.zaloUrl}
               />
             ))}
           </div>
@@ -169,21 +182,22 @@ export default async function SimCareerLandingPage({ params }: Props) {
         >
           <div>
             <p className="font-display text-2xl">
-              Muốn thầy chọn đích danh một số cho nghề {career.label}?
+              Muốn được chọn đích danh một số cho nghề {career.label}?
             </p>
             <p className="mt-1 text-sm text-white/80">
-              Gửi ngày giờ sinh qua Zalo — thầy lập Bát Tự, tìm dụng thần rồi tuyển số
-              khớp cả mệnh lẫn nghề, miễn phí trong 24h.
+              Gửi ngày giờ sinh qua Zalo — {contact.advisor} hỗ trợ lập Bát Tự, tìm
+              dụng thần rồi tuyển số khớp cả mệnh lẫn nghề.
             </p>
           </div>
           <a
-            href={LY_GIA.zaloUrl}
+            href={contact.zaloUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-white px-6 py-3 text-sm font-semibold"
             style={{ color: primary }}
           >
-            Nhắn Zalo {LY_GIA.phoneDisplay}
+            Nhắn Zalo
+            {contact.phoneDisplay ? ` ${contact.phoneDisplay}` : ''}
           </a>
         </section>
 

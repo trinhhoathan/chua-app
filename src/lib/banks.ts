@@ -6,6 +6,19 @@ export interface BankApp {
   logo: string;
   /** Tham số `app` cho https://dl.vietqr.io/pay */
   app: string;
+  /**
+   * App nhận đủ tham số ba/am/tn/bn từ dl.vietqr.io (theo API VietQR).
+   * Hiện chỉ: VietinBank, BIDV, OCB, ACB, MB — Vietcombank = false.
+   */
+  autofill?: boolean;
+}
+
+/** appId VietQR đã xác nhận autofill=1 (api.vietqr.io). */
+const AUTOFILL_APP_IDS = new Set(['icb', 'bidv', 'ocb', 'acb', 'mb']);
+
+export function bankSupportsAutofill(bank: Pick<BankApp, 'app' | 'autofill'>): boolean {
+  if (typeof bank.autofill === 'boolean') return bank.autofill;
+  return AUTOFILL_APP_IDS.has(bank.app);
 }
 
 export const POPULAR_BANK_APPS: BankApp[] = [
@@ -15,6 +28,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'VietinBank',
     logo: 'https://cdn.vietqr.io/img/ICB.png',
     app: 'icb',
+    autofill: true,
   },
   {
     code: 'VCB',
@@ -22,6 +36,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'Vietcombank',
     logo: 'https://cdn.vietqr.io/img/VCB.png',
     app: 'vcb',
+    autofill: false,
   },
   {
     code: 'BIDV',
@@ -29,6 +44,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'BIDV',
     logo: 'https://cdn.vietqr.io/img/BIDV.png',
     app: 'bidv',
+    autofill: true,
   },
   {
     code: 'MB',
@@ -36,6 +52,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'MBBank',
     logo: 'https://cdn.vietqr.io/img/MB.png',
     app: 'mb',
+    autofill: true,
   },
   {
     code: 'TCB',
@@ -43,6 +60,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'Techcombank',
     logo: 'https://cdn.vietqr.io/img/TCB.png',
     app: 'tcb',
+    autofill: false,
   },
   {
     code: 'ACB',
@@ -50,6 +68,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'ACB',
     logo: 'https://cdn.vietqr.io/img/ACB.png',
     app: 'acb',
+    autofill: true,
   },
   {
     code: 'VPB',
@@ -57,6 +76,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'VPBank',
     logo: 'https://cdn.vietqr.io/img/VPB.png',
     app: 'vpb',
+    autofill: false,
   },
   {
     code: 'TPB',
@@ -64,6 +84,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'TPBank',
     logo: 'https://cdn.vietqr.io/img/TPB.png',
     app: 'tpb',
+    autofill: false,
   },
   {
     code: 'STB',
@@ -71,6 +92,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'Sacombank',
     logo: 'https://cdn.vietqr.io/img/STB.png',
     app: 'stb',
+    autofill: false,
   },
   {
     code: 'HDB',
@@ -78,6 +100,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'HDBank',
     logo: 'https://cdn.vietqr.io/img/HDB.png',
     app: 'hdb',
+    autofill: false,
   },
   {
     code: 'VIB',
@@ -85,6 +108,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'VIB',
     logo: 'https://cdn.vietqr.io/img/VIB.png',
     app: 'vib',
+    autofill: false,
   },
   {
     code: 'MSB',
@@ -92,6 +116,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'MSB',
     logo: 'https://cdn.vietqr.io/img/MSB.png',
     app: 'msb',
+    autofill: false,
   },
   {
     code: 'SHB',
@@ -99,6 +124,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'SHB',
     logo: 'https://cdn.vietqr.io/img/SHB.png',
     app: 'shb',
+    autofill: false,
   },
   {
     code: 'OCB',
@@ -106,6 +132,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'OCB',
     logo: 'https://cdn.vietqr.io/img/OCB.png',
     app: 'ocb',
+    autofill: true,
   },
   {
     code: 'VBA',
@@ -113,6 +140,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'Agribank',
     logo: 'https://cdn.vietqr.io/img/VBA.png',
     app: 'vba',
+    autofill: false,
   },
   {
     code: 'LPB',
@@ -120,6 +148,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'LPBank',
     logo: 'https://cdn.vietqr.io/img/LPB.png',
     app: 'lpb',
+    autofill: false,
   },
   {
     code: 'EIB',
@@ -127,6 +156,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'Eximbank',
     logo: 'https://cdn.vietqr.io/img/EIB.png',
     app: 'eib',
+    autofill: false,
   },
   {
     code: 'CAKE',
@@ -134,6 +164,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'CAKE',
     logo: 'https://cdn.vietqr.io/img/CAKE.png',
     app: 'cake',
+    autofill: false,
   },
   {
     code: 'TIMO',
@@ -141,6 +172,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'Timo',
     logo: 'https://vietqr.net/portal-service/resources/icons/TIMO.png',
     app: 'timo',
+    autofill: false,
   },
   {
     code: 'NAB',
@@ -148,7 +180,14 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     name: 'NamABank',
     logo: 'https://cdn.vietqr.io/img/NAB.png',
     app: 'nab',
+    autofill: false,
   },
+];
+
+/** Ưu tiên NH điền sẵn trước — tiện chọn trên mobile. */
+export const POPULAR_BANK_APPS_MOBILE: BankApp[] = [
+  ...POPULAR_BANK_APPS.filter((b) => bankSupportsAutofill(b)),
+  ...POPULAR_BANK_APPS.filter((b) => !bankSupportsAutofill(b)),
 ];
 
 /** Mã NH nhận cho tham số `ba` (doc VietQR dùng app code, vd `msb`) — fallback BIN. */
@@ -166,10 +205,45 @@ export interface BankPayDeeplinkOptions {
   accountHolder?: string;
 }
 
+/** Làm sạch tên chủ TK cho tham số deeplink (bỏ ký tự lỗi encoding như `?`). */
+export function sanitizeBankAccountHolder(name: string): string {
+  return (name || '')
+    .replace(/\?/g, '')
+    .replace(/[^\p{L}\p{N}\s.&/\-]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 70);
+}
+
+/** Chuỗi chép sẵn khi app NH không autofill (VCB, TCB…). */
+export function formatBankTransferClipboard(info: {
+  accountNumber: string;
+  bankName: string;
+  accountHolder?: string;
+  amount: number;
+  transferContent: string;
+}): string {
+  const holder = sanitizeBankAccountHolder(info.accountHolder || '');
+  const lines = [
+    `STK: ${info.accountNumber.replace(/\s+/g, '')}`,
+    `NH: ${info.bankName}`,
+  ];
+  if (holder) lines.push(`Chu TK: ${holder}`);
+  lines.push(
+    `So tien: ${Math.round(info.amount)}`,
+    `Noi dung: ${info.transferContent}`,
+  );
+  return lines.join('\n');
+}
+
 /**
- * Deeplink mở app ngân hàng (VietQR): https://dl.vietqr.io/pay
- * Gửi đủ `app`, `ba`, `am`, `tn`, `bn` để app NH hỗ trợ autofill
- * điền sẵn số tiền + nội dung CK (VietinBank, BIDV, ACB, OCB…).
+ * Deeplink mở app ngân hàng qua https://dl.vietqr.io/pay.
+ *
+ * Lưu ý (2026): proxy VietQR trên Android/iOS chỉ redirect scheme trống
+ * (vd. `vietinbankipay://`, `intent://…scheme=mbbank…`) — **không** gắn ba/am/tn.
+ * Thực tế không autofill kể cả VietinBank/MB. Cách điền sẵn đáng tin: quét ảnh VietQR.
+ *
+ * Vẫn gửi đủ tham số (đúng format doc: `ba` giữ `@`, space = `%20`) phòng khi VietQR sửa.
  */
 export function buildBankPayDeeplink(
   bankApp: BankApp,
@@ -177,19 +251,22 @@ export function buildBankPayDeeplink(
   recipientBin: string,
   options: BankPayDeeplinkOptions = {},
 ): string {
-  const ba = `${recipientAccount.replace(/\s+/g, '')}@${toRecipientBankCode(recipientBin)}`;
-  const params = new URLSearchParams({
-    app: bankApp.app,
-    ba,
-  });
+  const account = recipientAccount.replace(/\s+/g, '');
+  const bankCode = toRecipientBankCode(recipientBin);
+  // Giữ `@` thô như ví dụ VietQR (URLSearchParams sẽ encode thành %40).
+  const parts: string[] = [
+    `app=${encodeURIComponent(bankApp.app)}`,
+    `ba=${account}@${bankCode}`,
+  ];
   if (options.amount && options.amount > 0) {
-    params.set('am', String(Math.round(options.amount)));
+    parts.push(`am=${Math.round(options.amount)}`);
   }
   if (options.transferContent) {
-    params.set('tn', options.transferContent);
+    parts.push(`tn=${encodeURIComponent(options.transferContent.slice(0, 25))}`);
   }
-  if (options.accountHolder) {
-    params.set('bn', options.accountHolder);
+  const holder = sanitizeBankAccountHolder(options.accountHolder || '');
+  if (holder) {
+    parts.push(`bn=${encodeURIComponent(holder)}`);
   }
-  return `https://dl.vietqr.io/pay?${params.toString()}`;
+  return `https://dl.vietqr.io/pay?${parts.join('&')}`;
 }

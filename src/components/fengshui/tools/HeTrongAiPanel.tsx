@@ -6,6 +6,7 @@ import type { NhanTuongPayload } from '@/lib/fengshui/nhan-tuong-prompt';
 import type { ChiTuongPayload } from '@/lib/fengshui/chi-tuong-prompt';
 import { useSitePersona } from '@/components/SitePersonaContext';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { WaterPromoBanner } from '@/components/water/WaterPromoBanner';
 import { LY_GIA } from '@/lib/ly-gia-phuc-an';
 import { TuViMarkdown } from './TuViMarkdown';
 
@@ -223,6 +224,12 @@ export function HeTrongAiPanel({
       ) : null}
       {phase === 'streaming' && text ? (
         <p className="mt-1 animate-pulse text-xs text-muted">…</p>
+      ) : null}
+      {!isSim && phase === 'done' && text ? (
+        <WaterPromoBanner
+          primaryColor={primaryColor}
+          className="mt-4"
+        />
       ) : null}
 
       {phase === 'error' && error ? (

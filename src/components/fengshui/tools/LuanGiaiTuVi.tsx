@@ -31,6 +31,7 @@ import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
 import { resolveEssayFollowUps } from '@/lib/fengshui/tuvi-prompt';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
+import { WaterPromoBanner } from '@/components/water/WaterPromoBanner';
 import { useSitePersona } from '@/components/SitePersonaContext';
 
 interface Props {
@@ -877,7 +878,16 @@ export function LuanGiaiTuVi({
                 </div>
               </div>
             ) : (
-              <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+              <div className="space-y-3">
+                <WaterPromoBanner
+                  primaryColor={primaryColor}
+                  templeName={templeName}
+                  className="mt-0"
+                />
+              <div
+                className="border bg-white p-3 space-y-2 text-sm"
+                style={{ borderColor: `${primaryColor}55` }}
+              >
                 <p className="font-medium text-ink">
                   Muốn luận 12 cung hoặc chuyên sâu hơn?
                 </p>
@@ -938,6 +948,7 @@ export function LuanGiaiTuVi({
                     Hỏi trụ trì thêm
                   </button>
                 </div>
+              </div>
               </div>
             )}
           </div>

@@ -5,8 +5,11 @@ import type { Temple } from '@/types/database';
 
 export type TempleBrief = Pick<
   Temple,
-  'id' | 'name' | 'domain' | 'primary_color'
+  'id' | 'name' | 'domain' | 'primary_color' | 'sim_store_enabled'
 >;
+
+const TEMPLE_BRIEF_COLS =
+  'id, name, domain, primary_color, sim_store_enabled' as const;
 
 export interface TempleAdminRow {
   id: string;
@@ -77,7 +80,7 @@ export async function requireAdmin(): Promise<AdminContext> {
       templeIds.length
         ? supabase
             .from('temples')
-            .select('id, name, domain, primary_color')
+            .select(TEMPLE_BRIEF_COLS)
             .in('id', templeIds)
             .eq('is_active', true)
             .order('name')
@@ -88,7 +91,7 @@ export async function requireAdmin(): Promise<AdminContext> {
   } else {
     const { data } = await supabase
       .from('temples')
-      .select('id, name, domain, primary_color')
+      .select(TEMPLE_BRIEF_COLS)
       .in('id', templeIds)
       .eq('is_active', true)
       .order('name');
@@ -134,7 +137,7 @@ export async function getTempleById(
   const supabase = await createClient();
   const { data } = await supabase
     .from('temples')
-    .select('id, name, domain, primary_color')
+    .select(TEMPLE_BRIEF_COLS)
     .eq('id', id)
     .eq('is_active', true)
     .maybeSingle();
@@ -150,7 +153,7 @@ export async function searchTemples(
   const trimmed = q.trim().replace(/[%_,]/g, ' ').slice(0, 80);
   let query = supabase
     .from('temples')
-    .select('id, name, domain, primary_color')
+    .select(TEMPLE_BRIEF_COLS)
     .eq('is_active', true)
     .order('name')
     .limit(limit);

@@ -11,6 +11,7 @@ import { TuViMarkdown } from '@/components/fengshui/tools/TuViMarkdown';
 import { TuViTeaserFollowUps } from '@/components/fengshui/tools/TuViTeaserFollowUps';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
 import { useSitePersona } from '@/components/SitePersonaContext';
+import { WaterPromoBanner } from '@/components/water/WaterPromoBanner';
 
 interface Props {
   /** Khối dữ liệu Âm Dương Ngũ Hành đã tính sẵn (đã mask nếu chủ đề bảo mật). */
@@ -260,7 +261,16 @@ export function BatCucEssaySection({
           </div>
         </div>
       ) : (
-        <div className="border border-fog bg-white p-3 space-y-2 text-sm">
+        <div className="space-y-3">
+          <WaterPromoBanner
+            primaryColor={primaryColor}
+            templeName={templeName}
+            className="mt-0"
+          />
+        <div
+          className="border bg-white p-3 space-y-2 text-sm"
+          style={{ borderColor: `${primaryColor}55` }}
+        >
           <p className="font-medium text-ink">{ctaTitle}</p>
           <ul className="text-[0.8rem] text-muted space-y-1 list-disc pl-4">
             <li>Thỉnh nước ủng hộ chùa để mở khóa luận đầy đủ</li>
@@ -317,6 +327,7 @@ export function BatCucEssaySection({
               Hỏi trụ trì thêm
             </button>
           </div>
+        </div>
         </div>
       )}
     </div>

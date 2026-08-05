@@ -20,6 +20,7 @@ export function SimBuyModal({
   priceVnd,
   birthQuery,
   primaryColor = LY_GIA.primary,
+  zaloUrl = LY_GIA.zaloUrl,
 }: {
   simId: string;
   phone: string;
@@ -28,6 +29,8 @@ export function SimBuyModal({
   /** query mang ngày sinh (không gồm dấu ?) */
   birthQuery?: string;
   primaryColor?: string;
+  /** Zalo theo temple đang bán — không mặc định ép brand Lý Gia trên site chùa. */
+  zaloUrl?: string;
 }) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
@@ -124,7 +127,7 @@ export function SimBuyModal({
                 phoneDisplay={phoneDisplay}
                 priceVnd={priceVnd}
                 primaryColor={primaryColor}
-                zaloUrl={LY_GIA.zaloUrl}
+                zaloUrl={zaloUrl}
                 defaultBirthDate={defaultBirthDate}
                 defaultGender={defaultGender}
                 alwaysOpen

@@ -53,7 +53,7 @@ const ACCOUNTS = [
           key: 'quy-linh',
           phone: '0929643333',
           password: process.env.QUY_LINH_ADMIN_PASSWORD || '123456',
-          displayName: 'Thích Lê Thiện',
+          displayName: 'Đồng thầy Lê Thiện',
           templeId: QUY_LINH_ID,
           role: 'admin',
           isSuperAdmin: false,

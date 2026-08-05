@@ -4,9 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   POPULAR_BANK_APPS,
   buildBankPayDeeplink,
+  formatBankTransferClipboard,
   type BankApp,
 } from '@/lib/banks';
-import { buildVietQrUrl, toVietQrTransferContent } from '@/lib/payment';
+import {
+  buildVietQrUrl,
+  shareOrSaveVietQrImage,
+  toVietQrTransferContent,
+} from '@/lib/payment';
+import {
+  useAdvisorRoleTitle,
+  useSitePersona,
+} from '@/components/SitePersonaContext';
 
 interface TenantBank {
   bankName: string;
@@ -58,10 +67,14 @@ export function SimPaymentCheckout({
   zaloUrl,
   hotlineDisplay,
 }: Props) {
+  const { role } = useSitePersona();
+  const roleTitle = useAdvisorRoleTitle();
   const isMobile = useIsMobile();
   const [selected, setSelected] = useState<BankApp | null>(null);
   const [status, setStatus] = useState(initialStatus);
   const [copied, setCopied] = useState<string | null>(null);
+  const [qrShareBusy, setQrShareBusy] = useState(false);
+  const [qrShareMsg, setQrShareMsg] = useState<string | null>(null);
 
   const paid = PAID_STATUSES.has(status);
   const cancelled = status === 'cancelled';
@@ -75,11 +88,17 @@ export function SimPaymentCheckout({
     () =>
       buildVietQrUrl(
         {
+          bankName: bank.bankName,
           bankBin: bank.bankBin,
           accountNumber: bank.accountNumber,
           accountHolder: bank.accountHolder,
         },
-        { amount, addInfo: transferContent },
+        {
+          amount,
+          addInfo: transferContent,
+          template: 'compact',
+          showInfo: true,
+        },
       ),
     [bank, amount, transferContent],
   );
@@ -122,9 +141,44 @@ export function SimPaymentCheckout({
     }
   }
 
-  function openBankApp() {
+  async function shareQr() {
+    if (!qrUrl || qrShareBusy) return;
+    setQrShareBusy(true);
+    setQrShareMsg(null);
+    try {
+      const mode = await shareOrSaveVietQrImage(qrUrl, transferContent);
+      setQrShareMsg(
+        mode === 'shared'
+          ? 'Đã mở chia sẻ — chọn «Lưu ảnh» rồi vào app NH → Quét VietQR → Chọn ảnh.'
+          : 'Đã tải ảnh QR — mở app NH → Quét VietQR → Chọn ảnh từ thư viện.',
+      );
+    } catch {
+      setQrShareMsg(
+        'Không chia sẻ được ảnh. Hãy chụp màn hình mã QR rồi quét từ thư viện trong app NH.',
+      );
+    } finally {
+      setQrShareBusy(false);
+    }
+  }
+
+  async function openBankApp() {
     if (!selected || !bank.accountNumber) return;
-    window.location.href = buildBankPayDeeplink(
+    try {
+      await navigator.clipboard.writeText(
+        formatBankTransferClipboard({
+          accountNumber: bank.accountNumber,
+          bankName: bank.bankName,
+          accountHolder: bank.accountHolder,
+          amount,
+          transferContent,
+        }),
+      );
+      setCopied('payinfo');
+      window.setTimeout(() => setCopied(null), 4000);
+    } catch {
+      /* ignore */
+    }
+    const url = buildBankPayDeeplink(
       selected,
       bank.accountNumber,
       bank.bankBin,
@@ -134,6 +188,9 @@ export function SimPaymentCheckout({
         accountHolder: bank.accountHolder,
       },
     );
+    window.setTimeout(() => {
+      window.location.href = url;
+    }, 180);
   }
 
   if (paid) {
@@ -148,8 +205,8 @@ export function SimPaymentCheckout({
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
           Đơn <span className="font-mono text-ink">{orderCode}</span> cho sim{' '}
           <span className="font-medium text-ink">{phoneDisplay}</span> đã được xác nhận.
-          Thầy sẽ liên hệ trong hôm nay để hẹn giao sim, đăng ký chính chủ và chọn ngày
-          tốt kích sim.
+          {roleTitle} sẽ liên hệ trong hôm nay để hẹn giao sim, đăng ký chính chủ và
+          chọn ngày tốt kích sim.
         </p>
         <a
           href={zaloUrl}
@@ -245,48 +302,71 @@ export function SimPaymentCheckout({
                 className="h-auto w-56 border border-fog bg-white p-3"
               />
               <p className="mt-2 max-w-xs text-center text-xs text-muted">
-                Quét QR bằng app ngân hàng bất kỳ — số tiền và nội dung CK đã
-                điền sẵn.
+                <span className="font-medium text-ink">Cách điền sẵn duy nhất:</span>{' '}
+                lưu ảnh QR → mở app NH → Quét VietQR → chọn ảnh từ thư viện.
+                (Nút mở app chỉ mở app trống.)
               </p>
+              <button
+                type="button"
+                disabled={qrShareBusy}
+                onClick={() => void shareQr()}
+                className="mt-3 w-full max-w-xs py-3.5 text-sm font-medium text-white disabled:opacity-40"
+                style={{ backgroundColor: primaryColor }}
+              >
+                {qrShareBusy ? 'Đang chuẩn bị ảnh QR…' : 'Lưu / chia sẻ mã QR để quét'}
+              </button>
+              {qrShareMsg ? (
+                <p className="mt-2 max-w-xs text-center text-xs text-[#1B6B3A]">
+                  {qrShareMsg}
+                </p>
+              ) : null}
             </div>
           ) : null}
-          <div>
-            <h2 className="font-display text-2xl text-ink">Hoặc mở app ngân hàng</h2>
+
+          <div className="border border-fog bg-mist/40 px-3 py-3">
+            <h2 className="font-display text-xl text-ink">Mở app rồi quét ảnh QR</h2>
             <p className="mt-1 text-sm text-muted">
-              Nếu app không điền sẵn, chuyển đúng số tiền và nội dung{' '}
-              <span className="font-mono text-ink">{orderCode}</span>. Thầy xác nhận là
-              trang này tự báo thành công.
+              Chọn ngân hàng chỉ để mở đúng app. Trong app hãy{' '}
+              <span className="font-medium text-ink">Quét VietQR → Chọn ảnh</span>{' '}
+              vừa lưu. Sau khi CK, {roleTitle.toLowerCase()} xác nhận là trang tự
+              báo thành công.
             </p>
+            <div className="mt-3 grid max-h-[36vh] grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4">
+              {POPULAR_BANK_APPS.map((b) => {
+                const active = selected?.code === b.code;
+                return (
+                  <button
+                    key={b.code}
+                    type="button"
+                    onClick={() => setSelected(b)}
+                    aria-label={b.name}
+                    title={b.name}
+                    className={`flex aspect-square items-center justify-center border p-1 transition-colors ${
+                      active ? 'border-ink bg-paper' : 'border-ink/15 bg-paper hover:border-ink/35'
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={b.logo} alt={b.name} className="h-full w-full object-contain" />
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              disabled={!selected}
+              onClick={() => void openBankApp()}
+              className="mt-3 w-full border border-ink/20 bg-paper py-3 text-sm font-medium text-ink disabled:opacity-40"
+            >
+              {selected
+                ? `Mở ${selected.name} → quét ảnh QR`
+                : 'Chọn ngân hàng để mở app'}
+            </button>
+            {copied === 'payinfo' ? (
+              <p className="mt-2 text-center text-xs text-[#1B6B3A]">
+                Đã chép STK · số tiền · nội dung CK vào bộ nhớ tạm
+              </p>
+            ) : null}
           </div>
-          <div className="grid max-h-[42vh] grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4">
-            {POPULAR_BANK_APPS.map((b) => {
-              const active = selected?.code === b.code;
-              return (
-                <button
-                  key={b.code}
-                  type="button"
-                  onClick={() => setSelected(b)}
-                  aria-label={b.name}
-                  title={b.name}
-                  className={`flex aspect-square items-center justify-center border p-1 transition-colors ${
-                    active ? 'border-ink bg-mist' : 'border-ink/15 bg-paper hover:border-ink/35'
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={b.logo} alt={b.name} className="h-full w-full object-contain" />
-                </button>
-              );
-            })}
-          </div>
-          <button
-            type="button"
-            disabled={!selected}
-            onClick={openBankApp}
-            className="w-full py-3.5 text-sm font-medium text-white disabled:opacity-40"
-            style={{ backgroundColor: primaryColor }}
-          >
-            {selected ? `Thanh toán bằng ${selected.name}` : 'Chọn ngân hàng để thanh toán'}
-          </button>
           <Waiting primaryColor={primaryColor} />
         </div>
       ) : (
@@ -307,7 +387,7 @@ export function SimPaymentCheckout({
           <div className="flex min-h-[240px] flex-col items-center justify-center border border-fog bg-mist/50 px-6 py-10">
             <Waiting primaryColor={primaryColor} large />
             <p className="mt-4 max-w-sm text-center text-sm leading-relaxed text-muted">
-              Sau khi bạn chuyển khoản, thầy đối chiếu và xác nhận đơn — trang sẽ tự
+              Sau khi bạn chuyển khoản, {role} đối chiếu và xác nhận đơn — trang sẽ tự
               chuyển sang màn thành công. Cần gấp? Nhắn Zalo kèm mã{' '}
               <span className="font-mono text-ink">{orderCode}</span>.
             </p>

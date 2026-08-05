@@ -3,6 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createSimOrder } from '@/app/actions/sims';
+import {
+  useAdvisorRoleTitle,
+  useSitePersona,
+} from '@/components/SitePersonaContext';
 
 function formatVnd(amount: number): string {
   return new Intl.NumberFormat('vi-VN').format(amount) + '\u00a0đ';
@@ -36,6 +40,8 @@ export function SimOrderForm({
   onCancel?: () => void;
   zaloUrl: string;
 }) {
+  const { role } = useSitePersona();
+  const roleTitle = useAdvisorRoleTitle();
   const router = useRouter();
   const [open, setOpen] = useState(Boolean(autoOpen) || Boolean(alwaysOpen));
   const [name, setName] = useState('');
@@ -97,7 +103,7 @@ export function SimOrderForm({
             (e.currentTarget as HTMLElement).style.backgroundColor = '';
           }}
         >
-          Nhắn Zalo — thầy tư vấn miễn phí
+          Nhắn Zalo — {role} tư vấn miễn phí
         </a>
       </div>
     );
@@ -121,15 +127,42 @@ export function SimOrderForm({
           </p>
           <p className="mt-1 text-xs text-muted">
             Thanh toán chuyển khoản có mã QR · Kiểm tra sim chính chủ xong mới kích hoạt ·
-            Thầy chọn ngày tốt kích sim miễn phí.
+            {roleTitle} hướng dẫn ngày tốt kích sim.
           </p>
         </>
       ) : (
         <p className="text-xs text-muted">
           Thanh toán chuyển khoản có mã QR · Kiểm tra sim chính chủ xong mới kích hoạt ·
-          Thầy chọn ngày tốt kích sim miễn phí.
+          {roleTitle} hướng dẫn ngày tốt kích sim.
         </p>
       )}
+
+      <ul
+        className="mt-3 space-y-1.5 border px-3 py-2.5 text-[0.78rem] leading-snug text-ink/80"
+        style={{ borderColor: `${primaryColor}33`, background: `${primaryColor}06` }}
+      >
+        <li>
+          · Số đã luận điểm thấp? Vào{' '}
+          <a href="/sim" className="underline underline-offset-2" style={{ color: primaryColor }}>
+            kho sim
+          </a>{' '}
+          chọn dãy điểm cao hơn — hợp mệnh hơn ngay từ đầu.
+        </li>
+        <li>· Sim phong thủy giữ lâu dài; đổi số thường làm đứt khí số đã quen.</li>
+        <li>
+          · Đặt mua hỗ trợ{' '}
+          {role === 'thầy' ? 'công việc tư vấn phong thủy' : 'Phật sự nhà chùa'}.
+        </li>
+        <li>
+          · Sau khi chọn số, mở{' '}
+          <span className="font-medium text-ink">báo cáo có dấu thẩm định</span> để
+          lưu / in làm căn cứ kích sim.
+        </li>
+        <li>
+          · Cần tư vấn thêm: ghi chú bên dưới hoặc nhắn Zalo {role} kèm ngày giờ
+          sinh.
+        </li>
+      </ul>
 
       <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2">
         <label className="block min-w-0">
@@ -155,7 +188,7 @@ export function SimOrderForm({
         </label>
         <label className="block min-w-0">
           <span className="mb-1 block text-xs text-muted">
-            Ngày sinh (để thầy chọn ngày kích sim)
+            Ngày sinh (để {role} chọn ngày kích sim)
           </span>
           <input
             type="date"

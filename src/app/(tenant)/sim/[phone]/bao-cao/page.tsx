@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
 import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
 import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
+import {
   getSimByPhone,
   NETWORK_LABELS,
   SIM_PURPOSE_GROUPS,
@@ -28,6 +32,7 @@ import { SimActivationHours } from '@/components/sim/SimActivationHours';
 import { SealStamp, MasterSignature } from '@/components/sim/SealStamp';
 import { HexagramFigure } from '@/components/sim/SimKinhDichSection';
 import { SimScoreRing, ELEMENT_BADGE, VERDICT_COLORS } from '@/components/sim/sim-ui';
+import { simStoreContact } from '@/lib/sim/branding';
 import { ReportActions } from './ReportActions';
 
 interface Props {
@@ -52,16 +57,19 @@ function vnDateLabel(): string {
   return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
 }
 
-function reportCode(phone: string): string {
+function reportCode(phone: string, paymentCode: string | null): string {
   const year = new Date(Date.now() + 7 * 3600 * 1000).getUTCFullYear();
-  return `LGPA-${year}-${phone.slice(-4)}`;
+  const prefix = (paymentCode || 'SIM').toUpperCase().slice(0, 6);
+  return `${prefix}-${year}-${phone.slice(-4)}`;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { phone } = await params;
+  const temple = await getCurrentTemple();
+  const brand = temple?.name ? ` | ${temple.name}` : '';
   return {
-    title: `Báo cáo luận giải phong thủy sim ${phone} — có dấu thẩm định | Lý Gia Phúc An`,
-    description: `Báo cáo chứng nhận luận giải phong thủy đầy đủ cho sim ${phone}: Bát Tự dụng thần, phổ điểm 5 phương diện, bảng Du Niên, quẻ Mai Hoa Dịch Số, mẹo hóa giải hung tinh và quy trình khai sim — có con dấu thẩm định của Lý Gia Phúc An.`,
+    title: `Báo cáo luận giải phong thủy sim ${phone} — có dấu thẩm định${brand}`,
+    description: `Báo cáo chứng nhận luận giải phong thủy đầy đủ cho sim ${phone}: Bát Tự dụng thần, phổ điểm 5 phương diện, bảng Du Niên, quẻ Mai Hoa Dịch Số, mẹo hóa giải hung tinh và quy trình khai sim — có con dấu thẩm định${temple?.name ? ` của ${temple.name}` : ''}.`,
   };
 }
 
@@ -92,13 +100,15 @@ function SectionHeading({
 
 export default async function SimReportPage({ params, searchParams }: Props) {
   const temple = await getCurrentTemple();
-  if (!temple || !isLyGiaPhucAnSite(temple)) notFound();
+  if (!temple || !isSimStoreEnabled(temple)) notFound();
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) notFound();
 
   const { phone } = await params;
   const sp = await searchParams;
   const primary = temple.primary_color || LY_GIA.primary;
 
-  const sim = await getSimByPhone(temple.id, phone);
+  const sim = await getSimByPhone(warehouseId, phone);
   if (!sim) notFound();
 
   const birth = parseBirthParams(sp);
@@ -138,9 +148,56 @@ export default async function SimReportPage({ params, searchParams }: Props) {
   const personal = dungThan ? personalizeSimScore(sim, dungThan, goal) : null;
 
   const el = ELEMENT_BADGE[sim.element];
-  const code = reportCode(sim.phone);
+  const code = reportCode(sim.phone, temple.payment_code);
   const dateLabel = vnDateLabel();
   const perDay = Math.round(sim.price_vnd / (10 * 365) / 100) * 100;
+  const isLyGia = isLyGiaPhucAnSite(temple);
+  const contact = simStoreContact(temple);
+  const brandOrg = isLyGia
+    ? LY_GIA.name.toUpperCase()
+    : temple.name.toUpperCase();
+  /**
+   * Vòng dưới con dấu: danh xưng trụ trì + tên (không địa chỉ).
+   * VD: "Trụ trì Thượng tọa Thích Quảng Trang" · "Đồng thầy Lê Thiện".
+   */
+  const brandSubtitle = isLyGia
+    ? 'TƯ VẤN PHONG THỦY · HÀ NỘI'
+    : (() => {
+        const name = temple.abbott_name?.trim() || '';
+        if (!name) return 'Trụ trì';
+        // Đã có "Trụ trì…" hoặc danh xưng kiểu "Đồng thầy…" → giữ nguyên
+        if (/^(trụ trì|đồng thầy)\b/i.test(name)) return name;
+        return `Trụ trì ${name}`;
+      })();
+  const brandMonogram = (temple.payment_code || 'SIM').toUpperCase().slice(0, 6);
+  const brandTagline = isLyGia ? 'KIẾN TẠO VẬN MỆNH' : 'PHẬT SỰ · HỢP MỆNH';
+  const signerName =
+    temple.abbott_name?.trim() ||
+    (isLyGia ? 'Thầy Lý Gia Phúc An' : temple.name);
+  const signerTitle =
+    temple.abbott_title?.trim() ||
+    (isLyGia ? undefined : `Trụ trì ${temple.name}`);
+  const brandEyebrow = isLyGia
+    ? 'Lý Gia Phúc An · Kiến tạo vận mệnh'
+    : `${temple.name}${temple.abbott_name ? ` · ${temple.abbott_name}` : ''}`;
+  const brandAddressLine = isLyGia
+    ? `Văn phòng tư vấn phong thủy — ${LY_GIA.address} · ${LY_GIA.phoneDisplay} · ${LY_GIA.website}`
+    : [
+        temple.address,
+        temple.hotline || temple.contact_links?.phone,
+        temple.domain,
+      ]
+        .filter(Boolean)
+        .join(' · ');
+  const logoSrc =
+    (isLyGia ? LY_GIA.logoOrb : temple.logo_url) || LY_GIA.logoOrb;
+  const zaloUrl =
+    temple.contact_links?.zalo ||
+    (temple.hotline
+      ? `https://zalo.me/${temple.hotline.replace(/\s+/g, '')}`
+      : LY_GIA.zaloUrl);
+  const hotlineDisplay =
+    temple.hotline || temple.contact_links?.phone || LY_GIA.phoneDisplay;
 
   const radarAxes = ASPECT_ORDER.map((id) => ({
     label: ASPECT_LABELS[id],
@@ -263,7 +320,7 @@ export default async function SimReportPage({ params, searchParams }: Props) {
             <span className="mx-1.5">/</span>
             <span className="text-ink">Báo cáo chứng nhận</span>
           </nav>
-          <ReportActions primaryColor={primary} zaloUrl={LY_GIA.zaloUrl} />
+          <ReportActions primaryColor={primary} zaloUrl={zaloUrl} />
         </div>
 
         {/* ====== TỜ BÁO CÁO ====== */}
@@ -282,21 +339,21 @@ export default async function SimReportPage({ params, searchParams }: Props) {
                   {/* img thuần: một số trình duyệt in PDF bỏ qua next/image */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={LY_GIA.logoOrb}
-                    alt={LY_GIA.name}
+                    src={logoSrc}
+                    alt={temple.name}
                     width={72}
                     height={72}
                     className="size-[72px] object-contain"
                   />
                 </div>
                 <p className="text-[0.62rem] uppercase tracking-[0.4em]" style={{ color: GOLD }}>
-                  Lý Gia Phúc An · Kiến tạo vận mệnh
+                  {brandEyebrow}
                 </p>
                 <h1 className="mt-1.5 font-display text-2xl leading-tight text-ink md:text-[1.7rem]">
                   BÁO CÁO LUẬN GIẢI PHONG THỦY SIM
                 </h1>
                 <p className="mt-1 text-[0.7rem] text-muted">
-                  Văn phòng tư vấn phong thủy — {LY_GIA.address} · {LY_GIA.phoneDisplay} · {LY_GIA.website}
+                  {brandAddressLine}
                 </p>
                 <div
                   className="mt-3.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 border-y py-2 text-[0.72rem]"
@@ -627,8 +684,9 @@ export default async function SimReportPage({ params, searchParams }: Props) {
                     <span className="grid h-5 w-5 shrink-0 place-items-center text-[0.62rem] font-bold text-white" style={{ backgroundColor: primary }}>2</span>
                     <span>
                       <span className="font-semibold text-ink">Khai sim giờ hoàng đạo:</span>{' '}
-                      thực hiện cuộc gọi đầu tiên vào khung giờ hoàng đạo bên dưới (thầy chọn lại đích danh
-                      theo Bát Tự khi giao sim — miễn phí).
+                      thực hiện cuộc gọi đầu tiên vào khung giờ hoàng đạo bên dưới (
+                      {contact.role} chọn lại đích danh theo Bát Tự khi giao sim — miễn
+                      phí).
                     </span>
                   </li>
                   <li className="flex gap-2.5">
@@ -644,7 +702,12 @@ export default async function SimReportPage({ params, searchParams }: Props) {
               </div>
 
               <div className="print-keep mt-4">
-                <SimActivationHours birthYear={birthYear} primaryColor={primary} compact />
+                <SimActivationHours
+                  birthYear={birthYear}
+                  primaryColor={primary}
+                  compact
+                  advisorRole={contact.role}
+                />
               </div>
 
               {/* Khối chứng nhận + con dấu — ngày & chữ ký/dấu bên phải */}
@@ -657,7 +720,9 @@ export default async function SimReportPage({ params, searchParams }: Props) {
                   <p className="mt-1 text-[0.75rem] leading-relaxed text-muted">
                     Báo cáo được lập tự động theo đúng phép luận Âm Dương Ngũ Hành — Du Niên, 81 Số Lý
                     và Mai Hoa Dịch Số áp dụng thống nhất cho toàn kho sim, được{' '}
-                    {LY_GIA.name} rà soát và bảo chứng nội dung.
+                    {temple.name}
+                    {temple.abbott_name ? `, ${signerTitle || 'Trụ trì'} ${temple.abbott_name}` : ''}{' '}
+                    rà soát và bảo chứng nội dung.
                   </p>
                   <p
                     className="mt-3 inline-block border-2 px-3 py-1 text-[0.72rem] font-bold tracking-[0.2em]"
@@ -668,13 +733,23 @@ export default async function SimReportPage({ params, searchParams }: Props) {
                 </div>
                 <div className="ml-auto flex flex-col items-end">
                   <p className="mb-1 text-right text-[0.7rem] text-muted">
-                    Hà Nội, ngày {dateLabel} · Hồ sơ {code}
+                    Ngày {dateLabel} · Hồ sơ {code}
                   </p>
                   <div className="relative flex items-end gap-2">
                     <div className="relative z-10 -mr-14 mb-2">
-                      <MasterSignature width={175} />
+                      <MasterSignature
+                        width={175}
+                        signerName={signerName}
+                        signerTitle={signerTitle}
+                      />
                     </div>
-                    <SealStamp size={135} />
+                    <SealStamp
+                      size={135}
+                      orgName={brandOrg}
+                      subtitle={brandSubtitle}
+                      monogram={brandMonogram}
+                      tagline={brandTagline}
+                    />
                   </div>
                 </div>
               </div>
@@ -683,7 +758,11 @@ export default async function SimReportPage({ params, searchParams }: Props) {
             {/* Footer báo cáo */}
             <footer className="mt-6 border-t pt-3.5 text-center text-[0.65rem] leading-relaxed text-muted" style={{ borderColor: `${GOLD}66` }}>
               <p>
-                {LY_GIA.name} — {LY_GIA.address} · Hotline/Zalo {LY_GIA.phoneDisplay} · {LY_GIA.website}
+                {temple.name}
+                {temple.abbott_name ? ` — ${signerTitle || 'Trụ trì'} ${temple.abbott_name}` : ''}
+                {temple.address ? ` — ${temple.address}` : ''}
+                {' · '}Hotline/Zalo {hotlineDisplay}
+                {' · '}{temple.domain}
               </p>
               <p className="mt-1">
                 Luận giải phong thủy mang tính tham khảo trường khí, không thay cho nỗ lực và phúc đức

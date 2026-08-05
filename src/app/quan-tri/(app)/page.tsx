@@ -45,6 +45,7 @@ export default async function AdminHomePage({ searchParams }: Props) {
       templeId={templeId}
       templeName={scope.temple?.name ?? ''}
       isSuperAdmin={ctx.isSuperAdmin}
+      simStoreEnabled={Boolean(scope.temple?.sim_store_enabled)}
     />
   );
 }
@@ -126,24 +127,30 @@ async function SimSiteDashboard({
       value: formatVnd(revenue),
       href: '/quan-tri/sim/don-hang',
     },
-    {
-      label: 'Sim đang bán',
-      value: String(available.count ?? 0),
-      href: '/quan-tri/sim',
-    },
-    {
-      label: 'Sim đã bán (tổng)',
-      value: String(sold.count ?? 0),
-      href: '/quan-tri/sim',
-    },
+    ...(isSuperAdmin
+      ? [
+          {
+            label: 'Sim đang bán (kho trung tâm)',
+            value: String(available.count ?? 0),
+            href: '/quan-tri/sim',
+          },
+          {
+            label: 'Sim đã bán (tổng kho)',
+            value: String(sold.count ?? 0),
+            href: '/quan-tri/sim',
+          },
+        ]
+      : []),
   ];
 
   return (
     <div>
       <h1 className="font-display text-3xl text-ink">Tổng quan</h1>
       <p className="mt-2 text-muted text-sm">
-        Tháng {month} · {templeName} · Thầy Phong Thủy Phúc An
-        {isSuperAdmin ? ' · ngữ cảnh SuperAdmin' : ''}
+        Tháng {month} · {templeName}
+        {isSuperAdmin
+          ? ' · SuperAdmin'
+          : ' · đại lý (thống kê đơn)'}
       </p>
 
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -362,10 +369,12 @@ async function TempleDashboard({
   templeId,
   templeName,
   isSuperAdmin,
+  simStoreEnabled = false,
 }: {
   templeId: string;
   templeName: string;
   isSuperAdmin: boolean;
+  simStoreEnabled?: boolean;
 }) {
   const supabase = await createClient();
   const month = currentMonth();
@@ -384,7 +393,7 @@ async function TempleDashboard({
       ? `${y + 1}-01-01T00:00:00Z`
       : `${y}-${String(m + 1).padStart(2, '0')}-01T00:00:00Z`;
 
-  const [pending, paid, ledger, prayers, devotees, inventory] =
+  const [pending, paid, ledger, prayers, devotees, inventory, simPaid] =
     await Promise.all([
       supabase
         .from('water_orders')
@@ -417,6 +426,15 @@ async function TempleDashboard({
         .select('id, quantity_on_hand, reorder_level')
         .eq('temple_id', templeId)
         .eq('is_active', true),
+      simStoreEnabled
+        ? supabase
+            .from('sim_orders')
+            .select('price_vnd, agent_commission_percent')
+            .eq('temple_id', templeId)
+            .in('status', ['paid', 'delivering', 'completed'])
+            .gte('paid_at', monthStart)
+            .lt('paid_at', nextMonth)
+        : Promise.resolve({ data: [] as { price_vnd: number; agent_commission_percent: number | null }[] }),
     ]);
 
   pendingCount = pending.count ?? 0;
@@ -430,6 +448,13 @@ async function TempleDashboard({
   lowStock = (inventory.data ?? []).filter(
     (i) => i.quantity_on_hand <= i.reorder_level,
   ).length;
+
+  const simRows = simPaid.data ?? [];
+  const simSoldCount = simRows.length;
+  const simAgentHh = simRows.reduce((s, o) => {
+    const pct = Number(o.agent_commission_percent ?? 0);
+    return s + Math.round((Number(o.price_vnd) * pct) / 100);
+  }, 0);
 
   const cards = [
     {
@@ -447,6 +472,20 @@ async function TempleDashboard({
       value: formatVnd(templeShare),
       href: '/quan-tri/doi-soat',
     },
+    ...(simStoreEnabled
+      ? [
+          {
+            label: 'Đơn sim tháng này',
+            value: String(simSoldCount),
+            href: '/quan-tri/sim/don-hang',
+          },
+          {
+            label: 'HH sim ước tính tháng này',
+            value: formatVnd(simAgentHh),
+            href: '/quan-tri/sim/don-hang',
+          },
+        ]
+      : []),
     {
       label: 'Sớ chờ duyệt',
       value: String(prayerPending),

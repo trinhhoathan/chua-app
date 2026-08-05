@@ -84,6 +84,10 @@ export interface Temple {
   bank_bin: string | null;
   /** Mã ngắn định danh chùa trên nội dung CK, ví dụ CV, BH. */
   payment_code: string | null;
+  /** Bật kho sim công khai (bán từ kho trung tâm LGPA). */
+  sim_store_enabled: boolean;
+  /** % hoa hồng đại lý trên đơn sim phát sinh từ domain này. */
+  sim_agent_commission_pct: number;
   water_price_vnd: number;
   water_profit_share_pct: number;
   is_active: boolean;
@@ -527,7 +531,10 @@ export interface SimOrder {
   /** Snapshot nguồn sim lúc đặt đơn */
   source_id: string | null;
   source_name: string | null;
+  /** Snapshot % HH nguồn kho (supplier). */
   commission_percent: number | null;
+  /** Snapshot % HH đại lý (trụ trì / site giới thiệu). */
+  agent_commission_percent: number | null;
   created_at: string;
   updated_at: string;
 }

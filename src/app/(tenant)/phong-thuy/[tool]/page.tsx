@@ -2,6 +2,11 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getCurrentTemple } from '@/lib/tenant';
 import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
+import { simStoreContact, simStoreTitle } from '@/lib/sim/branding';
 import { getSitePersona } from '@/lib/site-persona';
 import { SitePersonaProvider } from '@/components/SitePersonaContext';
 import { getFeaturedSims } from '@/lib/sim/catalog';
@@ -13,6 +18,7 @@ import {
 } from '@/lib/fengshui/tools';
 import { ToolShell } from '@/components/fengshui/ToolShell';
 import { ComingSoonPanel } from '@/components/fengshui/ComingSoonPanel';
+import { WaterPromoBanner } from '@/components/water/WaterPromoBanner';
 import { DongTho } from '@/components/fengshui/tools/DongTho';
 import { MuonTuoiLamNha } from '@/components/fengshui/tools/MuonTuoiLamNha';
 import { ChonNgayTool } from '@/components/fengshui/tools/ChonNgayTool';
@@ -98,12 +104,16 @@ export default async function ToolPage({ params }: Props) {
     }
   }
 
-  // Kho sim chỉ mở trên site Lý Gia Phúc An
   const isLyGia = isLyGiaPhucAnSite(temple);
+  const simStore = isSimStoreEnabled(temple);
+  const warehouseId = simStore ? await getSimWarehouseTempleId() : null;
   const suggestedSims =
-    isLyGia && tool === 'boi-sim' ? await getFeaturedSims(temple.id, 6) : [];
+    simStore && warehouseId && tool === 'boi-sim'
+      ? await getFeaturedSims(warehouseId, 6)
+      : [];
 
   const persona = getSitePersona(temple);
+  const simContact = simStore ? simStoreContact(temple) : null;
 
   return (
     <ToolShell tool={meta} primaryColor={primary}>
@@ -121,19 +131,21 @@ export default async function ToolPage({ params }: Props) {
         )}
       </SitePersonaProvider>
 
-      {suggestedSims.length > 0 ? (
+      {suggestedSims.length > 0 && simContact ? (
         <section className="mt-10 border border-fog bg-paper p-5 md:p-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
               <p className="text-[0.68rem] uppercase tracking-[0.25em]" style={{ color: primary }}>
-                Kho sim thầy tuyển
+                {simStoreTitle(temple.name)}
               </p>
               <p className="mt-1 font-display text-xl text-ink">
                 Xem xong luận giải — chọn luôn số điểm cao trong kho
               </p>
               <p className="mt-1 text-xs text-muted">
                 Các số dưới đây đã được chấm điểm bằng đúng thuật toán Bát Cực của công
-                cụ này. Đặt mua online, thanh toán QR, thầy chọn ngày kích sim.
+                cụ này. Đặt mua online, thanh toán QR, {simContact.role} chọn ngày kích
+                sim
+                {isLyGia ? '.' : ` — đồng hành cùng ${temple.name}.`}
               </p>
             </div>
             <Link
@@ -146,16 +158,26 @@ export default async function ToolPage({ params }: Props) {
           </div>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {suggestedSims.map((sim) => (
-              <SimCard key={sim.id} sim={sim} />
+              <SimCard
+                key={sim.id}
+                sim={sim}
+                primaryColor={primary}
+                zaloUrl={simContact.zaloUrl}
+              />
             ))}
           </div>
         </section>
       ) : null}
 
-      {isLyGia && tool !== 'boi-sim' ? (
+      {/* Site chùa: ưu tiên thỉnh nước; sim (nếu bật) đứng sau */}
+      {!isLyGia ? (
+        <WaterPromoBanner primaryColor={primary} templeName={temple.name} />
+      ) : null}
+
+      {simStore && tool !== 'boi-sim' ? (
         <Link
           href="/sim"
-          className="mt-10 flex flex-wrap items-center justify-between gap-2 border px-4 py-3 text-sm transition-colors hover:bg-mist"
+          className="mt-4 flex flex-wrap items-center justify-between gap-2 border px-4 py-3 text-sm transition-colors hover:bg-mist"
           style={{ borderColor: `${primary}55` }}
         >
           <span className="text-ink">

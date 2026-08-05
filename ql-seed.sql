@@ -35,9 +35,9 @@ BEGIN
 Tên chùa “Quý Linh” gợi nhắc sự quý kính đối với linh thiêng, khuyến khích mỗi người con Phật biết trân trọng thân người, gìn giữ giới hạnh và nuôi dưỡng tâm từ bi trong đời sống thường nhật. Trải qua các đợt trùng tu, chùa dần hình thành quần thể gồm chính điện, nhà tổ, giảng đường và khu thiền hành quanh hồ sen.
 
 Hằng năm, Quý Linh Tự tổ chức các khóa tu một ngày, lễ vía Phật – Bồ tát, lễ cầu an đầu năm và cầu siêu cuối năm. Phật tử gần xa về chùa không chỉ để lễ bái mà còn để học pháp, làm công quả và kết nối cộng đồng đạo hữu trong tinh thần lục hòa.',
-      'Thích Lê Thiện',
+      'Đồng thầy Lê Thiện',
       'Trụ trì Quý Linh Tự',
-      'Đại đức Thích Lê Thiện hiện trụ trì Quý Linh Tự, phụng sự Tăng đoàn và đồng hành cùng Phật tử trên bước đường tu học.
+      'Đồng thầy Lê Thiện hiện trụ trì Quý Linh Tự, phụng sự Tăng đoàn và đồng hành cùng Phật tử trên bước đường tu học.
 
 Thầy chú trọng giảng dạy Phật pháp ứng dụng vào đời sống, khuyến khích thiền tập, niệm Phật và phụng sự chúng sinh bằng những việc thiện nhỏ nhưng bền bỉ. Dưới sự dẫn dắt của Thầy, chùa thường xuyên tổ chức khóa tu, lễ cầu an — cầu siêu, chương trình khuyến học và các hoạt động từ thiện hướng về người khó khăn.
 
@@ -77,9 +77,9 @@ Với phương châm “an trú tâm, lợi lạc người”, Thầy luôn mở
 Tên chùa “Quý Linh” gợi nhắc sự quý kính đối với linh thiêng, khuyến khích mỗi người con Phật biết trân trọng thân người, gìn giữ giới hạnh và nuôi dưỡng tâm từ bi trong đời sống thường nhật. Trải qua các đợt trùng tu, chùa dần hình thành quần thể gồm chính điện, nhà tổ, giảng đường và khu thiền hành quanh hồ sen.
 
 Hằng năm, Quý Linh Tự tổ chức các khóa tu một ngày, lễ vía Phật – Bồ tát, lễ cầu an đầu năm và cầu siêu cuối năm. Phật tử gần xa về chùa không chỉ để lễ bái mà còn để học pháp, làm công quả và kết nối cộng đồng đạo hữu trong tinh thần lục hòa.',
-      abbott_name = 'Thích Lê Thiện',
+      abbott_name = 'Đồng thầy Lê Thiện',
       abbott_title = 'Trụ trì Quý Linh Tự',
-      abbott_bio = 'Đại đức Thích Lê Thiện hiện trụ trì Quý Linh Tự, phụng sự Tăng đoàn và đồng hành cùng Phật tử trên bước đường tu học.
+      abbott_bio = 'Đồng thầy Lê Thiện hiện trụ trì Quý Linh Tự, phụng sự Tăng đoàn và đồng hành cùng Phật tử trên bước đường tu học.
 
 Thầy chú trọng giảng dạy Phật pháp ứng dụng vào đời sống, khuyến khích thiền tập, niệm Phật và phụng sự chúng sinh bằng những việc thiện nhỏ nhưng bền bỉ. Dưới sự dẫn dắt của Thầy, chùa thường xuyên tổ chức khóa tu, lễ cầu an — cầu siêu, chương trình khuyến học và các hoạt động từ thiện hướng về người khó khăn.
 
@@ -128,7 +128,7 @@ Với phương châm “an trú tâm, lợi lạc người”, Thầy luôn mở
       crypt('123456', gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
-      jsonb_build_object('phone', '0929643333', 'display_name', 'Thích Lê Thiện'),
+      jsonb_build_object('phone', '0929643333', 'display_name', 'Đồng thầy Lê Thiện'),
       now(), now(), '', '', '', '', false, false
     );
     INSERT INTO auth.identities (
@@ -153,7 +153,7 @@ Với phương châm “an trú tâm, lợi lạc người”, Thầy luôn mở
       encrypted_password = crypt('123456', gen_salt('bf')),
       email_confirmed_at = COALESCE(email_confirmed_at, now()),
       raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb)
-        || jsonb_build_object('phone', '0929643333', 'display_name', 'Thích Lê Thiện'),
+        || jsonb_build_object('phone', '0929643333', 'display_name', 'Đồng thầy Lê Thiện'),
       updated_at = now()
     WHERE id = v_user_id;
   END IF;
@@ -165,12 +165,12 @@ Với phương châm “an trú tâm, lợi lạc người”, Thầy luôn mở
     INSERT INTO public.temple_admins (
       user_id, temple_id, role, display_name, phone, is_super_admin, is_active
     ) VALUES (
-      v_user_id, v_temple_id, 'admin', 'Thích Lê Thiện', '0929643333', FALSE, TRUE
+      v_user_id, v_temple_id, 'admin', 'Đồng thầy Lê Thiện', '0929643333', FALSE, TRUE
     );
   ELSE
     UPDATE public.temple_admins SET
       role = 'admin',
-      display_name = 'Thích Lê Thiện',
+      display_name = 'Đồng thầy Lê Thiện',
       phone = '0929643333',
       is_active = TRUE,
       is_super_admin = FALSE

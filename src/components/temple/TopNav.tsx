@@ -17,28 +17,29 @@ import {
 } from '@/lib/fengshui/tools';
 import { openWaterDonateForm } from '@/lib/water-merit-prompt';
 import { hasWaterBottleBrand } from '@/lib/water-bottle-brand';
+import { isSimStoreEnabled } from '@/lib/sim/warehouse';
 
 interface Props {
   temple: Temple;
 }
 
-const PRIMARY = [
-  { href: '/#hoat-dong', label: 'Hoạt động' },
-  { href: '/#tru-tri', label: 'Trụ trì' },
+const GIOI_THIEU = [
   { href: '/#gioi-thieu', label: 'Giới thiệu' },
-  { href: '/#dong-nuoc', label: 'Cúng dường' },
-  { href: '/#dang-ky-phat-tu', label: 'Kết duyên' },
-] as const;
-
-const MORE = [
+  { href: '/#tru-tri', label: 'Trụ trì' },
+  { href: '/#hoat-dong', label: 'Hoạt động' },
   { href: '/#lich-su', label: 'Lịch sử' },
   { href: '/#di-tich', label: 'Di tích' },
   { href: '/#thu-vien-anh', label: 'Hình ảnh' },
   { href: '/#danh-gia', label: 'Đánh giá' },
+  { href: '/#dang-ky-phat-tu', label: 'Kết duyên' },
 ] as const;
 
-type OpenMenu = 'more' | 'phongthuy' | 'phathoc' | null;
-type MobileSection = 'phongthuy' | 'phathoc' | null;
+const PRIMARY_BASE = [
+  { href: '/#dong-nuoc', label: 'Cúng dường' },
+] as const;
+
+type OpenMenu = 'gioithieu' | 'phongthuy' | 'phathoc' | null;
+type MobileSection = 'gioithieu' | 'phongthuy' | 'phathoc' | null;
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -186,7 +187,7 @@ export function TopNav({ temple }: Props) {
   const [mobileSection, setMobileSection] = useState<MobileSection>(null);
   const [scrolled, setScrolled] = useState(false);
   const desktopMenusRef = useRef<HTMLDivElement>(null);
-  const moreId = useId();
+  const gioiThieuId = useId();
   const phongThuyId = useId();
   const phatHocId = useId();
 
@@ -200,17 +201,21 @@ export function TopNav({ temple }: Props) {
     () => groupToolsByNavSection(PHAT_HOC_NAV_ORDER),
     [],
   );
-  const moreLinks = useMemo(() => {
-    const links: { href: string; label: string }[] = [...MORE];
+  const simStore = isSimStoreEnabled(temple);
+  const primaryLinks = useMemo(() => {
+    const links: { href: string; label: string }[] = [...PRIMARY_BASE];
+    if (simStore) {
+      links.push({ href: '/sim', label: 'Sim phong thủy' });
+    }
+    return links;
+  }, [simStore]);
+  const gioiThieuLinks = useMemo(() => {
+    const links: { href: string; label: string }[] = [...GIOI_THIEU];
     if (hasWaterBottleBrand(temple)) {
       links.push({ href: '/thu-nhan-nuoc', label: 'Chai nước mang nhãn' });
     }
     return links;
   }, [temple]);
-  const allSimpleLinks = useMemo(
-    () => [...PRIMARY, ...moreLinks],
-    [moreLinks],
-  );
 
   useEffect(() => {
     function onScroll() {
@@ -335,7 +340,42 @@ export function TopNav({ temple }: Props) {
               ref={desktopMenusRef}
               className="flex items-center gap-0.5 text-[0.8125rem] text-white/80"
             >
-              {PRIMARY.map((l) => (
+              <div className="relative">
+                <button
+                  type="button"
+                  aria-expanded={openMenu === 'gioithieu'}
+                  aria-controls={gioiThieuId}
+                  onClick={() => toggleMenu('gioithieu')}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1.5 transition-colors whitespace-nowrap ${
+                    openMenu === 'gioithieu' ? 'text-white' : 'hover:text-white'
+                  }`}
+                >
+                  Giới thiệu
+                  <Chevron open={openMenu === 'gioithieu'} />
+                </button>
+
+                {openMenu === 'gioithieu' ? (
+                  <div
+                    id={gioiThieuId}
+                    role="menu"
+                    className="absolute left-0 top-full mt-2 min-w-[12rem] py-1.5 bg-ink/95 backdrop-blur-md border border-white/15 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.7)]"
+                  >
+                    {gioiThieuLinks.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        role="menuitem"
+                        onClick={() => setOpenMenu(null)}
+                        className="block px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/8"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              {primaryLinks.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
@@ -453,40 +493,6 @@ export function TopNav({ temple }: Props) {
                 ) : null}
               </div>
 
-              <div className="relative">
-                <button
-                  type="button"
-                  aria-expanded={openMenu === 'more'}
-                  aria-controls={moreId}
-                  onClick={() => toggleMenu('more')}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1.5 transition-colors whitespace-nowrap ${
-                    openMenu === 'more' ? 'text-white' : 'hover:text-white'
-                  }`}
-                >
-                  Thêm
-                  <Chevron open={openMenu === 'more'} />
-                </button>
-
-                {openMenu === 'more' ? (
-                  <div
-                    id={moreId}
-                    role="menu"
-                    className="absolute right-0 top-full mt-2 min-w-[11.5rem] py-1.5 bg-ink/95 backdrop-blur-md border border-white/15 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.7)]"
-                  >
-                    {moreLinks.map((l) => (
-                      <Link
-                        key={l.href}
-                        href={l.href}
-                        role="menuitem"
-                        onClick={() => setOpenMenu(null)}
-                        className="block px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/8"
-                      >
-                        {l.label}
-                      </Link>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
             </div>
 
             {hotline ? (
@@ -564,7 +570,36 @@ export function TopNav({ temple }: Props) {
                 </Link>
               </div>
 
-              {allSimpleLinks.map((l) => (
+              <div className="border-b border-white/8">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMobileSection((s) =>
+                      s === 'gioithieu' ? null : 'gioithieu',
+                    )
+                  }
+                  className="w-full flex items-center justify-between px-3 py-3 text-base text-white/85"
+                >
+                  <span>Giới thiệu</span>
+                  <Chevron open={mobileSection === 'gioithieu'} />
+                </button>
+                {mobileSection === 'gioithieu' ? (
+                  <div className="pb-2">
+                    {gioiThieuLinks.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        onClick={closeAll}
+                        className="block px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/8 border-b border-white/[0.06]"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              {primaryLinks.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}

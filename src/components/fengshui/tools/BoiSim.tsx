@@ -391,7 +391,7 @@ export function BoiSim({
         <div className="mt-8 space-y-5">
           <ResultView result={result} primaryColor={primaryColor} />
 
-          {/* Site Lý Gia: gợi ý số điểm cao hơn trong kho */}
+          {/* Kho sim (đại lý / Lý Gia): gợi ý số điểm cao hơn */}
           <SimBetterUpsell
             score={result.overallScore}
             primaryColor={primaryColor}

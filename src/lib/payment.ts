@@ -3,13 +3,13 @@
  * Phân biệt chùa bằng mã nội dung chuyển khoản:
  *   {payment_code}{suffix}  ví dụ: CVA3K9MP  (không dấu gạch)
  *
- * QR thanh toán dùng VietQR Quick Link (img.vietqr.io) — quét là điền sẵn
- * STK, số tiền và nội dung CK.
+ * QR thanh toán dùng SePay VietQR: https://vietqr.app/img
+ * Docs: https://developer.sepay.vn/vi/tien-ich-khac/tao-qr-code
  */
 
 export interface CompanyBankAccount {
   bankName: string;
-  /** Mã BIN NAPAS, ví dụ VietinBank = 970415 */
+  /** Mã BIN NAPAS, ví dụ MSB = 970426 */
   bankBin: string;
   accountNumber: string;
   accountHolder: string;
@@ -17,13 +17,39 @@ export interface CompanyBankAccount {
   qrImageUrl: string | null;
 }
 
+export type SePayQrTemplate = 'compact' | 'qronly' | 'standee';
+
 export interface VietQrOptions {
   /** Số tiền VND (không dấu phẩy) */
   amount?: number;
-  /** Nội dung CK, ví dụ CVA3K9MP */
+  /** Nội dung CK → tham số `des` (vd. CVA3K9MP) */
   addInfo?: string;
-  /** Template: compact2 | compact | qr_only | print */
-  template?: 'compact2' | 'compact' | 'qr_only' | 'print';
+  /** Template SePay; alias cũ compact2/qr_only/print vẫn nhận */
+  template?: SePayQrTemplate | 'compact2' | 'qr_only' | 'print';
+  showInfo?: boolean;
+  fullAcc?: boolean;
+  store?: string;
+}
+
+/** Chủ TK trên ảnh SePay: không dấu, bỏ ký tự lỗi encoding. */
+export function toSePayHolder(name: string): string {
+  return (name || '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/\?/g, '')
+    .replace(/[^A-Za-z0-9\s./-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toUpperCase()
+    .slice(0, 70);
+}
+
+function mapSePayTemplate(
+  template?: VietQrOptions['template'],
+): SePayQrTemplate {
+  if (template === 'qronly' || template === 'qr_only') return 'qronly';
+  if (template === 'standee') return 'standee';
+  return 'compact';
 }
 
 export function getCompanyBankAccount(): CompanyBankAccount {
@@ -32,8 +58,8 @@ export function getCompanyBankAccount(): CompanyBankAccount {
     '',
   );
   const accountHolder = process.env.COMPANY_BANK_ACCOUNT_HOLDER ?? '';
-  const bankName = process.env.COMPANY_BANK_NAME ?? 'VietinBank';
-  const bankBin = process.env.COMPANY_BANK_BIN ?? '970415';
+  const bankName = process.env.COMPANY_BANK_NAME ?? 'MSB';
+  const bankBin = process.env.COMPANY_BANK_BIN ?? '970426';
 
   const bank: CompanyBankAccount = {
     bankName,
@@ -45,7 +71,7 @@ export function getCompanyBankAccount(): CompanyBankAccount {
 
   bank.qrImageUrl =
     process.env.COMPANY_VIETQR_URL ||
-    buildVietQrUrl(bank, { template: 'compact2' });
+    buildVietQrUrl(bank, { template: 'compact', showInfo: true });
 
   return bank;
 }
@@ -69,38 +95,113 @@ export function toVietQrTransferContent(orderCode: string): string {
 }
 
 /**
- * Sinh URL ảnh VietQR từ thông tin tài khoản (dùng được cả server và client).
- * Khi có `amount` + `addInfo`, app ngân hàng điền sẵn số tiền và nội dung CK.
+ * Sinh URL ảnh VietQR SePay: https://vietqr.app/img?...
+ * Truyền đủ bank · acc · amount · des · holder để quét app NH điền sẵn.
  */
 export function buildVietQrUrl(
   bank: Pick<
     CompanyBankAccount,
     'bankBin' | 'accountNumber' | 'accountHolder'
-  >,
+  > & { bankName?: string | null },
   options: VietQrOptions = {},
 ): string | null {
   const accountNumber = (bank.accountNumber || '').replace(/\s+/g, '');
   if (!accountNumber) return null;
 
-  const bankBin = bank.bankBin || '970415';
-  const template = options.template ?? 'compact2';
+  /** SePay nhận code / bin / short_name / alias — ưu tiên tên ngắn (MSB). */
+  const bankId =
+    (bank.bankName || '').trim() ||
+    (bank.bankBin || '').trim() ||
+    'MSB';
 
   const params = new URLSearchParams();
+  params.set('acc', accountNumber);
+  params.set('bank', bankId);
+  params.set('template', mapSePayTemplate(options.template));
+
   if (options.amount && options.amount > 0) {
     params.set('amount', String(Math.round(options.amount)));
   }
   if (options.addInfo) {
-    const addInfo = toVietQrTransferContent(options.addInfo);
-    if (addInfo) params.set('addInfo', addInfo);
-  }
-  if (bank.accountHolder) {
-    params.set('accountName', bank.accountHolder);
+    const des = toVietQrTransferContent(options.addInfo);
+    if (des) params.set('des', des);
   }
 
-  const qs = params.toString();
-  return `https://img.vietqr.io/image/${bankBin}-${accountNumber}-${template}.jpg${
-    qs ? `?${qs}` : ''
-  }`;
+  const showInfo = options.showInfo !== false;
+  if (showInfo) {
+    params.set('showinfo', 'true');
+    params.set('fullacc', options.fullAcc === false ? 'false' : 'true');
+  }
+
+  const holder = toSePayHolder(bank.accountHolder || '');
+  if (holder) params.set('holder', holder);
+
+  if (options.store) {
+    const store = toSePayHolder(options.store);
+    if (store) params.set('store', store);
+  }
+
+  return `https://vietqr.app/img?${params.toString()}`;
+}
+
+/**
+ * URL same-origin proxy ảnh QR — tránh CORS khi lưu/chia sẻ trên mobile.
+ */
+export function toProxiedVietQrUrl(qrUrl: string): string {
+  try {
+    const u = new URL(qrUrl);
+    if (u.hostname !== 'vietqr.app' && u.hostname !== 'img.vietqr.io') {
+      return qrUrl;
+    }
+    return `/api/vietqr${u.search}`;
+  } catch {
+    return qrUrl;
+  }
+}
+
+/**
+ * Lưu / chia sẻ ảnh VietQR trên mobile (qua proxy same-origin).
+ */
+export async function shareOrSaveVietQrImage(
+  qrUrl: string,
+  fileBaseName: string,
+): Promise<'shared' | 'downloaded'> {
+  const fetchUrl = toProxiedVietQrUrl(qrUrl);
+  const res = await fetch(fetchUrl, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Không tải được mã QR (${res.status})`);
+  const blob = await res.blob();
+  const safeName = (fileBaseName || 'vietqr')
+    .replace(/[^a-zA-Z0-9_-]/g, '')
+    .slice(0, 32);
+  const file = new File([blob], `${safeName || 'vietqr'}.png`, {
+    type: blob.type || 'image/png',
+  });
+
+  const nav = navigator as Navigator & {
+    canShare?: (data?: ShareData) => boolean;
+  };
+  if (typeof nav.share === 'function' && nav.canShare?.({ files: [file] })) {
+    await nav.share({
+      files: [file],
+      title: 'Mã VietQR thanh toán',
+      text: 'Mở app ngân hàng → Quét VietQR → chọn ảnh này',
+    });
+    return 'shared';
+  }
+
+  const objectUrl = URL.createObjectURL(blob);
+  try {
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = file.name;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+  return 'downloaded';
 }
 
 /** Nội dung CK = mã đơn (không gạch). */

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getCurrentTemple } from '@/lib/tenant';
+import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
 import { getSitePersona } from '@/lib/site-persona';
+import { WaterPromoBanner } from '@/components/water/WaterPromoBanner';
 import {
   NAV_SECTION_LABELS,
   PHONG_THUY_NAV_ORDER,
@@ -48,6 +50,7 @@ export default async function PhongThuyHub() {
   if (!temple) return null;
   const primary = temple.primary_color || '#7A1F1F';
   const persona = getSitePersona(temple);
+  const isLyGia = isLyGiaPhucAnSite(temple);
   const grouped = groupToolsByNavSection(PHONG_THUY_NAV_ORDER);
   const count = phongThuyMenuTools().length;
 
@@ -123,6 +126,10 @@ export default async function PhongThuyHub() {
         <p className="mt-14 text-xs text-muted leading-relaxed max-w-2xl">
           {count} chức năng phong thủy / cổ học · Phật học xem tại mục riêng.
         </p>
+
+        {!isLyGia ? (
+          <WaterPromoBanner primaryColor={primary} templeName={temple.name} />
+        ) : null}
       </div>
     </main>
   );

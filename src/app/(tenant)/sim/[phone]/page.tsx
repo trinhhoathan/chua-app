@@ -4,7 +4,12 @@ import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import { Suspense } from 'react';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
-import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
+import { LY_GIA } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
+import { simStoreContact } from '@/lib/sim/branding';
 import {
   getSimByPhone,
   recordSimView,
@@ -51,26 +56,31 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { phone } = await params;
+  const temple = await getCurrentTemple();
+  const brand = temple?.name ? ` | ${temple.name}` : '';
   return {
-    title: `Sim ${phone} — luận giải phong thủy & đặt mua | Lý Gia Phúc An`,
+    title: `Sim ${phone} — luận giải phong thủy & đặt mua${brand}`,
     description: `Luận giải phong thủy chi tiết sim ${phone} theo nguyên lý Âm Dương Ngũ Hành, Kinh dịch diệu luận: cặp quái số, đuôi sim, 81 số lý, ngũ hành, ngành nghề phù hợp. Đặt mua online.`,
   };
 }
 
 export default async function SimDetailPage({ params, searchParams }: Props) {
   const temple = await getCurrentTemple();
-  if (!temple || !isLyGiaPhucAnSite(temple)) notFound();
+  if (!temple || !isSimStoreEnabled(temple)) notFound();
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) notFound();
 
   const { phone } = await params;
   const sp = await searchParams;
   const primary = temple.primary_color || LY_GIA.primary;
+  const contact = simStoreContact(temple);
 
-  const sim = await getSimByPhone(temple.id, phone);
+  const sim = await getSimByPhone(warehouseId, phone);
   if (!sim) notFound();
 
   // Đếm view không chặn TTFB — chạy sau khi response đã gửi
   after(() => {
-    void recordSimView(temple.id, sim.phone);
+    void recordSimView(warehouseId, sim.phone);
   });
 
   const birth = parseBirthParams(sp);
@@ -250,7 +260,8 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
             {sold ? (
               <div className="mt-5 border border-fog bg-mist px-4 py-3 text-sm text-ink">
                 Sim này <span className="font-semibold">đã có chủ</span>. Xem các số
-                tương đương bên dưới hoặc nhắn Zalo để thầy tuyển số tương tự.
+                tương đương bên dưới hoặc nhắn Zalo để {contact.role} tuyển số
+                tương tự.
               </div>
             ) : (
               <div className="mt-6">
@@ -262,7 +273,7 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
                   defaultBirthDate={birth?.date}
                   defaultGender={birth?.gender}
                   autoOpen={sp.dat === '1'}
-                  zaloUrl={LY_GIA.zaloUrl}
+                  zaloUrl={contact.zaloUrl}
                 />
               </div>
             )}
@@ -270,7 +281,7 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
             <ul className="mt-6 grid gap-2 text-[0.78rem] text-ink/75 sm:grid-cols-2">
               <li>✓ Sim chính chủ — đăng ký tên bạn ngay khi giao</li>
               <li>✓ Giao sim tận nơi, kiểm tra xong mới thanh toán phần còn lại</li>
-              <li>✓ Thầy chọn ngày hoàng đạo kích sim miễn phí</li>
+              <li>✓ {contact.roleTitle} chọn ngày hoàng đạo kích sim miễn phí</li>
               <li>✓ Hỗ trợ giữ số & tư vấn 1-1 qua Zalo</li>
             </ul>
           </div>
@@ -510,7 +521,11 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
 
           {/* Giờ hoàng đạo kích sim */}
           <div className="mt-3">
-            <SimActivationHours birthYear={birthYear} primaryColor={primary} />
+            <SimActivationHours
+              birthYear={birthYear}
+              primaryColor={primary}
+              advisorRole={contact.role}
+            />
           </div>
         </section>
 
@@ -535,7 +550,7 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
                   style={{ borderColor: primary }}
                 >
                   <span className="font-medium" style={{ color: primary }}>
-                    Lời thầy:
+                    Lời {contact.role}:
                   </span>{' '}
                   {analysis.advice}
                 </div>
@@ -705,7 +720,11 @@ export default async function SimDetailPage({ params, searchParams }: Props) {
 
         {/* Sim tương tự — stream riêng, không chặn phần luận giải phía trên */}
         <Suspense fallback={<SimSimilarSkeleton />}>
-          <SimSimilarSection sim={sim} />
+          <SimSimilarSection
+            sim={sim}
+            primaryColor={primary}
+            zaloUrl={contact.zaloUrl}
+          />
         </Suspense>
       </div>
     </main>

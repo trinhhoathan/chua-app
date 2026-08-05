@@ -3,6 +3,10 @@ import { headers } from 'next/headers';
 import { supabase } from '@/lib/supabase';
 import { getCurrentDomain, getTempleByDomain } from '@/lib/tenant';
 import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
 import { LY_GIA_PRODUCTS } from '@/lib/ly-gia-products';
 import { toolsWithOwnPage } from '@/lib/fengshui/tools';
 import { SIM_CAREERS } from '@/lib/sim/careers';
@@ -21,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!temple) return [{ url: base, lastModified: new Date() }];
 
   const isLyGia = isLyGiaPhucAnSite(temple);
+  const simStore = isSimStoreEnabled(temple);
   const now = new Date();
 
   const entries: MetadataRoute.Sitemap = [
@@ -40,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${base}/phong-thuy/${tool.slug}`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: tool.slug === 'boi-sim' && isLyGia ? 0.9 : 0.6,
+      priority: tool.slug === 'boi-sim' && simStore ? 0.9 : 0.6,
     });
   }
 
@@ -59,6 +64,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.75,
       });
     }
+  }
+
+  if (simStore) {
     entries.push({
       url: `${base}/sim`,
       lastModified: now,
@@ -80,24 +88,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    // Trang chi tiết từng sim đang bán (tối đa 5000 URL)
-    const { data } = await supabase
-      .from('sim_listings')
-      .select('phone, updated_at')
-      .eq('temple_id', temple.id)
-      .eq('status', 'available')
-      .order('overall_score', { ascending: false })
-      .limit(5000);
+    const warehouseId =
+      (await getSimWarehouseTempleId()) ?? (isLyGia ? temple.id : null);
+    if (warehouseId) {
+      const { data } = await supabase
+        .from('sim_listings')
+        .select('phone, updated_at')
+        .eq('temple_id', warehouseId)
+        .eq('status', 'available')
+        .order('overall_score', { ascending: false })
+        .limit(5000);
 
-    for (const row of data ?? []) {
-      entries.push({
-        url: `${base}/sim/${row.phone}`,
-        lastModified: row.updated_at ? new Date(row.updated_at) : now,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-      });
+      for (const row of data ?? []) {
+        entries.push({
+          url: `${base}/sim/${row.phone}`,
+          lastModified: row.updated_at ? new Date(row.updated_at) : now,
+          changeFrequency: 'weekly',
+          priority: 0.7,
+        });
+      }
     }
-  } else {
+  }
+
+  if (!isLyGia) {
     entries.push({
       url: `${base}/phat-hoc`,
       lastModified: now,

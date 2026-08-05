@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCurrentTemple } from '@/lib/tenant';
 import { isLyGiaPhucAnSite } from '@/lib/ly-gia-phuc-an';
 import { getSitePersona } from '@/lib/site-persona';
+import { WaterPromoBanner } from '@/components/water/WaterPromoBanner';
 import {
   NAV_SECTION_LABELS,
   PHAT_HOC_NAV_ORDER,
@@ -104,6 +105,10 @@ export default async function PhatHocHub() {
         <p className="mt-14 text-xs text-muted leading-relaxed max-w-2xl">
           {tools.length} mục Phật học trong khung hệ thống.
         </p>
+
+        {!isLyGia ? (
+          <WaterPromoBanner primaryColor={primary} templeName={temple.name} />
+        ) : null}
       </div>
     </main>
   );

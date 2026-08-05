@@ -2,7 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCurrentTemple, formatVnd } from '@/lib/tenant';
-import { isLyGiaPhucAnSite, LY_GIA } from '@/lib/ly-gia-phuc-an';
+import { LY_GIA } from '@/lib/ly-gia-phuc-an';
+import {
+  getSimWarehouseTempleId,
+  isSimStoreEnabled,
+} from '@/lib/sim/warehouse';
+import { simStoreContact } from '@/lib/sim/branding';
 import {
   getSimByPhone,
   normalizeSimPhone,
@@ -19,14 +24,18 @@ import { SimScoreRing, VERDICT_COLORS, ELEMENT_BADGE } from '@/components/sim/si
 import { SimCompareForm } from '@/components/sim/SimCompareForm';
 import type { SimListing } from '@/types/database';
 
-export const metadata: Metadata = {
-  title: 'So sánh sim phong thủy — đối chiếu điểm Âm Dương Ngũ Hành từng số | Lý Gia Phúc An',
-  description:
-    'Đặt 2–4 số điện thoại cạnh nhau để so sánh điểm phong thủy, ngũ hành, tổng nút, 5 phương diện tài lộc – sự nghiệp – tình cảm – sức khỏe – quý nhân.',
-};
-
 interface Props {
   searchParams: Promise<Record<string, string | undefined>>;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const temple = await getCurrentTemple();
+  const brand = temple?.name ? ` | ${temple.name}` : '';
+  return {
+    title: `So sánh sim phong thủy — đối chiếu điểm Âm Dương Ngũ Hành${brand}`,
+    description:
+      'Đặt 2–4 số điện thoại cạnh nhau để so sánh điểm phong thủy, ngũ hành, tổng nút, 5 phương diện tài lộc – sự nghiệp – tình cảm – sức khỏe – quý nhân.',
+  };
 }
 
 interface CompareCol {
@@ -46,10 +55,13 @@ interface CompareCol {
 
 export default async function SimComparePage({ searchParams }: Props) {
   const temple = await getCurrentTemple();
-  if (!temple || !isLyGiaPhucAnSite(temple)) notFound();
+  if (!temple || !isSimStoreEnabled(temple)) notFound();
+  const warehouseId = await getSimWarehouseTempleId();
+  if (!warehouseId) notFound();
 
   const sp = await searchParams;
   const primary = temple.primary_color || LY_GIA.primary;
+  const contact = simStoreContact(temple);
 
   const phones = (sp.so ?? '')
     .split(',')
@@ -60,7 +72,7 @@ export default async function SimComparePage({ searchParams }: Props) {
 
   const cols: CompareCol[] = [];
   for (const phone of phones) {
-    const listing = await getSimByPhone(temple.id, phone);
+    const listing = await getSimByPhone(warehouseId, phone);
     if (listing) {
       cols.push({
         phone,
@@ -150,7 +162,7 @@ export default async function SimComparePage({ searchParams }: Props) {
                             className="px-1.5 py-0.5 text-[0.62rem] font-semibold text-white"
                             style={{ backgroundColor: primary }}
                           >
-                            Thầy khuyên chọn
+                            {contact.roleTitle} khuyên chọn
                           </span>
                         ) : null}
                       </div>
@@ -293,7 +305,7 @@ export default async function SimComparePage({ searchParams }: Props) {
             <p className="font-display text-xl text-ink">Nhập ít nhất 2 số để so sánh</p>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted">
               Có thể dán số đang dùng và số định mua — hệ thống chấm điểm cả hai theo
-              cùng một thuật toán với công cụ Bói Sim của thầy.
+              cùng một thuật toán với công cụ Bói Sim của {contact.role}.
             </p>
           </div>
         )}
@@ -302,7 +314,10 @@ export default async function SimComparePage({ searchParams }: Props) {
           <p className="mt-4 text-[0.7rem] leading-relaxed text-muted">
             Điểm số tính bằng engine Âm Dương Ngũ Hành (cặp quái, tổ hợp chế hóa, đuôi số,
             81 số lý, âm dương, tổng nút). Muốn đối chiếu thêm với ngày giờ sinh, mở trang
-            chi tiết từng sim và nhập Bát Tự, hoặc gọi thầy {LY_GIA.phoneDisplay}.
+            chi tiết từng sim và nhập Bát Tự
+            {contact.phoneDisplay
+              ? `, hoặc gọi ${contact.phoneDisplay}.`
+              : '.'}
           </p>
         ) : null}
       </div>

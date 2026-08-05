@@ -81,10 +81,13 @@ export function SimActivationHours({
   birthYear,
   primaryColor,
   compact = false,
+  advisorRole = 'trụ trì',
 }: {
   birthYear?: number;
   primaryColor: string;
   compact?: boolean;
+  /** Viết thường giữa câu: "thầy" / "trụ trì" */
+  advisorRole?: string;
 }) {
   const slots = findActivationSlots(birthYear);
   if (slots.length === 0) return null;
@@ -137,8 +140,8 @@ export function SimActivationHours({
       </div>
       {!compact ? (
         <p className="mt-2.5 text-[0.68rem] leading-relaxed text-muted">
-          Cần khung giờ khớp chính xác Bát Tự (giờ sinh, dụng thần)? Nhắn Zalo — thầy chọn
-          đích danh ngày giờ khai sim miễn phí khi nhận sim.
+          Cần khung giờ khớp chính xác Bát Tự (giờ sinh, dụng thần)? Nhắn Zalo —{' '}
+          {advisorRole} chọn đích danh ngày giờ khai sim khi nhận sim.
         </p>
       ) : null}
     </div>

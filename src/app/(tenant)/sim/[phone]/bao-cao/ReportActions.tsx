@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSitePersona } from '@/components/SitePersonaContext';
 
 export function ReportActions({
   primaryColor,
@@ -9,6 +10,7 @@ export function ReportActions({
   primaryColor: string;
   zaloUrl: string;
 }) {
+  const { role } = useSitePersona();
   const [copied, setCopied] = useState(false);
 
   const copyLink = async () => {
@@ -53,7 +55,7 @@ export function ReportActions({
         rel="noopener noreferrer"
         className="inline-flex h-10 items-center bg-[#0068FF] px-4 text-sm font-medium text-white"
       >
-        Hỏi thầy qua Zalo
+        Hỏi {role} qua Zalo
       </a>
       <p className="basis-full text-[0.68rem] text-muted sm:basis-auto">
         Bấm &ldquo;Tải báo cáo PDF&rdquo; rồi chọn &ldquo;Lưu dưới dạng PDF&rdquo; trong hộp thoại in.

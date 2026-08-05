@@ -131,6 +131,7 @@ export default async function AdminLayout({
           siteUpsell={
             selected ? (isLyGiaDomain(selected.domain) ? 'sim' : 'water') : null
           }
+          simStoreEnabled={Boolean(selected?.sim_store_enabled)}
         />
       </header>
       <div className="mx-auto max-w-6xl px-4 md:px-6 py-8">{children}</div>
