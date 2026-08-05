@@ -1,7 +1,11 @@
 /**
- * Ngân hàng VN — short_name SePay (QR ảnh) + appId deeplink VietQR.io.
- * QR SePay: https://developer.sepay.vn/vi/tien-ich-khac/tao-qr-code
- * Deeplink: https://www.vietqr.io/danh-sach-api/deeplink-app-ngan-hang
+ * Ngân hàng VN — short_name SePay cho ảnh QR vietqr.app/img.
+ *
+ * Lưu ý: vietqr.app (SePay) chỉ sinh **ảnh QR** chứa STK/số tiền/nội dung.
+ * Không có API “chuyển tiếp mở app NH đã điền sẵn”.
+ * dl.vietqr.io/pay mở app trống — không dùng.
+ *
+ * Docs: https://developer.sepay.vn/vi/tien-ich-khac/tao-qr-code
  */
 
 export interface BankApp {
@@ -11,31 +15,21 @@ export interface BankApp {
   /** short_name SePay cho `bank` trên vietqr.app/img */
   shortName: string;
   logo: string;
-  /** appId cho https://dl.vietqr.io/pay?app= */
+  /** id ngắn (vcb, mb…) — dùng mở scheme app nếu có */
   app: string;
-  /** Deeplink autofill theo changelog VietQR.io (MB, ICB, BIDV, ACB, OCB…). */
-  autofill?: boolean;
-}
-
-/** App đã hỗ trợ autofill ba/am/tn/bn qua dl.vietqr.io */
-const AUTOFILL_APP_IDS = new Set(['mb', 'icb', 'bidv', 'acb', 'ocb']);
-
-export function bankSupportsAutofill(
-  bank: Pick<BankApp, 'app' | 'autofill'>,
-): boolean {
-  if (typeof bank.autofill === 'boolean') return bank.autofill;
-  return AUTOFILL_APP_IDS.has(bank.app);
+  /** Scheme mở app NH trực tiếp (không qua dl.vietqr.io). */
+  scheme?: string;
 }
 
 export const POPULAR_BANK_APPS: BankApp[] = [
   {
-    code: 'MB',
-    bin: '970422',
-    name: 'MBBank',
-    shortName: 'MBBank',
-    logo: 'https://cdn.vietqr.io/img/MB.png',
-    app: 'mb',
-    autofill: true,
+    code: 'VCB',
+    bin: '970436',
+    name: 'Vietcombank',
+    shortName: 'Vietcombank',
+    logo: 'https://cdn.vietqr.io/img/VCB.png',
+    app: 'vcb',
+    scheme: 'vietcombankmobile://',
   },
   {
     code: 'ICB',
@@ -44,7 +38,16 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     shortName: 'VietinBank',
     logo: 'https://cdn.vietqr.io/img/ICB.png',
     app: 'icb',
-    autofill: true,
+    scheme: 'vietinbankipay://',
+  },
+  {
+    code: 'MB',
+    bin: '970422',
+    name: 'MBBank',
+    shortName: 'MBBank',
+    logo: 'https://cdn.vietqr.io/img/MB.png',
+    app: 'mb',
+    scheme: 'mbbank://',
   },
   {
     code: 'BIDV',
@@ -53,34 +56,7 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     shortName: 'BIDV',
     logo: 'https://cdn.vietqr.io/img/BIDV.png',
     app: 'bidv',
-    autofill: true,
-  },
-  {
-    code: 'ACB',
-    bin: '970416',
-    name: 'ACB',
-    shortName: 'ACB',
-    logo: 'https://cdn.vietqr.io/img/ACB.png',
-    app: 'acb',
-    autofill: true,
-  },
-  {
-    code: 'OCB',
-    bin: '970448',
-    name: 'OCB',
-    shortName: 'OCB',
-    logo: 'https://cdn.vietqr.io/img/OCB.png',
-    app: 'ocb',
-    autofill: true,
-  },
-  {
-    code: 'VCB',
-    bin: '970436',
-    name: 'Vietcombank',
-    shortName: 'Vietcombank',
-    logo: 'https://cdn.vietqr.io/img/VCB.png',
-    app: 'vcb',
-    autofill: false,
+    scheme: 'bidv://',
   },
   {
     code: 'TCB',
@@ -89,6 +65,16 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     shortName: 'Techcombank',
     logo: 'https://cdn.vietqr.io/img/TCB.png',
     app: 'tcb',
+    scheme: 'tcb://',
+  },
+  {
+    code: 'ACB',
+    bin: '970416',
+    name: 'ACB',
+    shortName: 'ACB',
+    logo: 'https://cdn.vietqr.io/img/ACB.png',
+    app: 'acb',
+    scheme: 'acb://',
   },
   {
     code: 'VPB',
@@ -147,6 +133,14 @@ export const POPULAR_BANK_APPS: BankApp[] = [
     app: 'shb',
   },
   {
+    code: 'OCB',
+    bin: '970448',
+    name: 'OCB',
+    shortName: 'OCB',
+    logo: 'https://cdn.vietqr.io/img/OCB.png',
+    app: 'ocb',
+  },
+  {
     code: 'VBA',
     bin: '970405',
     name: 'Agribank',
@@ -196,11 +190,8 @@ export const POPULAR_BANK_APPS: BankApp[] = [
   },
 ];
 
-/** Ưu tiên NH autofill trước trên lưới thanh toán nhanh. */
-export const POPULAR_BANK_APPS_MOBILE: BankApp[] = [
-  ...POPULAR_BANK_APPS.filter((b) => bankSupportsAutofill(b)),
-  ...POPULAR_BANK_APPS.filter((b) => !bankSupportsAutofill(b)),
-];
+/** Lưới chọn app trên mobile (giữ thứ tự phổ biến). */
+export const POPULAR_BANK_APPS_MOBILE: BankApp[] = POPULAR_BANK_APPS;
 
 /** short_name SePay từ BIN hoặc tên đã cấu hình. */
 export function toSePayBankId(
@@ -216,7 +207,6 @@ export function toSePayBankId(
         b.code.toLowerCase() === name.toLowerCase(),
     );
     if (byName) return byName.shortName;
-    // Đã là short_name / alias hợp lệ (không phải BIN thuần số)
     if (!/^\d{6}$/.test(name)) return name;
   }
   const bin = (bankBin || '').trim();
@@ -236,53 +226,14 @@ export function sanitizeBankAccountHolder(name: string): string {
     .slice(0, 70);
 }
 
-/** Mã NH nhận trong tham số `ba` (app code, vd msb) — fallback BIN. */
-function toRecipientBankCode(recipientBin: string): string {
-  const found = POPULAR_BANK_APPS.find((b) => b.bin === recipientBin);
-  return found?.app ?? recipientBin;
-}
-
-export interface BankPayDeeplinkOptions {
-  amount?: number;
-  transferContent?: string;
-  accountHolder?: string;
-  /** URL trở về sau CK (tuỳ app hỗ trợ). */
-  returnUrl?: string;
-}
-
 /**
- * Deeplink mở app NH thanh toán: https://dl.vietqr.io/pay
- * MB / VietinBank / BIDV / ACB / OCB hỗ trợ autofill STK·số tiền·nội dung.
+ * Mở app NH bằng scheme gốc (không qua dl.vietqr.io).
+ * App mở trống — thông tin CK nằm trong ảnh QR SePay đã lưu.
  */
-export function buildBankPayDeeplink(
-  bankApp: BankApp,
-  recipientAccount: string,
-  recipientBin: string,
-  options: BankPayDeeplinkOptions = {},
-): string {
-  const account = recipientAccount.replace(/\s+/g, '');
-  const bankCode = toRecipientBankCode(recipientBin);
-  const parts: string[] = [
-    `app=${encodeURIComponent(bankApp.app)}`,
-    `ba=${account}@${bankCode}`,
-  ];
-  if (options.amount && options.amount > 0) {
-    parts.push(`am=${Math.round(options.amount)}`);
-  }
-  if (options.transferContent) {
-    parts.push(
-      `tn=${encodeURIComponent(options.transferContent.slice(0, 25))}`,
-    );
-  }
-  const holder = sanitizeBankAccountHolder(options.accountHolder || '')
-    .normalize('NFD')
-    .replace(/\p{M}/gu, '')
-    .toUpperCase();
-  if (holder) {
-    parts.push(`bn=${encodeURIComponent(holder)}`);
-  }
-  if (options.returnUrl) {
-    parts.push(`url=${encodeURIComponent(options.returnUrl)}`);
-  }
-  return `https://dl.vietqr.io/pay?${parts.join('&')}`;
+export function openBankApp(bankApp: BankApp): boolean {
+  if (typeof window === 'undefined') return false;
+  const scheme = bankApp.scheme?.trim();
+  if (!scheme) return false;
+  window.location.href = scheme;
+  return true;
 }

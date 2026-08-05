@@ -4,8 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   POPULAR_BANK_APPS_MOBILE,
-  bankSupportsAutofill,
-  buildBankPayDeeplink,
+  openBankApp,
   type BankApp,
 } from '@/lib/banks';
 import {
@@ -57,9 +56,9 @@ export function PaymentCheckout({
   const [selected, setSelected] = useState<BankApp | null>(null);
   const [status, setStatus] = useState(initialStatus);
   const [copied, setCopied] = useState<string | null>(null);
-  const [qrShareBusy, setQrShareBusy] = useState(false);
-  const [qrShareMsg, setQrShareMsg] = useState<string | null>(null);
-  const [waitingHint, setWaitingHint] = useState(false);
+  const [payBusy, setPayBusy] = useState(false);
+  const [payMsg, setPayMsg] = useState<string | null>(null);
+  const [readyOpenApp, setReadyOpenApp] = useState(false);
 
   const paid = useMemo(
     () =>
@@ -136,42 +135,41 @@ export function PaymentCheckout({
     }
   }
 
-  async function shareQr() {
-    if (!qrUrl || qrShareBusy) return;
-    setQrShareBusy(true);
-    setQrShareMsg(null);
+  /**
+   * Thanh toán nhanh chuẩn SePay: lưu ảnh QR vietqr.app (đủ thông tin),
+   * rồi mới mở app NH để Quét → Chọn ảnh. Không dùng dl.vietqr.io.
+   */
+  async function startQuickPay() {
+    if (!selected || !qrUrl || payBusy) return;
+    setPayBusy(true);
+    setPayMsg(null);
+    setReadyOpenApp(false);
     try {
       const mode = await shareOrSaveVietQrImage(qrUrl, transferContent);
-      setQrShareMsg(
+      setPayMsg(
         mode === 'shared'
-          ? 'Đã mở chia sẻ — chọn «Lưu ảnh» vào Thư viện / Ảnh.'
-          : 'Đã tải ảnh QR vào máy.',
+          ? `Đã lưu mã QR SePay. Mở ${selected.name} → Quét VietQR → Chọn ảnh vừa lưu.`
+          : `Đã tải mã QR SePay. Mở ${selected.name} → Quét VietQR → Chọn ảnh vừa lưu.`,
       );
+      setReadyOpenApp(true);
     } catch {
-      setQrShareMsg(
-        'Không lưu được ảnh — hãy chụp màn hình mã QR phía trên.',
+      setPayMsg(
+        'Không lưu được ảnh tự động — hãy chụp màn hình mã QR, rồi mở app → Quét → Chọn ảnh.',
       );
+      setReadyOpenApp(true);
     } finally {
-      setQrShareBusy(false);
+      setPayBusy(false);
     }
   }
 
-  function openBankPay() {
-    if (!selected || !bank.accountNumber) return;
-    setWaitingHint(true);
-    const returnUrl =
-      typeof window !== 'undefined' ? window.location.href : undefined;
-    window.location.href = buildBankPayDeeplink(
-      selected,
-      bank.accountNumber,
-      bank.bankBin,
-      {
-        amount,
-        transferContent,
-        accountHolder: bank.accountHolder,
-        returnUrl,
-      },
-    );
+  function confirmOpenBank() {
+    if (!selected) return;
+    const opened = openBankApp(selected);
+    if (!opened) {
+      setPayMsg(
+        `Hãy mở app ${selected.name} thủ công → Quét VietQR → Chọn ảnh QR vừa lưu.`,
+      );
+    }
   }
 
   return (
@@ -240,11 +238,26 @@ export function PaymentCheckout({
 
       {isMobile ? (
         <div className="space-y-4">
+          {qrUrl ? (
+            <div className="flex flex-col items-center border border-fog bg-paper px-3 py-4">
+              <p className="mb-2 text-center text-xs font-medium text-ink">
+                Mã QR SePay (vietqr.app) — đủ STK · số tiền · nội dung
+              </p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrUrl}
+                alt="Mã QR VietQR SePay"
+                className="h-auto w-64 border border-fog bg-white p-3"
+              />
+            </div>
+          ) : null}
+
           <div className="border border-fog bg-mist/40 px-3 py-3">
             <h2 className="font-display text-xl text-ink">Thanh toán nhanh</h2>
             <p className="mt-1 text-sm text-muted">
-              Chọn app ngân hàng của bạn → mở app, điền sẵn STK · số tiền · nội
-              dung → xác nhận chuyển khoản.
+              Chọn app ngân hàng → lưu mã QR SePay → mở app →{' '}
+              <span className="font-medium text-ink">Quét VietQR → Chọn ảnh</span>{' '}
+              vừa lưu (thông tin tự điền).
             </p>
             <div className="mt-3 grid max-h-[36vh] grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4">
               {POPULAR_BANK_APPS_MOBILE.map((b) => {
@@ -253,14 +266,14 @@ export function PaymentCheckout({
                   <button
                     key={b.code}
                     type="button"
-                    onClick={() => setSelected(b)}
+                    onClick={() => {
+                      setSelected(b);
+                      setReadyOpenApp(false);
+                      setPayMsg(null);
+                    }}
                     aria-label={b.name}
-                    title={
-                      bankSupportsAutofill(b)
-                        ? `${b.name} — điền sẵn thông tin`
-                        : b.name
-                    }
-                    className={`relative flex aspect-square items-center justify-center border p-1 transition-colors ${
+                    title={b.name}
+                    className={`flex aspect-square items-center justify-center border p-1 transition-colors ${
                       active
                         ? 'border-ink bg-paper'
                         : 'border-ink/15 bg-paper hover:border-ink/35'
@@ -276,59 +289,51 @@ export function PaymentCheckout({
                 );
               })}
             </div>
-            <button
-              type="button"
-              disabled={!selected}
-              onClick={openBankPay}
-              className="mt-3 w-full py-3.5 text-sm font-medium text-white disabled:opacity-40"
-              style={{ backgroundColor: primaryColor }}
-            >
-              {selected
-                ? `Thanh toán bằng ${selected.name}`
-                : 'Chọn ngân hàng để thanh toán'}
-            </button>
-            {selected && !bankSupportsAutofill(selected) ? (
-              <p className="mt-2 text-center text-[0.7rem] leading-relaxed text-muted">
-                {selected.name} có thể chỉ mở app — nếu form trống, quét mã QR
-                SePay bên dưới.
-              </p>
-            ) : null}
-          </div>
 
-          {qrUrl ? (
-            <div className="flex flex-col items-center border border-fog bg-paper px-3 py-4">
-              <p className="mb-2 text-center text-xs text-muted">
-                Hoặc quét / lưu mã QR SePay
-              </p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={qrUrl}
-                alt="Mã QR VietQR SePay"
-                className="h-auto w-56 border border-fog bg-white p-3"
-              />
+            {!readyOpenApp ? (
               <button
                 type="button"
-                disabled={qrShareBusy}
-                onClick={() => void shareQr()}
-                className="mt-3 w-full max-w-xs border border-ink/20 bg-paper py-2.5 text-sm text-ink disabled:opacity-40"
+                disabled={!selected || !qrUrl || payBusy}
+                onClick={() => void startQuickPay()}
+                className="mt-3 w-full py-3.5 text-sm font-medium text-white disabled:opacity-40"
+                style={{ backgroundColor: primaryColor }}
               >
-                {qrShareBusy ? 'Đang lưu ảnh QR…' : 'Lưu mã QR vào máy'}
+                {!selected
+                  ? 'Chọn ngân hàng để thanh toán'
+                  : payBusy
+                    ? 'Đang lưu mã QR SePay…'
+                    : `Thanh toán bằng ${selected.name}`}
               </button>
-              {qrShareMsg ? (
-                <p className="mt-2 max-w-xs text-center text-xs text-[#1B6B3A]">
-                  {qrShareMsg}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+            ) : (
+              <div className="mt-3 space-y-2 border border-[#1B6B3A]/30 bg-[#1B6B3A]/5 px-3 py-3">
+                {payMsg ? (
+                  <p className="text-sm leading-relaxed text-ink">{payMsg}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={confirmOpenBank}
+                  className="w-full py-3.5 text-sm font-medium text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  Mở app {selected?.name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReadyOpenApp(false);
+                    setPayMsg(null);
+                  }}
+                  className="w-full py-2 text-xs text-muted underline underline-offset-2"
+                >
+                  Chọn lại ngân hàng
+                </button>
+              </div>
+            )}
+          </div>
 
           <WaitingSpinner
             primaryColor={primaryColor}
-            label={
-              waitingHint
-                ? 'Đã mở app ngân hàng — đang chờ tiền vào…'
-                : 'Đang chờ xác nhận thanh toán…'
-            }
+            label="Đang chờ xác nhận thanh toán…"
           />
         </div>
       ) : (
@@ -343,7 +348,8 @@ export function PaymentCheckout({
               />
             ) : null}
             <p className="mt-3 max-w-xs text-center text-xs text-muted">
-              Quét QR bằng app ngân hàng. Số tiền và nội dung CK đã điền sẵn.
+              Quét QR SePay bằng app ngân hàng. Số tiền và nội dung CK đã điền
+              sẵn.
             </p>
           </div>
           <div className="flex min-h-[240px] flex-col items-center justify-center border border-fog bg-mist/50 px-6 py-10">
