@@ -5,7 +5,11 @@
  *
  * QR thanh toán dùng SePay VietQR: https://vietqr.app/img
  * Docs: https://developer.sepay.vn/vi/tien-ich-khac/tao-qr-code
+ *
+ * MSB bắt buộc VA — COMPANY_BANK_ACCOUNT_NUMBER phải là số VA nhận tiền.
  */
+
+import { toSePayBankId } from '@/lib/banks';
 
 export interface CompanyBankAccount {
   bankName: string;
@@ -96,7 +100,7 @@ export function toVietQrTransferContent(orderCode: string): string {
 
 /**
  * Sinh URL ảnh VietQR SePay: https://vietqr.app/img?...
- * Truyền đủ bank · acc · amount · des · holder để quét app NH điền sẵn.
+ * `bank` = short_name SePay (MSB, Vietcombank…); `acc` = STK hoặc VA.
  */
 export function buildVietQrUrl(
   bank: Pick<
@@ -108,11 +112,7 @@ export function buildVietQrUrl(
   const accountNumber = (bank.accountNumber || '').replace(/\s+/g, '');
   if (!accountNumber) return null;
 
-  /** SePay nhận code / bin / short_name / alias — ưu tiên tên ngắn (MSB). */
-  const bankId =
-    (bank.bankName || '').trim() ||
-    (bank.bankBin || '').trim() ||
-    'MSB';
+  const bankId = toSePayBankId(bank.bankName, bank.bankBin);
 
   const params = new URLSearchParams();
   params.set('acc', accountNumber);
@@ -145,12 +145,12 @@ export function buildVietQrUrl(
 }
 
 /**
- * URL same-origin proxy ảnh QR — tránh CORS khi lưu/chia sẻ trên mobile.
+ * URL same-origin proxy ảnh QR SePay — tránh CORS khi lưu/chia sẻ trên mobile.
  */
 export function toProxiedVietQrUrl(qrUrl: string): string {
   try {
     const u = new URL(qrUrl);
-    if (u.hostname !== 'vietqr.app' && u.hostname !== 'img.vietqr.io') {
+    if (u.hostname !== 'vietqr.app') {
       return qrUrl;
     }
     return `/api/vietqr${u.search}`;

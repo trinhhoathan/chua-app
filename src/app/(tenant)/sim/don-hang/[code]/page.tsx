@@ -36,6 +36,7 @@ function resolveBank(opts: {
     const found = POPULAR_BANK_APPS.find(
       (b) =>
         bankName.toLowerCase().includes(b.name.toLowerCase()) ||
+        bankName.toLowerCase().includes(b.shortName.toLowerCase()) ||
         bankName.toUpperCase().includes(b.code),
     );
     bin = found?.bin ?? '';

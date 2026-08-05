@@ -259,7 +259,7 @@ export function EditTempleBasicsForm({ temple }: { temple: TempleBasics }) {
                 (b) => b.code === e.target.value,
               );
               if (bank) {
-                setBankName(bank.name);
+                setBankName(bank.shortName);
                 setBankBin(bank.bin);
               } else {
                 setBankName('');
