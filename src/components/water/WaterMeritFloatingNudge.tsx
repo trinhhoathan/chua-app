@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   WATER_NUDGE_EVENT,
   dismissNudge,
@@ -25,6 +26,7 @@ export function WaterMeritFloatingNudge({
   templeName,
   templeId,
 }: Props) {
+  const pathname = usePathname();
   const [source, setSource] = useState<WaterNudgeSource | null>(null);
 
   useEffect(() => {
@@ -40,6 +42,7 @@ export function WaterMeritFloatingNudge({
     return () => window.removeEventListener(WATER_NUDGE_EVENT, onNudge);
   }, [templeId]);
 
+  if (pathname?.startsWith('/huong-dan')) return null;
   if (!source) return null;
 
   const label =

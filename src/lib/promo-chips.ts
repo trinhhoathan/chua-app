@@ -141,12 +141,17 @@ export function waterPromoBlockedPath(pathname: string): boolean {
   return (
     pathname.startsWith('/dat-nuoc') ||
     pathname.startsWith('/quan-tri') ||
-    pathname.startsWith('/sim')
+    pathname.startsWith('/sim') ||
+    pathname.startsWith('/huong-dan')
   );
 }
 
 export function simPromoBlockedPath(pathname: string): boolean {
-  return pathname.startsWith('/sim') || pathname.startsWith('/quan-tri');
+  return (
+    pathname.startsWith('/sim') ||
+    pathname.startsWith('/quan-tri') ||
+    pathname.startsWith('/huong-dan')
+  );
 }
 
 /** Nước đủ điều kiện hiện (chưa tính delay timer). */

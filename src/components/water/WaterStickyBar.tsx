@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createWaterOrder } from '@/app/actions/orders';
 import {
   OPEN_WATER_DONATE_EVENT,
@@ -27,6 +27,7 @@ export function WaterStickyBar({
   unitPrice,
   templeName,
 }: Props) {
+  const pathname = usePathname();
   const router = useRouter();
   const [qty, setQty] = useState(MIN_QTY);
   const [open, setOpen] = useState(false);
@@ -84,6 +85,8 @@ export function WaterStickyBar({
       );
     });
   }
+
+  if (pathname?.startsWith('/huong-dan')) return null;
 
   return (
     <>
